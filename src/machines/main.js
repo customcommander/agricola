@@ -1,12 +1,18 @@
 const { createMachine } = require('xstate');
 const { assign } = require('xstate/lib/actions');
 
-module.exports = createMachine({
+module.exports = () => createMachine({
   id: 'game',
   context: {
     turn: 1,
     numWorkers: 2,
-    numWorkersRemaining: 2
+    numWorkersRemaining: 2,
+    taskTakeXWood: {
+      wood: 2,
+      label: 'Take {{wood}} wood',
+      selected: false,
+      available: true
+    }
   },
   initial: 'start',
   states: {
@@ -22,10 +28,7 @@ module.exports = createMachine({
           initial: 'setup',
           states: {
             setup: {
-              entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
-                turn: numWorkersRemaining == 0 ? turn + 1 : turn,
-                numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
-              })),
+              entry: 'taskSetup',
               always: {
                 target: 'pick'
               }
@@ -81,6 +84,24 @@ module.exports = createMachine({
     }
   }
 }, {
+  actions: {
+    taskSetup: assign(ctx => {
+      const {turn, numWorkers, numWorkersRemaining} = ctx;
+
+      const isNewTurn = numWorkersRemaining == 0;
+
+      ctx.turn = isNewTurn ? turn + 1 : turn;
+      ctx.numWorkersRemaining = isNewTurn ? numWorkers - 1 : numWorkersRemaining - 1;
+
+      if (isNewTurn) {
+        ctx.taskTakeXWood.wood += 2;
+        ctx.taskTakeXWood.selected = false;
+        ctx.taskTakeXWood.available = true;
+      }
+
+      return ctx;
+    })
+  },
   guards: {
     endOfStage: ({turn, numWorkersRemaining}) =>
       numWorkersRemaining == 0 && (  turn === 4

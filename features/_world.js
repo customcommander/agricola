@@ -1,13 +1,13 @@
 const { setWorldConstructor, World } = require('@cucumber/cucumber');
 const {interpret} = require('xstate');
-const machine = require('../src/machines/main');
+const getMachine = require('../src/machines/main');
 
 setWorldConstructor(class extends World {
   machine = null;
 
   constructor(options) {
     super(options);
-    this.machine = machine;
+    this.machine = getMachine();
   }
 
   start() {
@@ -28,6 +28,18 @@ setWorldConstructor(class extends World {
     const state = this.service.getSnapshot();
     if (state.matches('harvest')) return;
     throw new Error(`This is not harvest time (${state.value}).`);
+  }
+
+  assertActionStock(action, stock) {
+    const {context} = this.service.getSnapshot();
+    let actual;
+    let expected;
+    if (action == 'Take X Wood') {
+      actual = context.taskTakeXWood.wood;
+      expected = parseInt(stock);
+    }
+    if (actual == expected) return;
+    throw new Error(`Expected '${action}' to have ${stock} but got ${actual}`);
   }
 
   assertIsEndOfGame() {

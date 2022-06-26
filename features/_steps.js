@@ -16,6 +16,12 @@ When('I am done harvesting', function () {
   this.completeHarvest();
 });
 
+Then('the actions should be:', function (table) {
+  for ([action, stock] of table.raw()) {
+    this.assertActionStock(action, stock);
+  }
+});
+
 Then('the game ends', function () {
   this.assertIsEndOfGame();
 });

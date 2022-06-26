@@ -1,7 +1,7 @@
-Feature: Basic functionalities
-
 @taskMachine1
 @harvestMachine1
+Feature: Basic functionalities
+
 Scenario: End of game
   # Stage 1
   Given I start a new game
@@ -36,3 +36,18 @@ Scenario: End of game
   # End of game
   When I am done harvesting
   Then the game ends
+
+Scenario: Setup
+  Given I start a new game
+  Then the actions should be:
+    | Take X Wood | 2 wood |
+
+Scenario: Replenish
+  Given I start a new game
+  When I complete 1 round
+  Then the actions should be:
+    | Take X Wood | 4 wood |
+
+  When I complete 1 round
+  Then the actions should be:
+    | Take X Wood | 6 wood |
