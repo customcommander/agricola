@@ -16,35 +16,54 @@ module.exports = createMachine({
       }
     },
     work: {
-      initial: 'setup',
+      type: 'parallel',
       states: {
-        setup: {
-          entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
-            turn: numWorkersRemaining == 0 ? turn + 1 : turn,
-            numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
-          })),
-          always: {
-            target: 'perform'
-          },
-        },
-        perform: {
-          invoke: [
-            { id:'task-machine', src: 'taskMachine'}
-          ],
-          on: {
-            TASK_ABANDONED: {
-              target: 'setup',
-              actions: assign(({numWorkersRemaining}) => ({
-                numWorkersRemaining: numWorkersRemaining + 1
-              }))
+        task: {
+          initial: 'setup',
+          states: {
+            setup: {
+              entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
+                turn: numWorkersRemaining == 0 ? turn + 1 : turn,
+                numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
+              })),
+              always: {
+                target: 'pick'
+              }
             },
-            TASK_COMPLETED: [
-              { target: '#game.harvest', cond: 'endOfStage'},
-              { target: 'setup' },
-            ]
+            pick: {
+              on: {
+                TASK_SELECTED: {
+                  target: 'perform'
+                }
+              }
+            },
+            perform: {
+              invoke: {
+                src: 'taskMachine'
+              },
+              on: {
+                TASK_ABANDONED: {
+                  target: 'pick',
+                  actions: assign(({numWorkersRemaining}) => ({
+                    numWorkersRemaining: numWorkersRemaining + 1
+                  }))
+                },
+                TASK_COMPLETED: [
+                  { target: '#game.harvest', cond: 'endOfStage'},
+                  { target: 'setup' },
+                ]
+              }
+            }
+          }
+        },
+        activity: {
+          initial: 'pick',
+          states: {
+            pick: {},
+            perform: {}
           }
         }
-      },
+      }
     },
     harvest: {
       invoke: {
