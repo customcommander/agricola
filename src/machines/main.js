@@ -7,9 +7,21 @@ module.exports = () => createMachine({
     turn: 1,
     numWorkers: 2,
     numWorkersRemaining: 2,
-    taskTakeXWood: {
+    takeXWood: {
       wood: 2,
       label: 'Take {{wood}} wood',
+      selected: false,
+      available: true
+    },
+    takeXClay: {
+      clay: 1,
+      label: 'Take %n clay',
+      selected: false,
+      available: true
+    },
+    takeXReed: {
+      reed: 1,
+      label: 'Take %n reed',
       selected: false,
       available: true
     }
@@ -94,9 +106,17 @@ module.exports = () => createMachine({
       ctx.numWorkersRemaining = isNewTurn ? numWorkers - 1 : numWorkersRemaining - 1;
 
       if (isNewTurn) {
-        ctx.taskTakeXWood.wood += 2;
-        ctx.taskTakeXWood.selected = false;
-        ctx.taskTakeXWood.available = true;
+        ctx.takeXWood.wood += 2;
+        ctx.takeXWood.selected = false;
+        ctx.takeXWood.available = true;
+
+        ctx.takeXClay.clay += 1;
+        ctx.takeXClay.selected = false;
+        ctx.takeXClay.available = true;
+
+        ctx.takeXReed.reed += 1;
+        ctx.takeXReed.selected = false;
+        ctx.takeXReed.available = true;
       }
 
       return ctx;

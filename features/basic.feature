@@ -41,13 +41,19 @@ Scenario: Setup
   Given I start a new game
   Then the actions should be:
     | Take X Wood | 2 wood |
+    | Take X Clay | 1 clay |
+    | Take X Reed | 1 reed |
 
 Scenario: Replenish
   Given I start a new game
   When I complete 1 round
   Then the actions should be:
     | Take X Wood | 4 wood |
+    | Take X Clay | 2 clay |
+    | Take X Reed | 2 reed |
 
   When I complete 1 round
   Then the actions should be:
     | Take X Wood | 6 wood |
+    | Take X Clay | 3 clay |
+    | Take X Reed | 3 reed |

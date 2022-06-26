@@ -35,7 +35,15 @@ setWorldConstructor(class extends World {
     let actual;
     let expected;
     if (action == 'Take X Wood') {
-      actual = context.taskTakeXWood.wood;
+      actual = context.takeXWood.wood;
+      expected = parseInt(stock);
+    }
+    if (action == 'Take X Clay') {
+      actual = context.takeXClay.clay;
+      expected = parseInt(stock);
+    }
+    if (action == 'Take X Reed') {
+      actual = context.takeXReed.reed;
       expected = parseInt(stock);
     }
     if (actual == expected) return;
