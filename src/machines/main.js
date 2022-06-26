@@ -8,8 +8,13 @@ module.exports = createMachine({
     numWorkers: 2,
     numWorkersRemaining: 2
   },
-  initial: 'work',
+  initial: 'start',
   states: {
+    start: {
+      always: {
+        target: 'work'
+      }
+    },
     work: {
       entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
         turn: numWorkersRemaining == 0 ? turn + 1 : turn,
