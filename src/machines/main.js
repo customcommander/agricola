@@ -16,33 +16,31 @@ module.exports = createMachine({
       }
     },
     work: {
-      initial: 'pick_task',
+      initial: 'setup',
       states: {
-        pick_task: {
+        setup: {
           entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
             turn: numWorkersRemaining == 0 ? turn + 1 : turn,
             numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
           })),
-          on: {
-            TASK_SELECTED: {
-              target: 'perform_task'
-            }
+          always: {
+            target: 'perform'
           },
         },
-        perform_task: {
-          invoke: {
-            src: 'taskMachine'
-          },
+        perform: {
+          invoke: [
+            { id:'task-machine', src: 'taskMachine'}
+          ],
           on: {
             TASK_ABANDONED: {
-              target: 'pick_task',
+              target: 'setup',
               actions: assign(({numWorkersRemaining}) => ({
                 numWorkersRemaining: numWorkersRemaining + 1
               }))
             },
             TASK_COMPLETED: [
               { target: '#game.harvest', cond: 'endOfStage'},
-              { target: 'pick_task' },
+              { target: 'setup' },
             ]
           }
         }

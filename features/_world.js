@@ -17,7 +17,7 @@ setWorldConstructor(class extends World {
 
   completeNTurn(n) {
     const numWorkers = this.machine.context.numWorkers;
-    this.service.send(Array(n * numWorkers).fill(['TASK_SELECTED', 'TASK_COMPLETED']).flat(1));
+    this.service.send(Array(n * numWorkers).fill('TASK_COMPLETED'));
   }
 
   completeHarvest() {
