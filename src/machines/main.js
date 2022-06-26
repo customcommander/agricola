@@ -16,25 +16,37 @@ module.exports = createMachine({
       }
     },
     work: {
-      entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
-        turn: numWorkersRemaining == 0 ? turn + 1 : turn,
-        numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
-      })),
-      invoke: {
-        src: 'taskMachine'
-      },
-      on: {
-        TASK_ABANDONED: {
-          target: 'work',
-          actions: assign(({numWorkersRemaining}) => ({
-            numWorkersRemaining: numWorkersRemaining + 1
-          }))
+      initial: 'pick_task',
+      states: {
+        pick_task: {
+          entry: assign(({turn, numWorkers, numWorkersRemaining}) => ({
+            turn: numWorkersRemaining == 0 ? turn + 1 : turn,
+            numWorkersRemaining: numWorkersRemaining == 0 ? numWorkers - 1 : numWorkersRemaining - 1
+          })),
+          on: {
+            TASK_SELECTED: {
+              target: 'perform_task'
+            }
+          },
         },
-        TASK_COMPLETED: [
-          { target: 'harvest', cond: 'endOfStage'},
-          { target: 'work' },
-        ]
-      }
+        perform_task: {
+          invoke: {
+            src: 'taskMachine'
+          },
+          on: {
+            TASK_ABANDONED: {
+              target: 'pick_task',
+              actions: assign(({numWorkersRemaining}) => ({
+                numWorkersRemaining: numWorkersRemaining + 1
+              }))
+            },
+            TASK_COMPLETED: [
+              { target: '#game.harvest', cond: 'endOfStage'},
+              { target: 'pick_task' },
+            ]
+          }
+        }
+      },
     },
     harvest: {
       invoke: {
