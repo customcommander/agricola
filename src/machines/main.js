@@ -1,5 +1,7 @@
 const { createMachine } = require('xstate');
 const { assign } = require('xstate/lib/actions');
+const taskMachine = require('./task');
+const harvestMachine = require('./harvest');
 
 module.exports = () => createMachine({
   id: 'game',
@@ -132,5 +134,9 @@ module.exports = () => createMachine({
                                   || turn === 14),
 
     notEndOfGame: ({turn}) => turn < 14
+  },
+  services: {
+    taskMachine,
+    harvestMachine
   }
 });

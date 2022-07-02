@@ -1,5 +1,3 @@
-@taskMachine1
-@harvestMachine1
 Feature: Basic functionalities
 
 Scenario: End of game
