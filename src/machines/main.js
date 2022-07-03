@@ -1,4 +1,4 @@
-const { createMachine } = require('xstate');
+const { createMachine, spawn, send } = require('xstate');
 const { assign } = require('xstate/lib/actions');
 const taskMachine = require('./task');
 const harvestMachine = require('./harvest');
@@ -52,12 +52,13 @@ module.exports = () => createMachine({
                 TASK_SELECTED: {
                   target: 'perform'
                 }
-              }
+              },
+              exit: assign({
+                task: () => spawn(taskMachine())
+              })
             },
             perform: {
-              invoke: {
-                src: 'taskMachine'
-              },
+              entry: send('START', {to: ({task}) => task}),
               on: {
                 TASK_ABANDONED: {
                   target: 'pick',
@@ -136,7 +137,6 @@ module.exports = () => createMachine({
     notEndOfGame: ({turn}) => turn < 14
   },
   services: {
-    taskMachine,
     harvestMachine
   }
 });

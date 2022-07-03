@@ -2,9 +2,11 @@ const { createMachine } = require("xstate");
 
 module.exports = () => createMachine({
   id: 'task-machine',
-  initial: 'done',
+  initial: 'init',
   states: {
-    done: {
+    init: {
+    },
+    start: {
       type: 'final'
     }
   }
