@@ -17,7 +17,10 @@ setWorldConstructor(class extends World {
 
   completeNTurn(n) {
     const numWorkers = this.machine.context.numWorkers;
-    this.service.send(Array(n * numWorkers).fill(['TASK_SELECTED', 'TASK_COMPLETED']).flat(1));
+    const max = n * numWorkers;
+    for (let i = 0; i < max; i++) {
+      this.service.send('TASK_SELECTED');
+    }
   }
 
   completeHarvest() {
@@ -27,7 +30,7 @@ setWorldConstructor(class extends World {
   assertIsHarvestTime() {
     const state = this.service.getSnapshot();
     if (state.matches('harvest')) return;
-    throw new Error(`This is not harvest time (${state.value}).`);
+    throw new Error(`This is not harvest time (${JSON.stringify(state.value, null, 2)}).`);
   }
 
   assertActionStock(action, stock) {

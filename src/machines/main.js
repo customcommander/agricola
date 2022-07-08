@@ -50,15 +50,15 @@ module.exports = () => createMachine({
             pick: {
               on: {
                 TASK_SELECTED: {
-                  target: 'perform'
-                }
-              },
-              exit: assign({
-                task: () => spawn(taskMachine())
-              })
+                  target: 'perform',
+                  actions: assign({taskRef: () => spawn(taskMachine())})
+                },
+              }
             },
             perform: {
-              entry: send('START', {to: ({task}) => task}),
+              entry: [
+                send({type: 'START'}, {to: ctx => ctx.taskRef})
+              ],
               on: {
                 TASK_ABANDONED: {
                   target: 'pick',
@@ -72,7 +72,7 @@ module.exports = () => createMachine({
                 ]
               }
             }
-          }
+          },
         },
         activity: {
           initial: 'pick',
@@ -127,12 +127,12 @@ module.exports = () => createMachine({
   },
   guards: {
     endOfStage: ({turn, numWorkersRemaining}) =>
-      numWorkersRemaining == 0 && (  turn === 4
-                                  || turn === 7
-                                  || turn === 9
-                                  || turn === 11
-                                  || turn === 13
-                                  || turn === 14),
+      numWorkersRemaining == 0 && (  turn === 4  /* end of stage 1 */
+                                  || turn === 7  /* end of stage 2 */
+                                  || turn === 9  /* end of stage 3 */
+                                  || turn === 11 /* end of stage 4 */
+                                  || turn === 13 /* end of stage 5 */
+                                  || turn === 14 /* end of stage 6 */),
 
     notEndOfGame: ({turn}) => turn < 14
   },
