@@ -55,3 +55,8 @@ Scenario: Replenish
     | Take X Wood | 6 wood |
     | Take X Clay | 3 clay |
     | Take X Reed | 3 reed |
+
+Scenario: Core Actions
+  Given I start a new game
+  When I complete the "take x wood" action
+  Then I have 2 wood in my reserve

@@ -1,6 +1,7 @@
 const { setWorldConstructor, World } = require('@cucumber/cucumber');
 const {interpret} = require('xstate');
 const getMachine = require('../src/machines/main');
+const taskTakeXWood = require('../src/machines/task-take-x-wood');
 
 setWorldConstructor(class extends World {
   machine = null;
@@ -57,5 +58,18 @@ setWorldConstructor(class extends World {
     const state = this.service.getSnapshot();
     if (state.matches('end')) return;
     throw new Error(`The game has not ended yet (${state.value}).`);
+  }
+
+  assertReserve(material, expected) {
+    const state = this.service.getSnapshot();
+    const actual = state.context.reserve[material];
+    if (actual == expected) return;
+    throw new Error(`Expected ${expected} ${material} in the reserve but got ${actual} instead.`);
+  }
+
+  takeXWood() {
+    const state = this.service.getSnapshot();
+    this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
+    this.service.send({type: 'TASK_COMPLETED', update: taskTakeXWood.generateUpdate(state.context)});
   }
 });

@@ -22,6 +22,16 @@ Then('the actions should be:', function (table) {
   }
 });
 
+When('I complete the {string} action', function (action) {
+  if (action == 'take x wood') {
+    this.takeXWood();
+  }
+});
+
+Then('I have {int} {word} in my reserve', function (num, material) {
+  this.assertReserve(material, num);
+});
+
 Then('the game ends', function () {
   this.assertIsEndOfGame();
 });

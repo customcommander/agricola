@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jiff": "^0.7.3",
     "xstate": "^4.32.1"
   },
   "devDependencies": {

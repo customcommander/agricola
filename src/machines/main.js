@@ -1,6 +1,8 @@
 const { createMachine, spawn, send } = require('xstate');
 const { assign } = require('xstate/lib/actions');
+const {patchInPlace: mutate} = require('jiff');
 const taskMachine = require('./task');
+const taskTakeXWood = require('./task-take-x-wood');
 const harvestMachine = require('./harvest');
 
 module.exports = () => createMachine({
@@ -9,6 +11,9 @@ module.exports = () => createMachine({
     turn: 1,
     numWorkers: 2,
     numWorkersRemaining: 2,
+    reserve: {
+      wood: 0
+    },
     takeXWood: {
       wood: 2,
       label: 'Take {{wood}} wood',
@@ -42,7 +47,9 @@ module.exports = () => createMachine({
           initial: 'setup',
           states: {
             setup: {
-              entry: 'taskSetup',
+              entry: [
+                'taskSetup'
+              ],
               always: {
                 target: 'pick'
               }
@@ -51,7 +58,12 @@ module.exports = () => createMachine({
               on: {
                 TASK_SELECTED: {
                   target: 'perform',
-                  actions: assign({taskRef: () => spawn(taskMachine())})
+                  actions: assign({
+                    taskRef: (ctx, e) => spawn(
+                      e.task == 'take-x-wood'
+                        ? taskTakeXWood(ctx)
+                        : taskMachine())
+                  })
                 },
               }
             },
@@ -70,7 +82,11 @@ module.exports = () => createMachine({
                   { target: '#game.harvest', cond: 'endOfStage'},
                   { target: 'setup' },
                 ]
-              }
+              },
+              exit: assign((ctx, ev) => {
+                if (ev.type != 'TASK_COMPLETED') return ctx;
+                return mutate(ev.update, ctx);
+              })
             }
           },
         },
