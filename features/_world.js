@@ -1,7 +1,6 @@
 const { setWorldConstructor, World } = require('@cucumber/cucumber');
 const {interpret} = require('xstate');
 const getMachine = require('../src/machines/main');
-const taskTakeXWood = require('../src/machines/task-take-x-wood');
 
 setWorldConstructor(class extends World {
   machine = null;
@@ -20,7 +19,8 @@ setWorldConstructor(class extends World {
     const numWorkers = this.machine.context.numWorkers;
     const max = n * numWorkers;
     for (let i = 0; i < max; i++) {
-      this.service.send('TASK_SELECTED');
+      this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
+      this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
     }
   }
 
@@ -39,15 +39,15 @@ setWorldConstructor(class extends World {
     let actual;
     let expected;
     if (action == 'Take X Wood') {
-      actual = context.takeXWood.wood;
+      actual = context.task['take-x-wood'].wood;
       expected = parseInt(stock);
     }
     if (action == 'Take X Clay') {
-      actual = context.takeXClay.clay;
+      actual = context.task['take-x-clay'].clay;
       expected = parseInt(stock);
     }
     if (action == 'Take X Reed') {
-      actual = context.takeXReed.reed;
+      actual = context.task['take-x-reed'].reed;
       expected = parseInt(stock);
     }
     if (actual == expected) return;
@@ -68,8 +68,7 @@ setWorldConstructor(class extends World {
   }
 
   takeXWood() {
-    const state = this.service.getSnapshot();
     this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
-    this.service.send({type: 'TASK_COMPLETED', update: taskTakeXWood.generateUpdate(state.context)});
+    this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
   }
 });

@@ -1,8 +1,7 @@
 const { createMachine, spawn, send } = require('xstate');
 const { assign } = require('xstate/lib/actions');
 const {patchInPlace: mutate} = require('jiff');
-const taskMachine = require('./task');
-const taskTakeXWood = require('./task-take-x-wood');
+const task = require('./task/index.js');
 const harvestMachine = require('./harvest');
 
 module.exports = () => createMachine({
@@ -12,26 +11,24 @@ module.exports = () => createMachine({
     numWorkers: 2,
     numWorkersRemaining: 2,
     reserve: {
-      wood: 0
+      wood: 0,
+      clay: 0,
+      reed: 0
     },
-    takeXWood: {
-      wood: 2,
-      label: 'Take {{wood}} wood',
-      selected: false,
-      available: true
+    task: {
+      'take-x-wood': {
+        wood: 2,
+        selected: false,
+      },
+      'take-x-clay': {
+        clay: 1,
+        selected: false,
+      },
+      'take-x-reed': {
+        reed: 1,
+        selected: false,
+      }
     },
-    takeXClay: {
-      clay: 1,
-      label: 'Take %n clay',
-      selected: false,
-      available: true
-    },
-    takeXReed: {
-      reed: 1,
-      label: 'Take %n reed',
-      selected: false,
-      available: true
-    }
   },
   initial: 'start',
   states: {
@@ -58,13 +55,8 @@ module.exports = () => createMachine({
               on: {
                 TASK_SELECTED: {
                   target: 'perform',
-                  actions: assign({
-                    taskRef: (ctx, e) => spawn(
-                      e.task == 'take-x-wood'
-                        ? taskTakeXWood(ctx)
-                        : taskMachine())
-                  })
-                },
+                  actions: assign({taskRef: (ctx, e) => spawn(task[e.task](ctx))})
+                }
               }
             },
             perform: {
@@ -85,7 +77,7 @@ module.exports = () => createMachine({
               },
               exit: assign((ctx, ev) => {
                 if (ev.type != 'TASK_COMPLETED') return ctx;
-                return mutate(ev.update, ctx);
+                return mutate(task[ev.task].onTaskCompleted(ctx), ctx);
               })
             }
           },
@@ -125,17 +117,9 @@ module.exports = () => createMachine({
       ctx.numWorkersRemaining = isNewTurn ? numWorkers - 1 : numWorkersRemaining - 1;
 
       if (isNewTurn) {
-        ctx.takeXWood.wood += 2;
-        ctx.takeXWood.selected = false;
-        ctx.takeXWood.available = true;
-
-        ctx.takeXClay.clay += 1;
-        ctx.takeXClay.selected = false;
-        ctx.takeXClay.available = true;
-
-        ctx.takeXReed.reed += 1;
-        ctx.takeXReed.selected = false;
-        ctx.takeXReed.available = true;
+        mutate(task['take-x-wood'].onNewTurn(ctx), ctx);
+        mutate(task['take-x-clay'].onNewTurn(ctx), ctx);
+        mutate(task['take-x-reed'].onNewTurn(ctx), ctx);
       }
 
       return ctx;
