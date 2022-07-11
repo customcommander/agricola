@@ -61,7 +61,7 @@ module.exports = () => createMachine({
                     if (taskNotAvail) {
                       return escalate({message: `action '${taskId}' is not available.`});
                     }
-                    return assign({taskRef: () => spawn(task[e.task](ctx))})
+                    return assign({taskRef: () => spawn(task[taskId](ctx))})
                   })
                 }
               }

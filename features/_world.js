@@ -71,4 +71,9 @@ setWorldConstructor(class extends World {
     this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
     this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
   }
+
+  takeXClay() {
+    this.service.send({type: 'TASK_SELECTED', task: 'take-x-clay'});
+    this.service.send({type: 'TASK_COMPLETED', task: 'take-x-clay'});
+  }
 });

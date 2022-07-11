@@ -26,6 +26,9 @@ When('I complete the {string} action', function (action) {
   if (action == 'take x wood') {
     this.takeXWood();
   }
+  if (action == 'take x clay') {
+    this.takeXClay();
+  }
 });
 
 Then('I have {int} {word} in my reserve', function (num, material) {
