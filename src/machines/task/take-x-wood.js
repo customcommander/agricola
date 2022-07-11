@@ -35,5 +35,7 @@ module.exports.onNewTurn = gameContext => [
 ];
 
 module.exports.onTaskCompleted = gameContext => [
+  {op: 'replace', path: `/task/${id}/wood`, value: 0},
+  {op: 'replace', path: `/task/${id}/selected`, value: true},
   {op: 'replace', path: '/reserve/wood', value: gameContext.reserve.wood + gameContext.task[id].wood}
 ];

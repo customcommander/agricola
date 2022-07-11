@@ -16,11 +16,11 @@ setWorldConstructor(class extends World {
   }
 
   completeNTurn(n) {
-    const numWorkers = this.machine.context.numWorkers;
-    const max = n * numWorkers;
-    for (let i = 0; i < max; i++) {
+    for (let i = 0; i < n; i++) {
       this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
       this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
+      this.service.send({type: 'TASK_SELECTED', task: 'take-x-clay'});
+      this.service.send({type: 'TASK_COMPLETED', task: 'take-x-clay'});
     }
   }
 

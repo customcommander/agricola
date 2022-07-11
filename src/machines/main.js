@@ -1,5 +1,5 @@
 const { createMachine, spawn, send } = require('xstate');
-const { assign } = require('xstate/lib/actions');
+const { assign, pure, escalate } = require('xstate/lib/actions');
 const {patchInPlace: mutate} = require('jiff');
 const task = require('./task/index.js');
 const harvestMachine = require('./harvest');
@@ -55,7 +55,14 @@ module.exports = () => createMachine({
               on: {
                 TASK_SELECTED: {
                   target: 'perform',
-                  actions: assign({taskRef: (ctx, e) => spawn(task[e.task](ctx))})
+                  actions: pure((ctx, e) => {
+                    const taskId = e.task;
+                    const taskNotAvail = ctx.task[taskId].selected == true;
+                    if (taskNotAvail) {
+                      return escalate({message: `action '${taskId}' is not available.`});
+                    }
+                    return assign({taskRef: () => spawn(task[e.task](ctx))})
+                  })
                 }
               }
             },
