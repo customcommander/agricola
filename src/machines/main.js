@@ -1,6 +1,6 @@
-const { createMachine, spawn, send } = require('xstate');
-const { assign, pure, escalate } = require('xstate/lib/actions');
-const {patchInPlace: mutate} = require('jiff');
+const {createMachine} = require('xstate');
+const {pure, escalate, log} = require('xstate/lib/actions');
+const {assign} = require('@xstate/immer');
 const task = require('./task/index.js');
 const harvestMachine = require('./harvest');
 
@@ -61,21 +61,18 @@ module.exports = () => createMachine({
                     if (taskNotAvail) {
                       return escalate({message: `action '${taskId}' is not available.`});
                     }
-                    return assign({taskRef: () => spawn(task[taskId](ctx))})
+                    return log(`Performing task: ${taskId}`);
                   })
                 }
               }
             },
             perform: {
-              entry: [
-                send({type: 'START'}, {to: ctx => ctx.taskRef})
-              ],
               on: {
                 TASK_ABANDONED: {
                   target: 'pick',
-                  actions: assign(({numWorkersRemaining}) => ({
-                    numWorkersRemaining: numWorkersRemaining + 1
-                  }))
+                  actions: assign(ctx => {
+                    ctx.numWorkersRemaining += 1;
+                  })
                 },
                 TASK_COMPLETED: [
                   { target: '#game.harvest', cond: 'endOfStage'},
@@ -84,7 +81,7 @@ module.exports = () => createMachine({
               },
               exit: assign((ctx, ev) => {
                 if (ev.type != 'TASK_COMPLETED') return ctx;
-                return mutate(task[ev.task].onTaskCompleted(ctx), ctx);
+                task[ev.task].onTaskCompleted(ctx);
               })
             }
           },
@@ -124,12 +121,10 @@ module.exports = () => createMachine({
       ctx.numWorkersRemaining = isNewTurn ? numWorkers - 1 : numWorkersRemaining - 1;
 
       if (isNewTurn) {
-        mutate(task['take-x-wood'].onNewTurn(ctx), ctx);
-        mutate(task['take-x-clay'].onNewTurn(ctx), ctx);
-        mutate(task['take-x-reed'].onNewTurn(ctx), ctx);
+        task['take-x-wood'].onNewTurn(ctx);
+        task['take-x-clay'].onNewTurn(ctx);
+        task['take-x-reed'].onNewTurn(ctx);
       }
-
-      return ctx;
     })
   },
   guards: {

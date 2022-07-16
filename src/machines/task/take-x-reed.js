@@ -29,13 +29,13 @@ module.exports = (gameContext) => createMachine({
   }
 });
 
-module.exports.onNewTurn = gameContext => [
-  {op: 'replace', path: `/task/${id}/reed`, value: gameContext.task[id].reed + 1},
-  {op: 'replace', path: `/task/${id}/selected`, value: false}
-];
+module.exports.onNewTurn = gameContext => {
+  gameContext.task[id].reed += 1;
+  gameContext.task[id].selected = false;
+};
 
-module.exports.onTaskCompleted = gameContext => [
-  {op: 'replace', path: `/task/${id}/reed`, value: 0},
-  {op: 'replace', path: `/task/${id}/selected`, value: true},
-  {op: 'replace', path: '/reserve/reed', value: gameContext.reserve.reed + gameContext.task[id].reed}
-];
+module.exports.onTaskCompleted = gameContext => {
+  gameContext.reserve.reed += gameContext.task[id].reed;
+  gameContext.task[id].reed = 0;
+  gameContext.task[id].selected = true;
+};
