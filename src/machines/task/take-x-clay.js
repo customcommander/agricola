@@ -33,9 +33,3 @@ module.exports.onNewTurn = gameContext => {
   gameContext.task[id].clay += 1;
   gameContext.task[id].selected = false;
 };
-
-module.exports.onTaskCompleted = gameContext => {
-  gameContext.reserve.clay += gameContext.task[id].clay;
-  gameContext.task[id].clay = 0;
-  gameContext.task[id].selected = true;
-};
