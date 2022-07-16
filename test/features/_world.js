@@ -1,6 +1,6 @@
 const { setWorldConstructor, World } = require('@cucumber/cucumber');
 const {interpret} = require('xstate');
-const getMachine = require('../src/machines/main');
+const getMachine = require('../../src/machines/main');
 
 setWorldConstructor(class extends World {
   machine = null;
