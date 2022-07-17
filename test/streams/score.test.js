@@ -11,6 +11,6 @@ test('score$', t => {
   s.start();
   s.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
   s.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
-  t.same(scores, [{family: [2, 6]}]);
+  t.same(scores, [{family: [2, 6], unusedSpaces: [13, -13]}]);
   t.end();
 });

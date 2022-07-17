@@ -30,6 +30,23 @@ module.exports = () => createMachine({
         selected: false,
       }
     },
+    spaces: {
+      A1: {type: 'unused'      },
+      A2: {type: 'unused'      },
+      A3: {type: 'unused'      },
+      A4: {type: 'unused'      },
+      A5: {type: 'unused'      },
+      B1: {type: 'wooden_house'},
+      B2: {type: 'unused'      },
+      B3: {type: 'unused'      },
+      B4: {type: 'unused'      },
+      B5: {type: 'unused'      },
+      C1: {type: 'wooden_house'},
+      C2: {type: 'unused'      },
+      C3: {type: 'unused'      },
+      C4: {type: 'unused'      },
+      C5: {type: 'unused'      },
+    }
   },
   initial: 'start',
   states: {

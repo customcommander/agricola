@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx cucumber-js test/features"
+    "test": "npx cucumber-js test/features",
+    "unit": "npx tape test/streams/*.js"
   },
   "keywords": [],
   "author": "",
