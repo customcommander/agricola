@@ -1,9 +1,10 @@
 const {createMachine} = require('xstate');
-const {pure, escalate, log} = require('xstate/lib/actions');
-const {assign} = require('@xstate/immer');
 const harvestMachine = require('./harvest');
 const taskEnded = require('./task-ended.js');
 const taskSetup = require('./task-setup.js');
+const task_check = require('./task-check.js');
+const { is_end_of_stage
+      , not_end_of_game } = require('./context-query.js');
 
 module.exports = () => createMachine({
   id: 'game',
@@ -56,9 +57,7 @@ module.exports = () => createMachine({
           initial: 'setup',
           states: {
             setup: {
-              entry: [
-                'taskSetup'
-              ],
+              entry: 'taskSetup',
               always: {
                 target: 'pick'
               }
@@ -67,14 +66,7 @@ module.exports = () => createMachine({
               on: {
                 TASK_SELECTED: {
                   target: 'perform',
-                  actions: pure((ctx, e) => {
-                    const taskId = e.task;
-                    const taskNotAvail = ctx.task[taskId].selected == true;
-                    if (taskNotAvail) {
-                      return escalate({message: `action '${taskId}' is not available.`});
-                    }
-                    return log(`Performing task: ${taskId}`);
-                  })
+                  actions: 'task_check'
                 }
               }
             },
@@ -84,7 +76,7 @@ module.exports = () => createMachine({
                   target: 'pick'
                 },
                 TASK_COMPLETED: [
-                  { target: '#game.harvest', cond: 'endOfStage'},
+                  { target: '#game.harvest', cond: 'is_end_of_stage'},
                   { target: 'setup' },
                 ]
               },
@@ -107,7 +99,7 @@ module.exports = () => createMachine({
       },
       on: {
         HARVEST_COMPLETED: [
-          { target: 'work', cond: 'notEndOfGame'},
+          { target: 'work', cond: 'not_end_of_game'},
           { target: 'end' }
         ]
       }
@@ -118,19 +110,13 @@ module.exports = () => createMachine({
   }
 }, {
   actions: {
-    taskSetup,
-    taskEnded
+    task_check,
+    taskEnded,
+    taskSetup
   },
   guards: {
-    endOfStage: ({turn, numWorkersRemaining}) =>
-      numWorkersRemaining == 0 && (  turn === 4  /* end of stage 1 */
-                                  || turn === 7  /* end of stage 2 */
-                                  || turn === 9  /* end of stage 3 */
-                                  || turn === 11 /* end of stage 4 */
-                                  || turn === 13 /* end of stage 5 */
-                                  || turn === 14 /* end of stage 6 */),
-
-    notEndOfGame: ({turn}) => turn < 14
+    is_end_of_stage,
+    not_end_of_game
   },
   services: {
     harvestMachine
