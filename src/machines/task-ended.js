@@ -29,5 +29,7 @@ const task = {
 module.exports = assign((ctx, ev) => {
   if (ev.type == 'TASK_COMPLETED') {
     task[ev.task](ctx, ev);
+  } else {
+    ctx.numWorkersRemaining += 1;
   }
 });

@@ -2,7 +2,7 @@ const {createMachine} = require('xstate');
 const {pure, escalate, log} = require('xstate/lib/actions');
 const {assign} = require('@xstate/immer');
 const harvestMachine = require('./harvest');
-const taskCompleted = require('./task-completed.js');
+const taskEnded = require('./task-ended.js');
 const taskSetup = require('./task-setup.js');
 
 module.exports = () => createMachine({
@@ -81,17 +81,14 @@ module.exports = () => createMachine({
             perform: {
               on: {
                 TASK_ABANDONED: {
-                  target: 'pick',
-                  actions: assign(ctx => {
-                    ctx.numWorkersRemaining += 1;
-                  })
+                  target: 'pick'
                 },
                 TASK_COMPLETED: [
                   { target: '#game.harvest', cond: 'endOfStage'},
                   { target: 'setup' },
                 ]
               },
-              exit: 'taskCompleted'
+              exit: 'taskEnded'
             }
           },
         },
@@ -122,7 +119,7 @@ module.exports = () => createMachine({
 }, {
   actions: {
     taskSetup,
-    taskCompleted
+    taskEnded
   },
   guards: {
     endOfStage: ({turn, numWorkersRemaining}) =>
