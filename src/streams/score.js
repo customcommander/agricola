@@ -19,10 +19,20 @@ const score_grain = some( when(lt(1), constant(-1))
                         , when(lt(8), constant( 3))
                         ,             constant( 4));
 
+const count_fields = ctx =>
+  Object.values(ctx.spaces).filter(sp => sp.type == 'field').length;
+
+const score_fields = some( when(lt(2), constant(-1))
+                         , when(lt(3), constant( 1))
+                         , when(lt(4), constant( 2))
+                         , when(lt(5), constant( 3))
+                         ,             constant( 4));
+
 const scoreMap = {
   family: [ctx => ctx.numWorkers, mult(3)],
   unusedSpaces: [countUnusedSpaces, scoreUnusedSpaces],
-  grain: [count_grain, score_grain]
+  grain: [count_grain, score_grain],
+  fields: [count_fields, score_fields]
 };
 
 module.exports = service =>

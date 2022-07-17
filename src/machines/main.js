@@ -32,6 +32,9 @@ module.exports = () => createMachine({
       },
       take_grain: {
         selected: false
+      },
+      plow_field: {
+        selected: false
       }
     },
     spaces: {

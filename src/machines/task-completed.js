@@ -19,11 +19,15 @@ const task = {
   take_grain: ctx => {
     ctx.reserve.grain += 1;
     ctx.task.take_grain.selected = true;
+  },
+  plow_field: (ctx, ev) => {
+    ctx.task.plow_field.selected = true;
+    ev.spaces.forEach(sp => ctx.spaces[sp].type = 'field');
   }
 };
 
 module.exports = assign((ctx, ev) => {
   if (ev.type == 'TASK_COMPLETED') {
-    task[ev.task](ctx);
+    task[ev.task](ctx, ev);
   }
 });

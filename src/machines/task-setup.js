@@ -12,6 +12,12 @@ const task = {
   'take-x-reed': ctx => {
     ctx.task['take-x-reed'].reed += 1;
     ctx.task['take-x-reed'].selected = false;
+  },
+  take_grain: ctx => {
+    ctx.task.take_grain.selected = false;
+  },
+  plow_field: ctx => {
+    ctx.task.plow_field.selected = false;
   }
 };
 
@@ -27,5 +33,7 @@ module.exports = assign((ctx, ev) => {
     task['take-x-wood'](ctx);
     task['take-x-clay'](ctx);
     task['take-x-reed'](ctx);
+    task.take_grain(ctx);
+    task.plow_field(ctx);
   }
 });
