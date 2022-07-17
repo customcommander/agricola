@@ -3,7 +3,7 @@ const {pure, escalate, log} = require('xstate/lib/actions');
 const {assign} = require('@xstate/immer');
 const harvestMachine = require('./harvest');
 const taskCompleted = require('./task-completed.js');
-const taskSetup = require('./task-setup.js')
+const taskSetup = require('./task-setup.js');
 
 module.exports = () => createMachine({
   id: 'game',
@@ -37,23 +37,10 @@ module.exports = () => createMachine({
         selected: false
       }
     },
-    spaces: {
-      A1: {type: 'unused'    },
-      A2: {type: 'unused'    },
-      A3: {type: 'unused'    },
-      A4: {type: 'unused'    },
-      A5: {type: 'unused'    },
-      B1: {type: 'wooden_hut'},
-      B2: {type: 'unused'    },
-      B3: {type: 'unused'    },
-      B4: {type: 'unused'    },
-      B5: {type: 'unused'    },
-      C1: {type: 'wooden_hut'},
-      C2: {type: 'unused'    },
-      C3: {type: 'unused'    },
-      C4: {type: 'unused'    },
-      C5: {type: 'unused'    },
-    }
+    spaces:
+      { A1: {}                  , A2: {}, A3: {}, A4: {}, A5: {}
+      , B1: {type: 'wooden_hut'}, B2: {}, B3: {}, B4: {}, B5: {}
+      , C1: {type: 'wooden_hut'}, C2: {}, C3: {}, C4: {}, C5: {}}
   },
   initial: 'start',
   states: {

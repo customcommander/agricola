@@ -3,7 +3,7 @@ const {fromEventPattern} = require('rxjs');
 const {map, distinct} = require('rxjs/operators');
 
 const countUnusedSpaces = ctx =>
-  Object.values(ctx.spaces).filter(sp => sp.type == 'unused').length;
+  Object.values(ctx.spaces).filter(sp => sp.type == null).length;
 
 const scoreUnusedSpaces = n => n * -1;
 
@@ -28,12 +28,11 @@ const score_fields = some( when(lt(2), constant(-1))
                          , when(lt(5), constant( 3))
                          ,             constant( 4));
 
-const scoreMap = {
-  family: [ctx => ctx.numWorkers, mult(3)],
-  unusedSpaces: [countUnusedSpaces, scoreUnusedSpaces],
-  grain: [count_grain, score_grain],
-  fields: [count_fields, score_fields]
-};
+const scoreMap =
+  { family:       [ctx => ctx.numWorkers, mult(3)          ]
+  , unusedSpaces: [countUnusedSpaces    , scoreUnusedSpaces]
+  , grain:        [count_grain          , score_grain      ]
+  , fields:       [count_fields         , score_fields     ]};
 
 module.exports = service =>
   fromEventPattern(handler => service.onChange(handler))
