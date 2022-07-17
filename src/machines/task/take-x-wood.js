@@ -28,8 +28,3 @@ module.exports = (gameContext) => createMachine({
     }
   }
 });
-
-module.exports.onNewTurn = gameContext => {
-  gameContext.task[id].wood += 2;
-  gameContext.task[id].selected = false;
-}
