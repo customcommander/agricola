@@ -14,7 +14,8 @@ module.exports = () => createMachine({
     reserve: {
       wood: 0,
       clay: 0,
-      reed: 0
+      reed: 0,
+      grain: 0
     },
     task: {
       'take-x-wood': {
@@ -28,6 +29,9 @@ module.exports = () => createMachine({
       'take-x-reed': {
         reed: 1,
         selected: false,
+      },
+      take_grain: {
+        selected: false
       }
     },
     spaces: {

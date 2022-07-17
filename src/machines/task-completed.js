@@ -15,6 +15,10 @@ const task = {
     ctx.reserve.reed += ctx.task['take-x-reed'].reed;
     ctx.task['take-x-reed'].reed = 0;
     ctx.task['take-x-reed'].selected = true;
+  },
+  take_grain: ctx => {
+    ctx.reserve.grain += 1;
+    ctx.task.take_grain.selected = true;
   }
 };
 
