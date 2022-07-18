@@ -22,21 +22,25 @@ test('score$', t => {
                    { family:       [ 2,   6]
                    , unusedSpaces: [13, -13]
                    , grain:        [ 0,  -1]
-                   , fields:       [ 0,  -1]}
+                   , fields:       [ 0,  -1]
+                   , total:              -9}
                    // after taking grain
                  , { family:       [ 2,   6]
                    , unusedSpaces: [13, -13]
                    , grain:        [ 1,   1]
-                   , fields:       [ 0,  -1]}
+                   , fields:       [ 0,  -1]
+                   , total:              -7}
                    // after plowing field
                  , { family:       [ 2,   6]
                    , unusedSpaces: [12, -12]
                    , grain:        [ 1,   1]
-                   , fields:       [ 1,  -1]}
+                   , fields:       [ 1,  -1]
+                   , total:              -6}
                    // after taking grain
                  , { family:       [ 2,   6]
                    , unusedSpaces: [12, -12]
                    , grain:        [ 2,   1]
-                   , fields:       [ 1,  -1]}]);
+                   , fields:       [ 1,  -1]
+                   , total:              -6}]);
   t.end();
 });

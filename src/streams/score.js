@@ -1,6 +1,6 @@
 const {mult, map: fmap, some, when, constant, lt} = require('@customcommander/functionaut');
 const {fromEventPattern} = require('rxjs');
-const {map, distinct} = require('rxjs/operators');
+const {map, distinct, tap} = require('rxjs/operators');
 
 const countUnusedSpaces = ctx =>
   Object.values(ctx.spaces).filter(sp => sp.type == null).length;
@@ -34,7 +34,22 @@ const scoreMap =
   , grain:        [count_grain          , score_grain      ]
   , fields:       [count_fields         , score_fields     ]};
 
+
+const compute_score = ([ctx]) => fmap(([f, g, ...meta]) => {
+  const count = f(ctx);
+  const points = g(count);
+  return [count, points, ...meta];
+}, scoreMap);
+
+const with_total = score => {
+  const total = Object.values(score).reduce((tot, [_, points]) => tot + points, 0);
+  return {...score, total};
+};
+
+const score_signature = score => JSON.stringify(score);
+
 module.exports = service =>
   fromEventPattern(handler => service.onChange(handler))
-    .pipe( map(([ctx]) => fmap(([f, g, ...meta]) => [f(ctx), g(f(ctx)), ...meta], scoreMap))
-         , distinct(o => JSON.stringify(o)));
+    .pipe( map(compute_score)
+         , map(with_total)
+         , distinct(score_signature));
