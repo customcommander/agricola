@@ -3,21 +3,21 @@ const {assign} = require('@xstate/immer');
 const task = {
   'take-x-wood': ctx => {
     ctx.task['take-x-wood'].wood += 2;
-    ctx.task['take-x-wood'].selected = false;
+    ctx.task['take-x-wood'].available = true;
   },
   'take-x-clay': ctx => {
     ctx.task['take-x-clay'].clay += 1;
-    ctx.task['take-x-clay'].selected = false;
+    ctx.task['take-x-clay'].available = true;
   },
   'take-x-reed': ctx => {
     ctx.task['take-x-reed'].reed += 1;
-    ctx.task['take-x-reed'].selected = false;
+    ctx.task['take-x-reed'].available = true;
   },
   take_grain: ctx => {
-    ctx.task.take_grain.selected = false;
+    ctx.task.take_grain.available = true;
   },
   plow_field: ctx => {
-    ctx.task.plow_field.selected = false;
+    ctx.task.plow_field.available = true;
   }
 };
 
