@@ -35,7 +35,7 @@ const scoreMap =
   , fields:       [count_fields         , score_fields     ]};
 
 
-const compute_score = ([ctx]) => fmap(([f, g, ...meta]) => {
+const compute_score = ctx => fmap(([f, g, ...meta]) => {
   const count = f(ctx);
   const points = g(count);
   return [count, points, ...meta];
@@ -50,6 +50,6 @@ const score_signature = score => JSON.stringify(score);
 
 module.exports = service =>
   fromEventPattern(handler => service.onChange(handler))
-    .pipe( map(compute_score)
+    .pipe( map(([ctx]) => compute_score(ctx))
          , map(with_total)
          , distinct(score_signature));
