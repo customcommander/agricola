@@ -2,6 +2,7 @@
   "name": "@customcommander/agricola",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "npx cucumber-js test/features",
