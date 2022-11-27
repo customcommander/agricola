@@ -25,13 +25,13 @@ const machine_def = {
     },
     work: {
       entry: 'new_turn',
-      on: {
-        NEW_TURN: {
-          target: 'work'
-        },
-        HARVEST_TIME: {
-          target: 'feed'
-        }
+      invoke: {
+        id: 'work-service',
+        src: 'work',
+        onDone: [
+          {target: 'work', cond: 'not_harvest'},
+          {target: 'feed'}
+        ]
       }
     },
     feed: {
