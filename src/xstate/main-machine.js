@@ -14,9 +14,9 @@ export default () => createMachine({
         onDone: {
           target: 'turn_1'
         },
-        on: {
-          SETUP_GAME: forwardTo('setup-service')
-        }
+      },
+      on: {
+        SETUP_GAME: forwardTo('setup-service')
       }
     },
     turn_1: {
