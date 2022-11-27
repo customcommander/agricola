@@ -1,7 +1,7 @@
 import {createMachine, forwardTo} from 'xstate';
 
-import new_turn from './action-new-turn.js';
-import not_end_of_game from './guard-not-end-of-game.js'
+import * as actions from './actions/index.js';
+import * as guards from './guards/index.js';
 
 export default () => createMachine({
   context: {
@@ -53,10 +53,6 @@ export default () => createMachine({
     }
   }
 }, {
-  actions: {
-    new_turn
-  },
-  guards: {
-    not_end_of_game
-  }
+  actions,
+  guards
 });
