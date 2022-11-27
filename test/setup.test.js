@@ -4,7 +4,7 @@ import sut from '../src/xstate/main.js';
 
 test('starting a game', async (t) => {
   const game = sut();
-  await waitFor(game, state => state.matches('turn_1'));
+  await waitFor(game, state => state.matches('work'));
   t.pass('can start a new game');
   t.end();
 });
