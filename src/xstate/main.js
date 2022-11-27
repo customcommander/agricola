@@ -2,6 +2,7 @@ import {interpret, createMachine, forwardTo} from 'xstate';
 
 import * as actions from './actions/index.js';
 import * as guards from './guards/index.js';
+import * as services from './services/index.js';
 
 const machine_def = {
   context: {
@@ -13,10 +14,7 @@ const machine_def = {
     init: {
       invoke: {
         id: 'setup-service',
-        src: () => new Promise(res => {
-          // Simulates async operations whilst setting up a game (e.g. dynamic imports)
-          setTimeout(() => res(true), 50);
-        }),
+        src: 'setup',
         onDone: {
           target: 'work'
         },
@@ -39,9 +37,7 @@ const machine_def = {
     feed: {
       invoke: {
         id: 'feed-service',
-        src: () => new Promise(res => {
-          setTimeout(() => res(true), 50);
-        }),
+        src: 'feed',
         onDone: [
           {target: 'work', cond: 'not_end_of_game'},
           {target: 'end_of_game'}
@@ -65,7 +61,7 @@ const initGame = () => ({
 
 // Starts a new game unless `events` is not nil (i.e replaying a game)
 export default (events) => {
-  const game = interpret(createMachine(machine_def, {actions, guards}));
+  const game = interpret(createMachine(machine_def, {actions, guards, services}));
   game.start();
   game.send(events ?? [initGame()]);
   return game;
