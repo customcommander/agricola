@@ -4,7 +4,7 @@ import * as actions from './actions/index.js';
 import * as guards from './guards/index.js';
 import * as services from './services/index.js';
 
-const machine_def = {
+const machine = () => createMachine({
   context: {
     turn: 0,
     stage: 0,
@@ -24,15 +24,16 @@ const machine_def = {
       }
     },
     work: {
-      entry: 'new_turn',
-      invoke: {
-        id: 'work-service',
-        src: 'work',
-        onDone: [
+      entry: [
+        'new_turn',
+        'start_work_service'
+      ],
+      on: {
+        WORK_DONE: [
           {target: 'work', cond: 'not_harvest'},
           {target: 'feed'}
         ]
-      }
+      },
     },
     feed: {
       invoke: {
@@ -48,21 +49,27 @@ const machine_def = {
       type: 'final'
     }
   }
-};
+}, {
+  actions,
+  guards,
+  services
+});
 
 // TODO:
 // Eventually this event will be responsible for:
 //  1.  Selecting occupation cards
 //  2.  Selecting minor improvement cards
 //  3.  Randomizing the round cards
-const initGame = () => ({
+const init_game = () => ({
   type: 'SETUP_GAME'
 });
 
-// Starts a new game unless `events` is not nil (i.e replaying a game)
-export default (events) => {
-  const game = interpret(createMachine(machine_def, {actions, guards, services}));
-  game.start();
-  game.send(events ?? [initGame()]);
-  return game;
+// Returns a reference to the main machine as well as a function to start the game.
+export default () => {
+  const game = interpret(machine());
+  const start = (events) => {
+    game.start();
+    game.send(events ?? [init_game()]);
+  };
+  return [game, start];
 };

@@ -1,17 +1,17 @@
 import test from 'tape';
-import {from} from 'rxjs';
+import {distinct, from, map, toArray} from 'rxjs';
 
 import sut from '../src/xstate/main.js';
 
 test('sequence', (t) => {
-  const game = sut();
-  const state$ = from(game);
-  const actual = [];
+  const [game, startGame] = sut();
+  const state$ = from(game).pipe(
+    map(st => [st.value, st.context.turn, st.context.stage]),
+    distinct(arr => arr.join('/')),
+    toArray()
+  );
   state$.subscribe({
-    next(state) {
-      actual.push([state.value, state.context.turn, state.context.stage]);
-    },
-    complete() {
+    next(actual) {
       t.same(actual, [ [       'init',  0, 0]
                      , [       'work',  1, 1]
                      , [       'work',  2, 1]
@@ -34,7 +34,10 @@ test('sequence', (t) => {
                      , [       'work', 14, 6]
                      , [       'feed', 14, 6]
                      , ['end_of_game', 14, 6]]);
+    },
+    complete() {
       t.end();
     }
-  })
+  });
+  startGame();
 });

@@ -1,11 +1,20 @@
-import {createMachine} from 'xstate';
+import {assign, createMachine, sendParent, spawn} from 'xstate';
 
-export default createMachine({
+const machine = () => createMachine({
   context: {},
   initial: 'init',
   states: {
     init: {
-      type: 'final'
+      type: 'final',
+      entry: 'work_done'
     }
   }
+}, {
+  actions: {
+    work_done: sendParent({type: 'WORK_DONE'})
+  }
+});
+
+export const start_work_service = assign({
+  WorkService: () => spawn(machine())
 });
