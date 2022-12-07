@@ -1,15 +1,18 @@
 import test from 'tape';
-import {distinct, from, map, toArray} from 'rxjs';
+import {distinct, filter, from, map, take, toArray} from 'rxjs';
 
 import sut from '../src/xstate/main.js';
+import task from '../src/xstate/observables/task.js';
 
 test('sequence', (t) => {
   const [game, startGame] = sut();
+
   const state$ = from(game).pipe(
     map(st => [st.value, st.context.turn, st.context.stage]),
     distinct(arr => arr.join('/')),
     toArray()
   );
+
   state$.subscribe({
     next(actual) {
       t.same(actual, [ [       'init',  0, 0]
@@ -41,3 +44,25 @@ test('sequence', (t) => {
   });
   startGame();
 });
+
+test('preset tasks order', t => {
+  const [game, start] = sut();
+  const task$ = task(from(game)).pipe(
+    filter(t => t.available),
+    map(t => t.id),
+    take(14),
+    toArray()
+  );
+
+  task$.subscribe({
+    next(actual) {
+      t.same(actual, [2, 1, 3, 4, 6, 5, 7, 8, 9, 11, 10, 12, 13, 14]);
+    },
+    complete() {
+      t.end();
+    }
+  });
+
+  start([{type: 'SETUP_GAME', tasks_order: [2, 1, 3, 4, 6, 5, 7, 8, 9, 11, 10, 12, 13, 14]}]);
+});
+
