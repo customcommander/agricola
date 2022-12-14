@@ -1,7 +1,7 @@
 import {assign, forwardTo, spawn} from "xstate";
 import {assign as i_assign} from '@xstate/immer';
 
-// TODO: dynamically load occupations and minor improvements modules.
+// TODO: simulate a bit of delay whilst setting up the game.
 const service = (callback, receive) => {
 
   receive(e => {
