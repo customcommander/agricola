@@ -84,9 +84,9 @@ const machine = () => createMachine({
       },
     }
   },
-  initial: 'init',
+  initial: 'setup',
   states: {
-    init: {
+    setup: {
       entry: [
         'start_setup_service'
       ],

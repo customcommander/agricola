@@ -15,7 +15,7 @@ test('sequence', (t) => {
 
   state$.subscribe({
     next(actual) {
-      t.same(actual, [ [       'init',  0, 0]
+      t.same(actual, [ [      'setup',  0, 0]
                      , [       'work',  1, 1]
                      , [       'work',  2, 1]
                      , [       'work',  3, 1]
