@@ -10,9 +10,9 @@ A deep dive exploration of reactive programming combining state machines ([XStat
 
 The game engine is managed by a single state machine splits into multiple services.
 
-We can produce a wide range of observables from transitions and state changes. The user interface components subscribe to these observables.
+We can produce a diverse range of observables from the state machine. The user interface components subscribe to these observables.
 
-Even though the user interface is not allowed to subscribe directly to the state machine, it is however allowed to trigger events that will lead to either a transition or state change (or both) and possibly data being emitted by observables as a result.
+Even though the user interface is not allowed to subscribe directly to the state machine, it can however trigger events that will ultimately lead to state changes and new data being emitted by the observables.
 
 In all circumstances data flows in **one and only one** direction.
 
