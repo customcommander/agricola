@@ -6,16 +6,34 @@ A deep dive exploration of reactive programming combining state machines ([XStat
 
 ## Architecture
 
-### Overview
+### Boundaries
 
-The main state machine is kept relatively simple but each state spawns one or more services.
+The game engine is managed by a single state machine splits into multiple services.
+
+We can produce a wide range of observables from transitions and state changes. The user interface components subscribe to these observables.
+
+Even though the user interface is not allowed to subscribe directly to the state machine, it is however allowed to trigger events that will lead to either a transition or state change (or both) and possibly data being emitted by observables as a result.
+
+In all circumstances data flows in **one and only one** direction.
+
+```mermaid
+flowchart LR
+GE(((Game Engine)))    -- produces -->
+O(((Observables)))     --     feed -->
+UI(((User Interface))) -- triggers --> GE
+```
+
+### States Machines
+
+#### Overview
+
+The main state machine is kept relatively simple (YMMV) as each state is expected to spawn one or more services.
 
 ```mermaid
 stateDiagram-v2
     state after_harvest <<choice>>
     state after_work <<choice>>
 
-    
     [*] --> setup
 
     note left of setup
