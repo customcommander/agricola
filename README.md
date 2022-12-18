@@ -8,7 +8,7 @@ A deep dive exploration of reactive programming combining state machines ([XStat
 
 ### Boundaries
 
-The game engine is managed by a single state machine splits into multiple services.
+The game engine is managed by a single state machine split into multiple services.
 
 We can produce a diverse range of observables from the state machine. The user interface components subscribe to these observables.
 
