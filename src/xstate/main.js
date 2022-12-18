@@ -108,14 +108,14 @@ const machine = () => createMachine({
       on: {
         WORK_DONE: [
           {target: 'work', cond: 'not_harvest'},
-          {target: 'feed'}
+          {target: 'harvest'}
         ]
       },
     },
-    feed: {
+    harvest: {
       invoke: {
-        id: 'feed-service',
-        src: 'feed',
+        id: 'harvest-service',
+        src: 'harvest',
         onDone: [
           {target: 'work', cond: 'not_end_of_game'},
           {target: 'end_of_game'}
