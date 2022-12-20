@@ -60,6 +60,24 @@ stateDiagram-v2
     end_of_game --> [*]
 ```
 
+#### Work Service
+
+The **Work Service** is given the number of workers for the active turn and remains active until all the workers are placed on the board.
+
+```mermaid
+stateDiagram-v2
+    state after_perform <<choice>>
+
+    [*] --> init
+    init --> select
+    select --> perform: TASK_SELECTED
+    perform --> select: TASK_CANCELLED
+    perform --> after_perform: TASK_DONE
+    after_perform --> select: workers_left
+    after_perform --> done
+    done --> [*]
+```
+
 [XState]: https://xstate.js.org/
 [RxJS]: https://rxjs.dev/
 [Lit]: https://lit.dev/

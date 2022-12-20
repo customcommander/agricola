@@ -7,6 +7,7 @@ import * as services from './services/index.js';
 import {id} from './utils.js';
 
 const machine = () => createMachine({
+  id: 'game-engine',
   context: {
     turn: 0,
     stage: 0,
@@ -101,16 +102,31 @@ const machine = () => createMachine({
       }
     },
     work: {
-      entry: [
-        'new_turn',
-        'start_work_service'
-      ],
-      on: {
-        WORK_DONE: [
-          {target: 'work', cond: 'not_harvest'},
-          {target: 'harvest'}
-        ]
-      },
+      initial: 'init',
+      states: {
+        init: {
+          entry: [
+            'new_turn',
+            'start_work_service'
+          ],
+          on: {
+            WORK_SERVICE_READY: {
+              target: 'main'
+            }
+          }
+        },
+        main: {
+          on: {
+            WORK_DONE: [
+              {target: '#game-engine.work', cond: 'not_harvest'},
+              {target: '#game-engine.harvest'}
+            ],
+            '*': {
+              actions: ['forward_to_work_service']
+            }
+          }
+        }
+      }
     },
     harvest: {
       invoke: {
