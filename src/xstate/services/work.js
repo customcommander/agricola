@@ -1,10 +1,10 @@
 import {assign, createMachine, forwardTo, sendParent, spawn} from 'xstate';
 import {assign as i_assign} from '@xstate/immer';
 
-const machine = () => createMachine({
+const machine = ({num_workers}) => createMachine({
   id: 'work-service',
   context: {
-    num_workers: 2
+    num_workers
   },
   initial: 'init',
   states: {
@@ -52,7 +52,7 @@ const machine = () => createMachine({
 });
 
 export const start_work_service = assign({
-  WorkService: () => spawn(machine())
+  WorkService: ({num_workers}) => spawn(machine({num_workers}))
 });
 
 export const forward_to_work_service = forwardTo(ctx => ctx.WorkService);

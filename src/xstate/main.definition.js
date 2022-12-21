@@ -5,6 +5,7 @@ export default () => ({
   context: {
     turn: 0,
     stage: 0,
+    num_workers: 2,
     tasks_order: [],
     tasks: {
       1: {
