@@ -4,6 +4,18 @@
 
 A deep dive exploration of reactive programming combining state machines ([XState][]) and observables ([RxJS][]) with a web-component-based ([Lit][]) single page application. In the end I hope to build the solo version of the popular board game.
 
+## Development
+
+### Requirements
+
+- Node.js v19+
+
+### Tests
+
+```
+npx tape test/*.test.js
+```
+
 ## Architecture
 
 ### Boundaries
