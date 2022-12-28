@@ -13,7 +13,7 @@ A deep dive exploration of reactive programming combining state machines ([XStat
 ### Tests
 
 ```
-npx tape test/*.test.js
+npm test
 ```
 
 ## Architecture
