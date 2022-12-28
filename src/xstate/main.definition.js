@@ -124,13 +124,24 @@ export default () => ({
       }
     },
     harvest: {
-      invoke: {
-        id: 'harvest-service',
-        src: 'harvest',
-        onDone: [
-          {target: 'work', cond: 'not_end_of_game'},
-          {target: 'end_of_game'}
-        ]
+      initial: 'init',
+      states: {
+        init: {
+          entry: ['start_harvest_service'],
+          on: {
+            HARVEST_SERVICE_READY: {
+              target: 'main'
+            }
+          }
+        },
+        main: {
+          on: {
+            HARVEST_DONE: [
+              {target: '#game-engine.work', cond: 'not_end_of_game'},
+              {target: '#game-engine.end_of_game'}
+            ]
+          }
+        }
       }
     },
     end_of_game: {

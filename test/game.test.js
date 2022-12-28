@@ -1,5 +1,5 @@
 import test from 'tape';
-import {distinct, filter, from, map, take, tap, toArray} from 'rxjs';
+import {distinct, filter, from, map, take, toArray} from 'rxjs';
 import {waitFor} from 'xstate/lib/waitFor.js';
 
 import sut from '../src/xstate/main.js';
@@ -9,8 +9,14 @@ test('sequence', (t) => {
   const [game, start] = sut();
 
   const state$ = from(game).pipe(
-    filter(st => st.matches('work.init') === false),
-    map(st => [st.matches('work.main') ? 'work' : st.value, st.context.turn, st.context.stage]),
+    filter(st => (  st.matches('work.init')    === false
+                 && st.matches('harvest.init') === false)),
+
+    map(st => [ ( st.matches('work.main')    ? 'work'
+                : st.matches('harvest.main') ? 'harvest'
+                                             : st.value)
+              , st.context.turn
+              , st.context.stage]),
     distinct(arr => arr.join('/')),
     toArray(),
   );
