@@ -20,6 +20,6 @@
     "xstate": "^4.32.1"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^8.3.1"
+    "@cucumber/cucumber": "^8.10.0"
   }
 }
