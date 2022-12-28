@@ -17,11 +17,12 @@ setWorldConstructor(class extends World {
 
   async completeNTurn(n) {
     await waitFor(this.game, st => st.matches('work.main'));
+    const {context} = this.game.getSnapshot();
     for (let i = 0; i < n; i++) {
-      this.game.send({type: 'TASK_SELECTED'});
-      this.game.send({type: 'TASK_DONE'});
-      this.game.send({type: 'TASK_SELECTED'});
-      this.game.send({type: 'TASK_DONE'});
+      for (let j = 0; j < context.num_workers; j++) {
+        this.game.send({type: 'TASK_SELECTED'});
+        this.game.send({type: 'TASK_DONE'});
+      }
     }
   }
 
