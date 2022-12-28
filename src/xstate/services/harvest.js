@@ -6,29 +6,27 @@ const machine = () => createMachine({
   states: {
     init: {
       entry: ['notify_startup'],
-      on: {
-        HARVEST_FIELD: {
-          target: 'field'
-        }
+      always: {
+        target: 'fields'
       }
     },
-    field: {
+    fields: {
       on: {
-        HARVEST_FEED: {
+        HARVEST_FIELDS_DONE: {
           target: 'feed'
         }
       }
     },
     feed: {
       on: {
-        HARVEST_BREED: {
+        HARVEST_FEED_DONE: {
           target: 'breed'
         }
       }
     },
     breed: {
       on: {
-        HARVEST_DONE: {
+        HARVEST_BREED_DONE: {
           target: 'done'
         }
       }

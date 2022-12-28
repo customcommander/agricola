@@ -90,6 +90,18 @@ stateDiagram-v2
     done --> [*]
 ```
 
+#### Harvest Service
+
+```mermaid
+stateDiagram-v2
+    [*] --> init
+    init --> fields
+    fields --> feed: HARVEST_FIELDS_DONE
+    feed --> breed:  HARVEST_FEED_DONE
+    breed --> done: HARVEST_BREED_DONE
+    done --> [*]
+```
+
 [XState]: https://xstate.js.org/
 [RxJS]: https://rxjs.dev/
 [Lit]: https://lit.dev/

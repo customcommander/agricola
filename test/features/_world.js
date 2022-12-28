@@ -27,10 +27,9 @@ setWorldConstructor(class extends World {
   }
 
   completeHarvest() {
-    this.game.send({type: 'HARVEST_FIELD'});
-    this.game.send({type: 'HARVEST_FEED'});
-    this.game.send({type: 'HARVEST_BREED'});
-    this.game.send({type: 'HARVEST_DONE'});
+    this.game.send({type: 'HARVEST_FIELDS_DONE'});
+    this.game.send({type: 'HARVEST_FEED_DONE'});
+    this.game.send({type: 'HARVEST_BREED_DONE'});
   }
 
   async assertIsHarvestTime() {
