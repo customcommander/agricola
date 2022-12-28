@@ -1,79 +1,42 @@
-const { setWorldConstructor, World } = require('@cucumber/cucumber');
-const {interpret} = require('xstate');
-const getMachine = require('../../src/machines/main');
+import { setWorldConstructor, World } from '@cucumber/cucumber';
+import main from '../../src/xstate/main.js';
+import {waitFor} from 'xstate/lib/waitFor.js';
 
 setWorldConstructor(class extends World {
-  machine = null;
 
   constructor(options) {
     super(options);
-    this.machine = getMachine();
+    const [game, start] = main();
+    this.game = game;
+    this.start = start;
   }
 
   start() {
-    this.service = interpret(this.machine);
-    this.service.start();
+    this.start();
   }
 
-  completeNTurn(n) {
+  async completeNTurn(n) {
+    await waitFor(this.game, st => st.matches('work.main'));
     for (let i = 0; i < n; i++) {
-      this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
-      this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
-      this.service.send({type: 'TASK_SELECTED', task: 'take-x-clay'});
-      this.service.send({type: 'TASK_COMPLETED', task: 'take-x-clay'});
+      this.game.send({type: 'TASK_SELECTED'});
+      this.game.send({type: 'TASK_DONE'});
+      this.game.send({type: 'TASK_SELECTED'});
+      this.game.send({type: 'TASK_DONE'});
     }
   }
 
   completeHarvest() {
-    this.service.send('HARVEST_COMPLETED');
+    this.game.send({type: 'HARVEST_FIELD'});
+    this.game.send({type: 'HARVEST_FEED'});
+    this.game.send({type: 'HARVEST_BREED'});
+    this.game.send({type: 'HARVEST_DONE'});
   }
 
-  assertIsHarvestTime() {
-    const state = this.service.getSnapshot();
-    if (state.matches('harvest')) return;
-    throw new Error(`This is not harvest time (${JSON.stringify(state.value, null, 2)}).`);
+  async assertIsHarvestTime() {
+    await waitFor(this.game, st => st.matches('harvest.main'));
   }
 
-  assertActionStock(action, stock) {
-    const {context} = this.service.getSnapshot();
-    let actual;
-    let expected;
-    if (action == 'Take X Wood') {
-      actual = context.task['take-x-wood'].wood;
-      expected = parseInt(stock);
-    }
-    if (action == 'Take X Clay') {
-      actual = context.task['take-x-clay'].clay;
-      expected = parseInt(stock);
-    }
-    if (action == 'Take X Reed') {
-      actual = context.task['take-x-reed'].reed;
-      expected = parseInt(stock);
-    }
-    if (actual == expected) return;
-    throw new Error(`Expected '${action}' to have ${stock} but got ${actual}`);
-  }
-
-  assertIsEndOfGame() {
-    const state = this.service.getSnapshot();
-    if (state.matches('end')) return;
-    throw new Error(`The game has not ended yet (${state.value}).`);
-  }
-
-  assertReserve(material, expected) {
-    const state = this.service.getSnapshot();
-    const actual = state.context.reserve[material];
-    if (actual == expected) return;
-    throw new Error(`Expected ${expected} ${material} in the reserve but got ${actual} instead.`);
-  }
-
-  takeXWood() {
-    this.service.send({type: 'TASK_SELECTED', task: 'take-x-wood'});
-    this.service.send({type: 'TASK_COMPLETED', task: 'take-x-wood'});
-  }
-
-  takeXClay() {
-    this.service.send({type: 'TASK_SELECTED', task: 'take-x-clay'});
-    this.service.send({type: 'TASK_COMPLETED', task: 'take-x-clay'});
+  async assertIsEndOfGame() {
+    await waitFor(this.game, st => st.matches('end_of_game'));
   }
 });

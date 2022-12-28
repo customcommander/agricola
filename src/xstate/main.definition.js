@@ -129,18 +129,22 @@ export default () => ({
         init: {
           entry: ['start_harvest_service'],
           on: {
-            HARVEST_SERVICE_READY: {
+            HARVEST_SERVICE_STARTUP: {
               target: 'main'
             }
           }
         },
         main: {
           on: {
-            HARVEST_DONE: [
+            HARVEST_SERVICE_SHUTDOWN: [
               {target: '#game-engine.work', cond: 'not_end_of_game'},
               {target: '#game-engine.end_of_game'}
-            ]
-          }
+            ],
+            '*': {
+              actions: ['forward_to_harvest_service']
+            }
+          },
+          exit: ['stop_harvest_service']
         }
       }
     },
