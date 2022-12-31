@@ -1,83 +1,13 @@
-import {id} from './utils.js';
-
 export default () => ({
   id: 'game-engine',
   context: {
     turn: 0,
     stage: 0,
     num_workers: 2,
-    tasks_order: [],
     tasks: {
-      1: {
-        id: 1,
-        available: false,
-        change_id: id()
-      },
-      2: {
-        id: 2,
-        available: false,
-        change_id: id()
-      },
-      3: {
-        id: 3,
-        available: false,
-        change_id: id()
-      },
-      4: {
-        id: 4,
-        available: false,
-        change_id: id()
-      },
-      5: {
-        id: 5,
-        available: false,
-        change_id: id()
-      },
-      6: {
-        id: 6,
-        available: false,
-        change_id: id()
-      },
-      7: {
-        id: 7,
-        available: false,
-        change_id: id()
-      },
-      8: {
-        id: 8,
-        available: false,
-        change_id: id()
-      },
-      9: {
-        id: 9,
-        available: false,
-        change_id: id()
-      },
-      10: {
-        id: 10,
-        available: false,
-        change_id: id()
-      },
-      11: {
-        id: 11,
-        available: false,
-        change_id: id()
-      },
-      12: {
-        id: 12,
-        available: false,
-        change_id: id()
-      },
-      13: {
-        id: 13,
-        available: false,
-        change_id: id()
-      },
-      14: {
-        id: 14,
-        available: false,
-        change_id: id()
-      },
+      /*
+      turn-based action spaces are randomly assigned during setup.
+      */
     }
   },
   initial: 'setup',

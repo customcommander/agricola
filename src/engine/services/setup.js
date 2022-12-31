@@ -1,14 +1,12 @@
 import {assign, forwardTo, spawn} from "xstate";
 import {assign as i_assign} from '@xstate/immer';
+import {id} from "../utils.js";
 
-// TODO: simulate a bit of delay whilst setting up the game.
 const service = (callback, receive) => {
 
-  receive(e => {
-    if (e.type == 'SETUP_GAME') {
-      setTimeout(() => {
-        callback({type: 'SETUP_DONE', tasks_order: e.tasks_order});
-      }, 50);
+  receive(({type, ...payload}) => {
+    if (type == 'SETUP_GAME') {
+      callback({type: 'SETUP_DONE', ...payload});
     }
   });
 
@@ -16,11 +14,25 @@ const service = (callback, receive) => {
 };
 
 export const start_setup_service = assign({
-  SetupService: () => spawn(service)
+  setup_service: () => spawn(service)
 });
 
-export const forward_to_setup_service = forwardTo(ctx => ctx.SetupService);
+export const forward_to_setup_service = forwardTo(ctx => ctx.setup_service);
 
-export const setup_done = i_assign((ctx, e) => {
-  ctx.tasks_order = e.tasks_order;
+export const setup_done = i_assign((ctx, {rounds}) => {
+  ctx.tasks = {
+    ...ctx.tasks,
+    ...Object.assign(
+      ...rounds.map((round, i) => ({
+        [round]: {
+          type: 'turn-based',
+          turn: i+1,
+          change_id: id(),
+          available: false,
+          disabled: null,
+          selected: false
+        }
+      }))
+    )
+  };
 });

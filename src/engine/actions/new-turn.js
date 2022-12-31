@@ -11,6 +11,11 @@ export default assign(ctx => {
                 || ctx.turn == 10
                 || ctx.turn == 12
                 || ctx.turn == 14);
-  ctx.tasks[ctx.tasks_order[ctx.turn - 1]].change_id = id();
-  ctx.tasks[ctx.tasks_order[ctx.turn - 1]].available = true;
+
+  const next_task =
+    Object.keys(ctx.tasks).find(
+      t => ctx.tasks[t].type == 'turn-based' && ctx.tasks[t].turn == ctx.turn);
+
+  ctx.tasks[next_task].change_id = id();
+  ctx.tasks[next_task].available = true;
 });
