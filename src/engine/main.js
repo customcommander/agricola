@@ -9,15 +9,14 @@ import machineDef from './main.definition.js';
 const machine = () =>
   createMachine(machineDef(), {actions, guards, services});
 
-const init_game = (payload) => ({type: 'SETUP_GAME', ...payload});
-
 // Returns a reference to the main machine as well as a function to start the game.
 export default () => {
   const game = interpret(machine());
   const start = (events) => {
     game.start();
     // TODO: randomly select occupation cards and minor improvement cards.
-    game.send(events ?? [init_game({
+    game.send(events ?? [{
+      type: 'SETUP_GAME',
       rounds: [
         ...shuffle([ '1-sow-and-or-bake-bread'
                    , '1-major-or-minor-improvement'
@@ -34,7 +33,7 @@ export default () => {
                    , '5-family-growth-even-without-room']),
                      '6-after-renovation-also-fences'
       ]
-    })]);
+    }]);
   };
   return [game, start];
 };
