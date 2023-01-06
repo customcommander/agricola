@@ -1,11 +1,20 @@
-import {Given, When, Then} from '@cucumber/cucumber';
+import {Given, When, Then, defineParameterType} from '@cucumber/cucumber';
 import { take } from 'rxjs';
+
+defineParameterType({
+  name: 'quantity',
+  regexp: /\d+|the/,
+  transformer: qty => {
+    if (qty === 'the') return 1;
+    return Number(qty);
+  }
+});
 
 Given('I start a new game', function () {
   this.startGame();
 });
 
-When('I complete {int} round(s)', async function (n) {
+When('I complete/finish {quantity} round(s)', async function (n) {
   await this.completeNTurn(n);
 });
 
