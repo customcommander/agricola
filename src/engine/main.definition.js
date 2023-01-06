@@ -5,9 +5,17 @@ export default () => ({
     stage: 0,
     num_workers: 2,
     tasks: {
-      /*
-      turn-based action spaces are randomly assigned during setup.
-      */
+/*
+  Tasks are things a player can do throughout the game:
+
+  - permanent actions (those printend on the board)
+  - turn-based actions
+  - minor & major improvement cards
+  - occupation cards
+
+  All tasks (including those randomly allocated) are defined
+  whilst setting up the game.
+*/
     }
   },
   initial: 'setup',

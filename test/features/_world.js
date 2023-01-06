@@ -1,6 +1,7 @@
 import { setWorldConstructor, World } from '@cucumber/cucumber';
 import {waitFor} from 'xstate/lib/waitFor.js';
 import main from '../../src/engine/main.js';
+import turn from '../../src/engine/observables/turn.js';
 
 setWorldConstructor(class extends World {
 
@@ -9,10 +10,11 @@ setWorldConstructor(class extends World {
     const [game, start] = main();
     this.game = game;
     this.start = start;
+    this.turn$ = turn(game);
   }
 
-  start() {
-    this.start();
+  startGame() {
+    this.start(this.parameters.events);
   }
 
   async completeNTurn(n) {
