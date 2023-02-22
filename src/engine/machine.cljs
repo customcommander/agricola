@@ -1,10 +1,12 @@
 (ns engine.machine)
 
-(def definition
-  {:initial :start
-   :states
-   {:start
-    {:entry :display-message
-     :always :end}
-    :end
-    {:type :final}}})
+;; JavaScript definition of the main machine
+(defn get-definition []
+  (clj->js
+   {:initial :start
+    :states
+    {:start
+     {:entry :display-message
+      :always :end}
+     :end
+     {:type :final}}}))

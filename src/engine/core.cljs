@@ -2,8 +2,8 @@
   (:require [xstate]
             [engine.machine :as machine]))
 
-(-> (clj->js machine/definition)
+(-> (machine/get-definition)
     (xstate/createMachine #js {:actions
-                               #js {:display-message (fn [] (println "ClojureScript FTW ;-)"))}})
+                               #js {:display-message (fn [] (println "ClojureScript FTW ;)"))}})
     (xstate/interpret)
     (.start))
