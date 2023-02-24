@@ -22,7 +22,7 @@
        
        :guards
        #js {:workers-left?
-            #(> (:num-workers (bean %) 0))}})
+            #(> (:num-workers (bean %)) 0)}})
 
 ;; Service definion. Invoked by XState.
 (defn get-service [js-ctx]
