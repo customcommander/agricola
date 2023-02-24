@@ -1,6 +1,7 @@
 (ns engine.core
   (:require [xstate]
-            [engine.machine :as machine]))
+            [engine.machine :as machine]
+            [engine.services.setup :as setup]))
 
 (-> (machine/get-definition)
     (xstate/createMachine #js {:actions
