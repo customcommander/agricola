@@ -14,14 +14,29 @@
         :states
         #js {:work
              #js {:invoke
-                  #js {:id "work-service-id"
-                       :src "work"}
+                  #js {:id work/id
+                       :src "work"
+                       :onDone
+                       #js {:target "end"}}
                   :on
-                  #js {:work-service-ready
-                       #js {:actions (fn [] (print "this is ready to rock"))}}}
+                  #js {:task-selected
+                       #js {:actions (xstate/forwardTo work/id)}
+                       :task-done
+                       #js {:actions (xstate/forwardTo work/id)}}}
              :end
-             #js {:type "final"}}}
+             #js {:entry (fn []
+                           (println "game over"))
+                  :type "final"}}}
    machine-opts))
 
-(.start (xstate/interpret (get-machine)))
+(defn get-service []
+  (xstate/interpret (get-machine)))
+
+;; temp
+(-> (get-service)
+    (.start)
+    (.send #js [#js {:type "task-selected"}
+                #js {:type "task-done"}
+                #js {:type "task-selected"}
+                #js {:type "task-done"}]))
 
