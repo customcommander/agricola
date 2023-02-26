@@ -2,6 +2,8 @@
   (:require [xstate]
             [cljs-bean.core :refer [bean ->js]]))
 
+(def id "work-service")
+
 (def machine-opts
   #js {:actions
        #js {:notify-ready
@@ -28,7 +30,7 @@
 (defn get-service [js-ctx]
   (let [{:keys [num-workers]} (bean js-ctx)]
     (xstate/createMachine
-     #js {:id "work-service"
+     #js {:id id
           :context
           #js {:num-workers num-workers}
           :initial "init"
