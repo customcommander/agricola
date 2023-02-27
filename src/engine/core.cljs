@@ -37,11 +37,7 @@
 
 (defn main []
   (let [game (xstate/interpret (get-machine))]
-    [game
-     (fn [evs]
-       (.start game)
-       (.send game evs))]))
-
+    [game #(.send (.start game) %)]))
 
 (comment
   (let [[_ start] (main)]
@@ -49,5 +45,6 @@
                 #js {:type "task-done"}
                 #js {:type "task-selected"}
                 #js {:type "task-done"}]))
+
   )
 
