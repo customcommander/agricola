@@ -3,8 +3,13 @@
             [engine.services.work :as work]))
 
 (def machine-opts
-  #js {:services
-       #js {:work work/get-service}})
+  #js {:actions
+       #js {:forward-to-work
+            (xstate/forwardTo work/id)}
+       
+       :services
+       #js {:work
+            work/get-service}})
 
 (defn get-machine []
   (xstate/createMachine
@@ -20,23 +25,29 @@
                        #js {:target "end"}}
                   :on
                   #js {:task-selected
-                       #js {:actions (xstate/forwardTo work/id)}
+                       #js {:actions "forward-to-work"}
                        :task-done
-                       #js {:actions (xstate/forwardTo work/id)}}}
+                       #js {:actions "forward-to-work"}}}
              :end
              #js {:entry (fn []
-                           (println "game over"))
+                           (println "game over ;)"))
                   :type "final"}}}
    machine-opts))
 
-(defn get-service []
-  (xstate/interpret (get-machine)))
 
-;; temp
-(-> (get-service)
-    (.start)
-    (.send #js [#js {:type "task-selected"}
+(defn main []
+  (let [game (xstate/interpret (get-machine))]
+    [game
+     (fn [evs]
+       (.start game)
+       (.send game evs))]))
+
+
+(comment
+  (let [[_ start] (main)]
+    (start #js [#js {:type "task-selected"}
                 #js {:type "task-done"}
                 #js {:type "task-selected"}
                 #js {:type "task-done"}]))
+  )
 
