@@ -5,7 +5,11 @@
 (def machine-opts
   #js {:actions
        #js {:forward-to-work
-            (xstate/forwardTo work/id)}
+            (xstate/forwardTo work/id)
+
+            :bye
+            (fn []
+              (println "game over! bye ;)"))}
        
        :services
        #js {:work
@@ -29,8 +33,7 @@
                        :task-done
                        #js {:actions "forward-to-work"}}}
              :end
-             #js {:entry (fn []
-                           (println "game over ;)"))
+             #js {:entry "bye"
                   :type "final"}}}
    machine-opts))
 
@@ -45,6 +48,5 @@
                 #js {:type "task-done"}
                 #js {:type "task-selected"}
                 #js {:type "task-done"}]))
-
-  )
+)
 
