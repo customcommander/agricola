@@ -1,1 +1,0 @@
-export default (ctx) => ctx.turn < 14;

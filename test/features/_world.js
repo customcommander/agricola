@@ -1,41 +1,23 @@
 import { setWorldConstructor, World } from '@cucumber/cucumber';
 import {waitFor} from 'xstate/lib/waitFor.js';
-import main from '../../src/engine/main.js';
-import turn from '../../src/engine/observables/turn.js';
+import init_game from '../../src/engine/main.js';
 
 setWorldConstructor(class extends World {
 
   constructor(options) {
     super(options);
-    const [game, start] = main();
-    this.game = game;
-    this.start = start;
-    this.turn$ = turn(game);
+    this.game = init_game();
   }
 
   startGame() {
-    this.start(this.parameters.events);
+    this.game.start();
   }
 
-  async completeNTurn(n) {
-    await waitFor(this.game, st => st.matches('work.main'));
-    const {context} = this.game.getSnapshot();
+  completeNTurn(n) {
     for (let i = 0; i < n; i++) {
-      for (let j = 0; j < context.num_workers; j++) {
-        this.game.send({type: 'TASK_SELECTED'});
-        this.game.send({type: 'TASK_DONE'});
-      }
+      this.game.send({type: 'WORK'});
+      this.game.send({type: 'WORK_DONE'});
     }
-  }
-
-  completeHarvest() {
-    this.game.send({type: 'HARVEST_FIELDS_DONE'});
-    this.game.send({type: 'HARVEST_FEED_DONE'});
-    this.game.send({type: 'HARVEST_BREED_DONE'});
-  }
-
-  async assertIsHarvestTime() {
-    await waitFor(this.game, st => st.matches('harvest.main'));
   }
 
   async assertIsEndOfGame() {
