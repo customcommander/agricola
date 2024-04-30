@@ -1,5 +1,5 @@
 import {LitElement, css, html} from 'lit';
-import {consume_turn} from './app/context';
+import {consume_turn} from './app/context.js';
 
 class InfoBar extends LitElement {
   #turn;
