@@ -1,12 +1,10 @@
 {
   "name": "@customcommander/agricola",
   "version": "1.0.0",
-  "description": "",
   "type": "module",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "web-dev-server",
-    "test": "./test/run.sh"
+    "start": "webpack serve --open"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +16,9 @@
     "xstate": "^5.12.0"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^8.10.0",
-    "@web/dev-server": "^0.4.4"
+    "html-webpack-plugin": "^5.6.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   }
 }
