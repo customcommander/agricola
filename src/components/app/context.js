@@ -4,7 +4,7 @@ import {
   createContext,
 } from '@lit/context';
 
-const turn_context = createContext('game-turn');
+const turn_context = createContext(Symbol());
 
 export function provide_turn() {
   return new ContextProvider(this, {
