@@ -4,18 +4,18 @@ import {
   createContext,
 } from '@lit/context';
 
-const turn_context = createContext(Symbol());
+const turn = createContext(Symbol());
 
 export function provide_turn() {
   return new ContextProvider(this, {
-    context: turn_context,
+    context: turn,
     initialValue: 0
   });
 }
 
 export function consume_turn() {
   return new ContextConsumer(this, {
-    context: turn_context,
+    context: turn,
     subscribe: true
   });
 }
