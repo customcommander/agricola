@@ -1,6 +1,7 @@
 {
   "context": {
     "turn": 1,
+    "family": 2,
     "workers": 2
   },
   "initial": "init",
