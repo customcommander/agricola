@@ -5,7 +5,7 @@ import {
   setup,
 } from 'xstate';
 
-
+import def from './game-machine.json';
 import work from './work.js';
 
 const src = {
@@ -15,67 +15,40 @@ const src = {
   actions: {
     setup_turn: enqueueActions(({enqueue}) => {
       enqueue.assign({
-        turn: ({context}) => context.turn + 1
+        turn: ({context}) => context.turn + 1,
+        workers: () => 2,
       });
       enqueue.emit(({context}) => ({
         type: 'new_turn',
         turn: context.turn
       }));
+    }),
+
+    allocate_worker: assign({
+      workers: ({context}) => {
+        console.log(`workers=${context.workers}`);
+        return context.workers - 1;
+      }
     })
   },
   guards: {
+    has_workers: ({context}) => context.workers > 0,
+
     is_harvest_time: ({context}) => {
       const {turn} = context;
-      return [4, 7, 9, 11, 13, 14].includes(turn);
+      const check = [4, 7, 9, 11, 13, 14].includes(turn);
+      console.log(`is harvest time? ${check}`);
+      return check;
     },
-    is_not_last_turn: ({context}) => {
+
+    is_last_turn: ({context}) => {
       const {turn} = context;
-      return turn < 14;
+      const check = turn === 14;
+      console.log(`is last turn? ${check}`);
+      return check;
     }
   }
 };
 
-export default setup(src).createMachine({
-  context: {
-    workers: 2,
-    turn: 0
-  },
-  initial: 'game_start',
-  states: {
-    game_start: {
-      after: {
-        500: 'new_turn'
-      }
-    },
-    new_turn: {
-      entry: 'setup_turn',
-      after: {
-        500: 'work'
-      }
-    },
-    work: {
-      invoke: {
-        id: 'work-actor',
-        src: 'work',
-        input: ({context}) => ({
-          workers: context.workers
-        }),
-        onDone: [
-          { target: 'harvest', guard: 'is_harvest_time' },
-          { target: 'new_turn' }
-        ],
-      }
-    },
-    harvest: {
-      after: {
-        500: [
-          { target: 'new_turn', guard: 'is_not_last_turn' },
-          { target: 'game_over' }
-        ]
-      }
-    },
-    game_over: {
-      type: 'final'
-    }
-  }
-});
+export default setup(src).createMachine(def);
+
