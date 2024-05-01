@@ -1,17 +1,11 @@
 {
   "context": {
-    "turn": 0,
+    "turn": 1,
     "workers": 2
   },
   "initial": "init",
   "states": {
     "init": {
-      "after": {
-        "200": "new_turn"
-      }
-    },
-    "new_turn": {
-      "entry": "setup_turn",
       "after": {
         "200": "work"
       }
@@ -50,7 +44,8 @@
           "guard": "is_harvest_time"
         },
         {
-          "target": "new_turn"
+          "target": "work",
+          "actions": "setup_new_turn"
         }
       ]
     },
@@ -82,7 +77,8 @@
           "guard": "is_last_turn"
         },
         {
-          "target": "new_turn"
+          "target": "work",
+          "actions": "setup_new_turn"
         }
       ]
     },
