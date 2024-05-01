@@ -9,7 +9,7 @@ const src = {
   actions: {
     setup_new_turn: assign({
       turn: ({context}) => context.turn + 1,
-      workers: () => 2,
+      workers: ({context}) => context.family,
     }),
 
     allocate_worker: assign({
