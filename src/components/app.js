@@ -1,6 +1,15 @@
 import {LitElement, css, html} from 'lit';
+
 import {createActor} from 'xstate';
-import {Subject, fromEventPattern, multicast, refCount, map, distinct} from 'rxjs';
+
+import {
+  Subject,
+  distinct,
+  fromEventPattern,
+  map,
+  multicast,
+  refCount,
+} from 'rxjs';
 
 import {provide_turn} from './app/context.js';
 
@@ -15,6 +24,7 @@ class App extends LitElement {
 
   constructor() {
     super();
+
     this.#game = createActor(game);
 
     const subject = new Subject();
@@ -53,7 +63,6 @@ class App extends LitElement {
   render() {
     return html`<agricola-infobar></agricola-infobar>`;
   }
-
 }
 
 customElements.define('agricola-app', App);
