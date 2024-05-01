@@ -8,8 +8,7 @@ const turn = createContext(Symbol());
 
 export function provide_turn() {
   return new ContextProvider(this, {
-    context: turn,
-    initialValue: 0
+    context: turn
   });
 }
 
