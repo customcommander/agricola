@@ -29,3 +29,13 @@ export function consume_tasks() {
   return new ContextConsumer(this, { context: tasks, subscribe: true });
 }
 
+const supply = createContext(Symbol());
+
+export function provide_supply() {
+  return new ContextProvider(this, { context: supply });
+}
+
+export function consume_supply() {
+  return new ContextConsumer(this, { context: supply, subscribe: true });
+}
+

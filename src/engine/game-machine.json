@@ -3,6 +3,11 @@
     "turn": 1,
     "family": 2,
     "workers": 2,
+    "supply": {
+      "wood": 0,
+      "reed": 0,
+      "clay": 0
+    },
     "tasks": [
       {
         "id": 101,
@@ -38,7 +43,7 @@
           "on": {
             "task.selected": {
               "target": "perform_task",
-              "actions": "allocate_worker"
+              "actions": "start_task"
             }
           }
         },
@@ -47,10 +52,12 @@
             "task.completed": [
               {
                 "target": "select_task",
-                "guard": "has_workers"
+                "guard": "has_workers",
+                "actions": "stop_task"
               },
               {
-                "target": "done"
+                "target": "done",
+                "actions": "stop_task"
               }
             ]
           }
@@ -106,5 +113,11 @@
     "game_over": {
       "type": "final"
     }
+  },
+  "on": {
+    "task.collect.done": {
+      "actions": "collect_done"
+    }
   }
 }
+

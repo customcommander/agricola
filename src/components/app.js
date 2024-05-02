@@ -15,19 +15,22 @@ import {
 import deep_equal from 'fast-deep-equal';
 
 import {
-  provide_turn,
+  provide_supply,
   provide_tasks,
+  provide_turn,
 } from './app/context.js';
 
 import game from '../engine/game.js';
 
 import './infobar.js';
+import './supply.js';
 import './tasks.js';
 
 class App extends LitElement {
   #game;
   #snapshot$;
   #turn;
+  #supply;
   #tasks;
 
   constructor() {
@@ -47,11 +50,17 @@ class App extends LitElement {
         refCount()
       );
 
-    this.#provideTurn();
-    this.#provideTasks();
+    this.#provide_turn();
+    this.#provide_supply();
+    this.#provide_tasks();
+
+    this.addEventListener('task.selected', (e) => {
+      this.#game.send({type: 'task.selected', ...e.detail});
+    });
+
   }
 
-  #provideTurn() {
+  #provide_turn() {
     this.#turn = provide_turn.apply(this);
 
     this.#snapshot$
@@ -64,7 +73,7 @@ class App extends LitElement {
       });
   }
 
-  #provideTasks() {
+  #provide_tasks() {
     this.#tasks = provide_tasks.apply(this);
 
     this.#snapshot$
@@ -77,6 +86,19 @@ class App extends LitElement {
       });
   }
 
+  #provide_supply() {
+    this.#supply = provide_supply.apply(this);
+
+    this.#snapshot$
+      .pipe(
+        map(snapshot => snapshot.context.supply),
+        distinctUntilChanged(deep_equal)
+      )
+      .subscribe(supply => {
+        this.#supply.setValue(supply);
+      });
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.#game.start();
@@ -85,6 +107,7 @@ class App extends LitElement {
   render() {
     return html`
 <agricola-infobar></agricola-infobar>
+<agricola-supply></agricola-supply>
 <agricola-tasks></agricola-tasks>
 `;
   }
