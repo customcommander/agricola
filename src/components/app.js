@@ -9,18 +9,26 @@ import {
   map,
   multicast,
   refCount,
+  distinctUntilChanged,
 } from 'rxjs';
 
-import {provide_turn} from './app/context.js';
+import deep_equal from 'fast-deep-equal';
+
+import {
+  provide_turn,
+  provide_tasks,
+} from './app/context.js';
 
 import game from '../engine/game.js';
 
 import './infobar.js';
+import './tasks.js';
 
 class App extends LitElement {
   #game;
   #snapshot$;
   #turn;
+  #tasks;
 
   constructor() {
     super();
@@ -40,6 +48,7 @@ class App extends LitElement {
       );
 
     this.#provideTurn();
+    this.#provideTasks();
   }
 
   #provideTurn() {
@@ -55,13 +64,29 @@ class App extends LitElement {
       });
   }
 
+  #provideTasks() {
+    this.#tasks = provide_tasks.apply(this);
+
+    this.#snapshot$
+      .pipe(
+        map(snapshot => snapshot.context.tasks),
+        distinctUntilChanged(deep_equal)
+      )
+      .subscribe(tasks => {
+        this.#tasks.setValue(tasks);
+      });
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.#game.start();
   }
 
   render() {
-    return html`<agricola-infobar></agricola-infobar>`;
+    return html`
+<agricola-infobar></agricola-infobar>
+<agricola-tasks></agricola-tasks>
+`;
   }
 }
 
