@@ -3,6 +3,15 @@ import {
   setup,
 } from 'xstate';
 
+import {
+  start_task,
+  stop_task
+} from './task.js';
+
+import {
+  collect_done
+} from './task-collect.js';
+
 import def from './game-machine.json';
 
 const src = {
@@ -10,15 +19,18 @@ const src = {
     setup_new_turn: assign({
       turn: ({context}) => context.turn + 1,
       workers: ({context}) => context.family,
+      tasks: ({context}) => context.tasks.map(t => {
+        const update = {...t, selected: false};
+        if (t.id == 101) update.quantity += 2;
+        if (t.id == 102) update.quantity += 1;
+        if (t.id == 103) update.quantity += 1;
+        return update;
+      })
     }),
 
-    allocate_worker: assign({
-      workers: ({context}) => {
-        const update = context.workers - 1;
-        console.log(`remaining workers ${update}`);
-        return update;
-      }
-    })
+    start_task,
+    stop_task,
+    collect_done,
   },
 
   guards: {
