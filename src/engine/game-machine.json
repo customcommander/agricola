@@ -2,7 +2,27 @@
   "context": {
     "turn": 1,
     "family": 2,
-    "workers": 2
+    "workers": 2,
+    "tasks": [
+      {
+        "id": 101,
+        "selected": false,
+        "hidden": false,
+        "quantity": 2
+      },
+      {
+        "id": 102,
+        "selected": false,
+        "hidden": false,
+        "quantity": 1
+      },
+      {
+        "id": 103,
+        "selected": false,
+        "hidden": false,
+        "quantity": 1
+      }
+    ]
   },
   "initial": "init",
   "states": {
@@ -15,16 +35,16 @@
       "initial": "select_task",
       "states": {
         "select_task": {
-          "after": {
-            "200": {
+          "on": {
+            "task.selected": {
               "target": "perform_task",
               "actions": "allocate_worker"
             }
           }
         },
         "perform_task": {
-          "after": {
-            "200": [
+          "on": {
+            "task.completed": [
               {
                 "target": "select_task",
                 "guard": "has_workers"

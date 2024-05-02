@@ -19,3 +19,13 @@ export function consume_turn() {
   });
 }
 
+const tasks = createContext(Symbol());
+
+export function provide_tasks() {
+  return new ContextProvider(this, { context: tasks });
+}
+
+export function consume_tasks() {
+  return new ContextConsumer(this, { context: tasks, subscribe: true });
+}
+
