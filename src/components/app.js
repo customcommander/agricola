@@ -61,10 +61,10 @@ class App extends LitElement {
 
   render() {
     return html`
-<agricola-infobar></agricola-infobar>
-<agricola-supply></agricola-supply>
-<agricola-tasks></agricola-tasks>
-`;
+      <agricola-infobar></agricola-infobar>
+      <agricola-supply></agricola-supply>
+      <agricola-tasks></agricola-tasks>
+    `;
   }
 }
 
