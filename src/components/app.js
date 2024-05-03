@@ -20,6 +20,30 @@ import './supply.js';
 import './tasks.js';
 
 class App extends LitElement {
+  static styles = css`
+    :host {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-areas:
+        "info   info   info"
+        "supply supply supply"
+        "tasks  board  improvements"
+        "score  score  score";
+    }
+
+    agricola-infobar {
+      grid-area: info;
+    }
+
+    agricola-supply {
+      grid-area: supply;
+    }
+
+    agricola-tasks {
+      grid-area: tasks;
+    }
+  `;
+
   #game;
 
   #messages;
