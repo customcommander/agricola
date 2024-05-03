@@ -30,9 +30,9 @@ class App extends LitElement {
   constructor() {
     super();
 
-    const provide = context => new ContextProvider(this, {context});
-
     this.#game = createActor(game);
+
+    const provide = context => new ContextProvider(this, {context});
 
     this.#messages = provide('messages');
     this.#supply = provide('supply');
@@ -42,12 +42,11 @@ class App extends LitElement {
     this.#messages.setValue(messages);
 
     const game$ = observe_game(this.#game);
-
     const observe = (fn, cb) => fn(game$).subscribe(cb);
 
-    observe(turn$, turn => this.#turn.setValue(turn));
-    observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(supply$, supply => this.#supply.setValue(supply));
+    observe(tasks$, tasks => this.#tasks.setValue(tasks));
+    observe(turn$, turn => this.#turn.setValue(turn));
 
     this.addEventListener('task.selected', (e) => {
       this.#game.send({type: 'task.selected', ...e.detail});
