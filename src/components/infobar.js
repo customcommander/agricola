@@ -1,5 +1,5 @@
 import {LitElement, css, html} from 'lit';
-import {consume_turn, consume_messages} from './app/context.js';
+import {ContextConsumer} from '@lit/context';
 
 class InfoBar extends LitElement {
   #messages;
@@ -7,8 +7,15 @@ class InfoBar extends LitElement {
 
   constructor() {
     super();
-    this.#messages = consume_messages.apply(this);
-    this.#turn = consume_turn.apply(this);
+
+    this.#messages = new ContextConsumer(this, {
+      context: 'messages'
+    });
+
+    this.#turn = new ContextConsumer(this, {
+      context: 'turn',
+      subscribe: true
+    });
   }
 
   render() {
@@ -22,3 +29,4 @@ class InfoBar extends LitElement {
 }
 
 customElements.define('agricola-infobar', InfoBar);
+

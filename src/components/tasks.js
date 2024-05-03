@@ -1,6 +1,6 @@
 import {LitElement, css, html} from 'lit';
+import {ContextConsumer} from '@lit/context';
 import {map} from 'lit/directives/map.js';
-import {consume_tasks, consume_messages} from './app/context.js';
 
 class Tasks extends LitElement {
   static styles = css`
@@ -29,8 +29,15 @@ div[selected] {
 
   constructor() {
     super();
-    this.#tasks = consume_tasks.apply(this);
-    this.#messages = consume_messages.apply(this);
+
+    this.#tasks = new ContextConsumer(this, {
+      context: 'tasks',
+      subscribe: true
+    });
+
+    this.#messages = new ContextConsumer(this, {
+      context: 'messages'
+    });
   }
 
   createRenderRoot() {
