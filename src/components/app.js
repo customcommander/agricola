@@ -3,14 +3,11 @@ import {LitElement, css, html} from 'lit';
 import {createActor} from 'xstate';
 
 import {
-  Subject,
-  distinct,
-  fromEventPattern,
-  map,
-  multicast,
-  refCount,
-  distinctUntilChanged,
-} from 'rxjs';
+  observe_game,
+  observe_supply,
+  observe_tasks,
+  observe_turn,
+} from '../observables.js';
 
 import deep_equal from 'fast-deep-equal';
 
@@ -31,82 +28,33 @@ import './tasks.js';
 
 class App extends LitElement {
   #game;
-  #snapshot$;
 
   #messages;
-  #turn;
   #supply;
   #tasks;
+  #turn;
 
   constructor() {
     super();
 
     this.#game = createActor(game);
 
-    const subject = new Subject();
+    this.#messages = provide_messages.apply(this);
+    this.#supply = provide_supply.apply(this);
+    this.#tasks = provide_tasks.apply(this);
+    this.#turn = provide_turn.apply(this);
 
-    this.#snapshot$ =
-      fromEventPattern(
-        (handler) => this.#game.subscribe(handler),
-        (_, subscription) => subscription.unsubscribe()
-      )
-      .pipe(
-        multicast(subject),
-        refCount()
-      );
+    this.#messages.setValue(messages);
 
-    this.#provide_messages();
-    this.#provide_turn();
-    this.#provide_supply();
-    this.#provide_tasks();
+    const game$ = observe_game(this.#game);
+
+    observe_turn(game$).subscribe(turn => this.#turn.setValue(turn));
+    observe_tasks(game$).subscribe(tasks => this.#tasks.setValue(tasks));
+    observe_supply(game$).subscribe(supply => this.#supply.setValue(supply));
 
     this.addEventListener('task.selected', (e) => {
       this.#game.send({type: 'task.selected', ...e.detail});
     });
-  }
-
-  #provide_messages() {
-    this.#messages = provide_messages.apply(this);
-    this.#messages.setValue(messages);
-  }
-
-  #provide_turn() {
-    this.#turn = provide_turn.apply(this);
-
-    this.#snapshot$
-      .pipe(
-        map(snapshot => snapshot.context.turn),
-        distinct()
-      )
-      .subscribe(turn => {
-        this.#turn.setValue(turn);
-      });
-  }
-
-  #provide_tasks() {
-    this.#tasks = provide_tasks.apply(this);
-
-    this.#snapshot$
-      .pipe(
-        map(snapshot => snapshot.context.tasks),
-        distinctUntilChanged(deep_equal)
-      )
-      .subscribe(tasks => {
-        this.#tasks.setValue(tasks);
-      });
-  }
-
-  #provide_supply() {
-    this.#supply = provide_supply.apply(this);
-
-    this.#snapshot$
-      .pipe(
-        map(snapshot => snapshot.context.supply),
-        distinctUntilChanged(deep_equal)
-      )
-      .subscribe(supply => {
-        this.#supply.setValue(supply);
-      });
   }
 
   connectedCallback() {
