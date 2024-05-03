@@ -1,6 +1,6 @@
 import {LitElement, css, html} from 'lit';
 import {map} from 'lit/directives/map.js';
-import {consume_tasks} from './app/context.js';
+import {consume_tasks, consume_messages} from './app/context.js';
 
 class Tasks extends LitElement {
   static styles = css`
@@ -22,13 +22,15 @@ div[selected] {
 	opacity: 0.2;
 	cursor: not-allowed;
 }
-	`;
+`;
 
   #tasks;
+  #messages;
 
   constructor() {
     super();
     this.#tasks = consume_tasks.apply(this);
+    this.#messages = consume_messages.apply(this);
   }
 
   createRenderRoot() {
@@ -55,10 +57,10 @@ div[selected] {
 
   render() {
     const task = t => html`
-			<div id=${t.id} ?selected=${t.selected}>
-				${t.id} -> (${t.quantity})
-			</div>
-		`;
+<div id=${t.id} ?selected=${t.selected}>
+  ${this.#messages.value[t.id]({qty: t.quantity})}
+</div>
+`;
 
     return html`${map(this.#tasks.value, task)}`;
   }
