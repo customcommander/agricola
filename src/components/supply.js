@@ -1,5 +1,5 @@
 import {LitElement, css, html} from 'lit';
-import {consume_supply, consume_messages} from './app/context.js';
+import {ContextConsumer} from '@lit/context';
 
 class Supply extends LitElement {
   #supply;
@@ -7,8 +7,15 @@ class Supply extends LitElement {
 
   constructor() {
     super();
-    this.#supply = consume_supply.apply(this);
-    this.#messages = consume_messages.apply(this);
+
+    this.#supply = new ContextConsumer(this, {
+      context: 'supply',
+      subscribe: true
+    });
+
+    this.#messages = new ContextConsumer(this, {
+      context: 'messages',
+    });
   }
 
   render() {

@@ -20,17 +20,17 @@ export const observe_game = game =>
     refCount()
   );
 
-export const observe_turn = snapshot$ => snapshot$.pipe(
+export const turn$ = snapshot$ => snapshot$.pipe(
   map(snapshot => snapshot.context.turn),
   distinct()
 );
 
-export const observe_tasks = snapshot$ => snapshot$.pipe(
+export const tasks$ = snapshot$ => snapshot$.pipe(
   map(snapshot => snapshot.context.tasks),
   distinctUntilChanged(deep_equal)
 );
 
-export const observe_supply = snapshot$ => snapshot$.pipe(
+export const supply$ = snapshot$ => snapshot$.pipe(
   map(snapshot => snapshot.context.supply),
   distinctUntilChanged(deep_equal)
 );

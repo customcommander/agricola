@@ -4,19 +4,12 @@ import {createActor} from 'xstate';
 
 import {
   observe_game,
-  observe_supply,
-  observe_tasks,
-  observe_turn,
+  supply$,
+  tasks$,
+  turn$,
 } from '../observables.js';
 
-import deep_equal from 'fast-deep-equal';
-
-import {
-  provide_messages,
-  provide_supply,
-  provide_tasks,
-  provide_turn,
-} from './app/context.js';
+import {ContextProvider} from '@lit/context';
 
 import messages from '../messages_en.yaml';
 
@@ -37,20 +30,24 @@ class App extends LitElement {
   constructor() {
     super();
 
+    const provide = context => new ContextProvider(this, {context});
+
     this.#game = createActor(game);
 
-    this.#messages = provide_messages.apply(this);
-    this.#supply = provide_supply.apply(this);
-    this.#tasks = provide_tasks.apply(this);
-    this.#turn = provide_turn.apply(this);
+    this.#messages = provide('messages');
+    this.#supply = provide('supply');
+    this.#tasks = provide('tasks');
+    this.#turn = provide('turn');
 
     this.#messages.setValue(messages);
 
     const game$ = observe_game(this.#game);
 
-    observe_turn(game$).subscribe(turn => this.#turn.setValue(turn));
-    observe_tasks(game$).subscribe(tasks => this.#tasks.setValue(tasks));
-    observe_supply(game$).subscribe(supply => this.#supply.setValue(supply));
+    const observe = (fn, cb) => fn(game$).subscribe(cb);
+
+    observe(turn$, turn => this.#turn.setValue(turn));
+    observe(tasks$, tasks => this.#tasks.setValue(tasks));
+    observe(supply$, supply => this.#supply.setValue(supply));
 
     this.addEventListener('task.selected', (e) => {
       this.#game.send({type: 'task.selected', ...e.detail});
