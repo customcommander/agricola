@@ -15,10 +15,13 @@ import {
 import deep_equal from 'fast-deep-equal';
 
 import {
+  provide_messages,
   provide_supply,
   provide_tasks,
   provide_turn,
 } from './app/context.js';
+
+import messages from '../messages_en.yaml';
 
 import game from '../engine/game.js';
 
@@ -29,6 +32,8 @@ import './tasks.js';
 class App extends LitElement {
   #game;
   #snapshot$;
+
+  #messages;
   #turn;
   #supply;
   #tasks;
@@ -50,6 +55,7 @@ class App extends LitElement {
         refCount()
       );
 
+    this.#provide_messages();
     this.#provide_turn();
     this.#provide_supply();
     this.#provide_tasks();
@@ -57,7 +63,11 @@ class App extends LitElement {
     this.addEventListener('task.selected', (e) => {
       this.#game.send({type: 'task.selected', ...e.detail});
     });
+  }
 
+  #provide_messages() {
+    this.#messages = provide_messages.apply(this);
+    this.#messages.setValue(messages);
   }
 
   #provide_turn() {

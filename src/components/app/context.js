@@ -39,3 +39,13 @@ export function consume_supply() {
   return new ContextConsumer(this, { context: supply, subscribe: true });
 }
 
+const messages = createContext(Symbol());
+
+export function provide_messages() {
+  return new ContextProvider(this, { context: messages });
+}
+
+export function consume_messages() {
+  return new ContextConsumer(this, { context: messages });
+}
+
