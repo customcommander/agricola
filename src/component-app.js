@@ -82,9 +82,7 @@ class App extends LitElement {
     observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(turn$, turn => this.#turn.setValue(turn));
 
-    this.addEventListener('task.selected', (e) => {
-      this.#game.send({type: 'task.selected', ...e.detail});
-    });
+    this.addEventListener('dispatch', (e) => this.#game.send(e.detail));
   }
 
   connectedCallback() {
