@@ -49,10 +49,11 @@ class Tasks extends LitElement {
       if (already_selected) return;
 
       this.dispatchEvent(
-        new CustomEvent('task.selected', {
+        new CustomEvent('dispatch', {
           bubbles: true,
           composed: true,
           detail: {
+            type: 'task.selected',
             task_id: e.target.id
           }
         })
