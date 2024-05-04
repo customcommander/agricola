@@ -1,7 +1,7 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export default {
-  entry: './src/components/app.js',
+  entry: './src/component-app.js',
   mode: 'development',
   output: {
     filename: 'bundle.js'
