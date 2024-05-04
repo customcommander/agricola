@@ -4,25 +4,25 @@ import {map} from 'lit/directives/map.js';
 
 class Tasks extends LitElement {
   static styles = css`
-:host {
-	display: flex;
-	flex-direction: column;
-	row-gap: 1em;
-}
+    :host {
+      display: flex;
+      flex-direction: column;
+      row-gap: 1em;
+    }
 
-div {
-	border: 1px solid black;
-}
+    div {
+      border: 1px solid black;
+    }
 
-div:not([selected]) {
-	cursor: pointer;
-}
+    div:not([selected]) {
+      cursor: pointer;
+    }
 
-div[selected] {
-	opacity: 0.2;
-	cursor: not-allowed;
-}
-`;
+    div[selected] {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+  `;
 
   #tasks;
   #messages;
@@ -64,10 +64,10 @@ div[selected] {
 
   render() {
     const task = t => html`
-<div id=${t.id} ?selected=${t.selected}>
-  ${this.#messages.value[t.id]({qty: t.quantity})}
-</div>
-`;
+      <div id=${t.id} ?selected=${t.selected}>
+        ${this.#messages.value[t.id]({qty: t.quantity})}
+      </div>
+    `;
 
     return html`${map(this.#tasks.value, task)}`;
   }
