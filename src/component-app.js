@@ -8,18 +8,18 @@ import {
   supply$,
   tasks$,
   turn$,
-} from '../observables.js';
+} from './observables.js';
 
 import {ContextProvider} from '@lit/context';
 
-import messages from '../messages_en.yaml';
+import messages from './messages_en.yaml';
 
-import game from '../engine/game.js';
+import game from './game.js';
 
-import './infobar.js';
-import './supply.js';
-import './tasks.js';
-import '../component-farmyard.js';
+import './component-infobar.js';
+import './component-supply.js';
+import './component-tasks.js';
+import './component-farmyard.js';
 
 class App extends LitElement {
   static styles = css`
