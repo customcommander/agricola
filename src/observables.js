@@ -35,3 +35,8 @@ export const supply$ = snapshot$ => snapshot$.pipe(
   distinctUntilChanged(deep_equal)
 );
 
+export const farmyard$ = snapshot$ => snapshot$.pipe(
+  map(snapshot => snapshot.context.farmyard),
+  distinctUntilChanged(deep_equal)
+);
+

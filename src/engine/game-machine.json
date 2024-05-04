@@ -8,6 +8,27 @@
       "reed": 0,
       "clay": 0
     },
+    "farmyard": {
+      "A1": null,
+      "A2": null,
+      "A3": null,
+      "A4": null,
+      "A5": null,
+      "B1": {
+        "type": "wooden_hut"
+      },
+      "B2": null,
+      "B3": null,
+      "B4": null,
+      "B5": null,
+      "C1": {
+        "type": "wooden_hut"
+      },
+      "C2": null,
+      "C3": null,
+      "C4": null,
+      "C5": null
+    },
     "tasks": [
       {
         "id": 101,
