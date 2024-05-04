@@ -18,6 +18,7 @@ import game from '../engine/game.js';
 import './infobar.js';
 import './supply.js';
 import './tasks.js';
+import '../component-farmyard.js';
 
 class App extends LitElement {
   static styles = css`
@@ -25,10 +26,10 @@ class App extends LitElement {
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
       grid-template-areas:
-        "info   info   info"
-        "supply supply supply"
-        "tasks  board  improvements"
-        "score  score  score";
+        "info   info     info"
+        "supply supply   supply"
+        "tasks  farmyard improvements"
+        "score  score    score";
     }
 
     agricola-infobar {
@@ -41,6 +42,10 @@ class App extends LitElement {
 
     agricola-tasks {
       grid-area: tasks;
+    }
+
+    agricola-farmyard {
+      grid-area: farmyard;
     }
   `;
 
@@ -87,6 +92,7 @@ class App extends LitElement {
       <agricola-infobar></agricola-infobar>
       <agricola-supply></agricola-supply>
       <agricola-tasks></agricola-tasks>
+      <agricola-farmyard></agricola-farmyard>
     `;
   }
 }
