@@ -15,6 +15,13 @@ export const stop_task = enqueueActions(({enqueue, event, context}) => {
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
   enqueue.stopChild(spawn_id);
-  enqueue.assign({[spawn_id]: undefined});
+  enqueue.assign({
+    [spawn_id]: undefined,
+    tasks: ({context}) => context.tasks.map(t => {
+      if (t.id != task_id) return t;
+      const update = {...t, done: true};
+      return update;
+    })
+  });
 });
 
