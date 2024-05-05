@@ -33,18 +33,21 @@
       {
         "id": 101,
         "selected": false,
+        "done": false,
         "hidden": false,
         "quantity": 2
       },
       {
         "id": 102,
         "selected": false,
+        "done": false,
         "hidden": false,
         "quantity": 1
       },
       {
         "id": 103,
         "selected": false,
+        "done": false,
         "hidden": false,
         "quantity": 1
       }

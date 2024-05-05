@@ -20,7 +20,7 @@ const src = {
       turn: ({context}) => context.turn + 1,
       workers: ({context}) => context.family,
       tasks: ({context}) => context.tasks.map(t => {
-        const update = {...t, selected: false};
+        const update = {...t, selected: false, done: false};
         if (t.id == 101) update.quantity += 2;
         if (t.id == 102) update.quantity += 1;
         if (t.id == 103) update.quantity += 1;
