@@ -1,5 +1,7 @@
 import {
   assign,
+  enqueueActions,
+  sendTo,
   setup,
 } from 'xstate';
 
@@ -31,6 +33,19 @@ const src = {
     start_task,
     stop_task,
     collect_done,
+
+    'forward-to-action-daemon':
+    sendTo(({context, event}) => context[`task-${event.task_id}-ref`],
+           ({event}) => event),
+
+    'plow-field': enqueueActions(({enqueue}) => {
+      enqueue.assign({
+        farmyard: ({context: {farmyard}, event}) => ({
+          ...farmyard,
+          [event.space_id]: {type: "field"}
+        })
+      });
+    })
   },
 
   guards: {

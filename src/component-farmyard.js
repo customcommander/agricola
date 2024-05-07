@@ -1,8 +1,11 @@
-import {LitElement, css, html} from 'lit';
+import {LitElement, css, html, nothing} from 'lit';
 import {map} from 'lit/directives/map.js';
 import {ContextConsumer} from '@lit/context';
 
+import {spaces} from './util-farmyard.js';
+
 import './component-farmyard-room.js';
+import './component-field.js';
 
 class FarmYard extends LitElement {
   static styles = css`
@@ -34,6 +37,7 @@ class FarmYard extends LitElement {
   `;
 
   #farmyard;
+  #selection;
 
   constructor() {
     super();
@@ -42,6 +46,19 @@ class FarmYard extends LitElement {
       context: 'farmyard',
       subscribe: true
     });
+
+    this.#selection = new ContextConsumer(this, {
+      context: 'selection',
+      subscribe: true
+    });
+  }
+
+  _empty(id) {
+    return html`
+      <div id=${id}>
+        empty
+      </div>
+    `;
   }
 
   _room(id, space) {
@@ -53,26 +70,37 @@ class FarmYard extends LitElement {
     `;
   }
 
-  _empty(id) {
-    return html`<div id=${id}>${id}</div>`;
+  _field(id, space, selection) {
+    return html`
+      <agricola-field
+        id=${id}
+        type=${space?.type ?? nothing}
+        ?plow=${space == null && selection != null}>
+      </agricola-field>
+    `;
+  }
+
+  _space(space_id) {
+    const farmyard = this.#farmyard.value;
+    const selection = this.#selection.value;
+
+    const space = farmyard[space_id];
+    const selected = selection?.spaces.includes(space_id);
+    const task_id = selection?.task_id;
+
+    if (space?.type == 'field' || (selected && task_id == 104)) {
+      return this._field(space_id, space, selection);
+    }
+
+    if (space?.type == 'wooden_hut') {
+      return this._room(space_id, space);
+    }
+
+    return this._empty(space_id);
   }
 
   render() {
-    const spaces = ['A1', 'A2', 'A3', 'A4', 'A5',
-                    'B1', 'B2', 'B3', 'B4', 'B5',
-                    'C1', 'C2', 'C3', 'C4', 'C5'];
-
-    const farmyard = this.#farmyard.value;
-
-    const space = id => {
-      const s = farmyard[id];
-
-      return (!s ? this._empty(id)
-                 : this._room(id, s));
-
-    };
-
-    return html`${map(spaces, space)}`;
+    return html`${map(spaces, id => this._space(id))}`;
   }
 }
 

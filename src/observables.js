@@ -10,6 +10,8 @@ import {
 
 import deep_equal from 'fast-deep-equal';
 
+import {empty_spaces} from './util-farmyard.js';
+
 export const observe_game = game =>
   fromEventPattern(
     (handler) => game.subscribe(handler),
@@ -40,3 +42,25 @@ export const farmyard$ = snapshot$ => snapshot$.pipe(
   distinctUntilChanged(deep_equal)
 );
 
+function is_current_task(task) {
+  const {selected, done} = task;
+  return selected && !done;
+}
+
+export const selection$ = snapshot$ => snapshot$.pipe(
+  map(({context: {tasks, farmyard}}) => {
+    const task = tasks.find(is_current_task);
+    const no_selection = (
+      task?.id != 104
+    );
+
+    if (no_selection) return null;
+
+    return {
+      task_id: 104,
+      spaces: empty_spaces(farmyard)
+    };
+  }),
+
+  distinctUntilChanged(deep_equal)
+);
