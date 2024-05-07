@@ -4,7 +4,11 @@ supply_wood: Wood ({qty})
 supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})
 
+# verbs
+plow: Plow
+
 # Actions
 101: Take {qty} wood
 102: Take {qty} reed
 103: Take {qty} clay
+104: Plow field

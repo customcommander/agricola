@@ -5,6 +5,7 @@ import {createActor} from 'xstate';
 import {
   observe_game,
   farmyard$,
+  selection$,
   supply$,
   tasks$,
   turn$,
@@ -54,6 +55,7 @@ class App extends LitElement {
   #messages;
 
   #farmyard;
+  #selection;
   #supply;
   #tasks;
   #turn;
@@ -68,6 +70,7 @@ class App extends LitElement {
     this.#messages = provide('messages');
 
     this.#farmyard = provide('farmyard');
+    this.#selection = provide('selection');
     this.#supply = provide('supply');
     this.#tasks = provide('tasks');
     this.#turn = provide('turn');
@@ -78,6 +81,7 @@ class App extends LitElement {
     const observe = (fn, cb) => fn(game$).subscribe(cb);
 
     observe(farmyard$, farmyard => this.#farmyard.setValue(farmyard));
+    observe(selection$, selection => this.#selection.setValue(selection));
     observe(supply$, supply => this.#supply.setValue(supply));
     observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(turn$, turn => this.#turn.setValue(turn));

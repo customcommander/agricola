@@ -50,6 +50,11 @@
         "done": false,
         "hidden": false,
         "quantity": 1
+      },
+      {
+        "id": 104,
+        "selected": false,
+        "done": false
       }
     ]
   },
@@ -141,6 +146,12 @@
   "on": {
     "task.collect.done": {
       "actions": "collect_done"
+    },
+    "space.selected": {
+      "actions": "forward-to-action-daemon"
+    },
+    "action.plow.field": {
+      "actions": "plow-field"
     }
   }
 }
