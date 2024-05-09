@@ -6,8 +6,8 @@ import {
 } from 'xstate';
 
 import {
-  start_task,
-  stop_task
+  task_start,
+  task_stop
 } from './task.js';
 
 import {
@@ -30,8 +30,8 @@ const src = {
       })
     }),
 
-    start_task,
-    stop_task,
+    'task-start': task_start,
+    'task-stop': task_stop,
     collect_done,
 
     'forward-to-action-daemon':

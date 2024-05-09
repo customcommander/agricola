@@ -72,7 +72,7 @@
           "on": {
             "task.selected": {
               "target": "perform_task",
-              "actions": "start_task"
+              "actions": "task-start"
             }
           }
         },
@@ -82,11 +82,11 @@
               {
                 "target": "select_task",
                 "guard": "has_workers",
-                "actions": "stop_task"
+                "actions": "task-stop"
               },
               {
                 "target": "done",
-                "actions": "stop_task"
+                "actions": "task-stop"
               }
             ]
           }

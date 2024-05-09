@@ -2,7 +2,7 @@ import {assign, enqueueActions, sendTo} from 'xstate';
 import {collect} from './task-collect.js';
 import {plow} from './task-plow.js';
 
-export const start_task = enqueueActions(({enqueue, context, event, self}) => {
+export const task_start = enqueueActions(({enqueue, context, event, self}) => {
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
@@ -29,7 +29,7 @@ export const start_task = enqueueActions(({enqueue, context, event, self}) => {
   });
 });
 
-export const stop_task = enqueueActions(({enqueue, event, context}) => {
+export const task_stop = enqueueActions(({enqueue, event, context}) => {
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
