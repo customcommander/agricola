@@ -11,7 +11,7 @@ import {
 } from './task.js';
 
 import {
-  collect_done
+  task_collect_done
 } from './task-collect.js';
 
 import def from './game-machine.json';
@@ -32,7 +32,8 @@ const src = {
 
     'task-start': task_start,
     'task-stop': task_stop,
-    collect_done,
+
+    'task-collect-done': task_collect_done,
 
     'forward-to-action-daemon':
     sendTo(({context, event}) => context[`task-${event.task_id}-ref`],

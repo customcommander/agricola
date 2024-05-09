@@ -6,7 +6,7 @@ export const collect = fromCallback(({sendBack, input}) => {
   sendBack({type: 'task.completed', task_id});
 });
 
-export const collect_done = assign(({context, event}) => {
+export const task_collect_done = assign(({context, event}) => {
   const {task_id} = event;
   const {quantity} = context.tasks.find(t => t.id == task_id);
 
