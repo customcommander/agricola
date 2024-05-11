@@ -1,19 +1,21 @@
 import {assign, enqueueActions, sendTo} from 'xstate';
+import {produce} from 'immer';
 import {collect} from './task-collect.js';
 import {plow} from './task-plow.js';
 
-export const task_start = enqueueActions(({enqueue, context, event, self}) => {
+export const task_start = enqueueActions(({enqueue, event, self}) => {
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
-  enqueue.assign({
-    workers: context.workers - 1,
-    tasks: context.tasks.map(t => t.id != task_id ? t : {...t, selected: true})
-  });
+  enqueue.assign(({context}) => produce(context, draft => {
+    draft.workers -= 1;
+    draft.tasks[task_id].selected = true;
+    return draft;
+  }));
 
   enqueue.assign({
     [spawn_id]: ({spawn}) => {
-      const is_collect = task_id == 101 || task_id == 102 || task_id == 103;
+      const is_collect = task_id == 107 || task_id == 108 || task_id == 109;
       if (is_collect) return spawn(collect, {input: {task_id}});
 
       const is_plow = task_id == 104;
@@ -35,13 +37,10 @@ export const task_stop = enqueueActions(({enqueue, event, context}) => {
 
   enqueue.stopChild(spawn_id);
 
-  enqueue.assign({
-    [spawn_id]: undefined,
-    tasks: ({context}) => context.tasks.map(t => {
-      if (t.id != task_id) return t;
-      const update = {...t, done: true};
-      return update;
-    })
-  });
+  enqueue.assign(() => produce(context, draft => {
+    delete draft[spawn_id];
+    draft.tasks[task_id].done = true;
+    return draft;
+  }));
 });
 

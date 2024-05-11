@@ -8,7 +8,7 @@ supply_clay: Clay ({qty})
 plow: Plow
 
 # Actions
-101: Take {qty} wood
-102: Take {qty} reed
-103: Take {qty} clay
-104: Plow field
+104: "Plow 1 Field"
+107: "{qty} Wood"
+108: "{qty} Clay"
+109: "{qty} Reed"

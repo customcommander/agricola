@@ -5,8 +5,8 @@
     "workers": 2,
     "supply": {
       "wood": 0,
-      "reed": 0,
-      "clay": 0
+      "clay": 0,
+      "reed": 0
     },
     "farmyard": {
       "A1": null,
@@ -29,34 +29,30 @@
       "C4": null,
       "C5": null
     },
-    "tasks": [
-      {
-        "id": 101,
+    "tasks": {
+      "104": {
+        "selected": false,
+        "done": false
+      },
+      "107": {
         "selected": false,
         "done": false,
         "hidden": false,
         "quantity": 2
       },
-      {
-        "id": 102,
+      "108": {
         "selected": false,
         "done": false,
         "hidden": false,
         "quantity": 1
       },
-      {
-        "id": 103,
+      "109": {
         "selected": false,
         "done": false,
         "hidden": false,
         "quantity": 1
-      },
-      {
-        "id": 104,
-        "selected": false,
-        "done": false
       }
-    ]
+    }
   },
   "initial": "init",
   "states": {
@@ -150,8 +146,8 @@
     "space.selected": {
       "actions": "forward-to-action-daemon"
     },
-    "action.plow.field": {
-      "actions": "plow-field"
+    "game.update": {
+      "actions": "game-update"
     }
   }
 }

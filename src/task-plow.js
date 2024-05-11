@@ -1,5 +1,6 @@
 import {setup, enqueueActions, sendTo} from 'xstate';
 import {empty_spaces} from './util-farmyard.js';
+import {produce} from 'immer';
 
 const src = {
   actions: {
@@ -9,8 +10,11 @@ const src = {
       });
 
       enqueue.sendTo(context.parent, {
-        type: 'action.plow.field',
-        space_id: event.space_id
+        type: 'game.update',
+        from: event,
+        produce: produce((draft, {space_id}) => {
+          draft.farmyard[space_id] = {type: 'field'};
+        })
       });
     }),
 

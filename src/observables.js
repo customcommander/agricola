@@ -49,10 +49,9 @@ function is_current_task(task) {
 
 export const selection$ = snapshot$ => snapshot$.pipe(
   map(({context: {tasks, farmyard}}) => {
-    const task = tasks.find(is_current_task);
-    const no_selection = (
-      task?.id != 104
-    );
+    const task_id = [104,107,108,109].find(id => tasks[id].selected && !tasks[id].done);
+    const task = tasks[task_id];
+    const no_selection = task_id != 104;
 
     if (no_selection) return null;
 

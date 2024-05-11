@@ -5,6 +5,8 @@ import {
   setup,
 } from 'xstate';
 
+import {produce} from 'immer';
+
 import {
   task_start,
   task_stop
@@ -18,17 +20,22 @@ import def from './game-machine.json';
 
 const src = {
   actions: {
-    setup_new_turn: assign({
-      turn: ({context}) => context.turn + 1,
-      workers: ({context}) => context.family,
-      tasks: ({context}) => context.tasks.map(t => {
-        const update = {...t, selected: false, done: false};
-        if (t.id == 101) update.quantity += 2;
-        if (t.id == 102) update.quantity += 1;
-        if (t.id == 103) update.quantity += 1;
-        return update;
-      })
-    }),
+    setup_new_turn: assign(({context}) => produce(context, draft => {
+      draft.turn += 1;
+      draft.workers = draft.family;
+      draft.tasks["104"].selected = false;
+      draft.tasks["104"].done = false;
+      draft.tasks["107"].selected = false;
+      draft.tasks["107"].done = false;
+      draft.tasks["107"].quantity += 2;
+      draft.tasks["108"].selected = false;
+      draft.tasks["108"].done = false;
+      draft.tasks["108"].quantity += 1;
+      draft.tasks["109"].selected = false;
+      draft.tasks["109"].done = false;
+      draft.tasks["109"].quantity += 1;
+      return draft;
+    })),
 
     'task-start': task_start,
     'task-stop': task_stop,
@@ -39,13 +46,8 @@ const src = {
     sendTo(({context, event}) => context[`task-${event.task_id}-ref`],
            ({event}) => event),
 
-    'plow-field': enqueueActions(({enqueue}) => {
-      enqueue.assign({
-        farmyard: ({context: {farmyard}, event}) => ({
-          ...farmyard,
-          [event.space_id]: {type: "field"}
-        })
-      });
+    'game-update': assign(({context, event}) => {
+      return event.produce(context, event.from);
     })
   },
 

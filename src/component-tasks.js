@@ -64,13 +64,14 @@ class Tasks extends LitElement {
   }
 
   render() {
-    const task = t => html`
-      <div id=${t.id} ?selected=${t.selected}>
-        ${this.#messages.value[t.id]({qty: t.quantity})}
+    const tasks = Object.entries(this.#tasks.value);
+    const task = ([id, t]) => html`
+      <div id=${id} ?selected=${t.selected}>
+        ${this.#messages.value[id]({qty: t.quantity})}
       </div>
     `;
 
-    return html`${map(this.#tasks.value, task)}`;
+    return html`${map(tasks, task)}`;
   }
 }
 
