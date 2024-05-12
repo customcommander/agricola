@@ -14,6 +14,7 @@ const src = {
         from: event,
         produce: produce((draft, {space_id}) => {
           draft.farmyard[space_id] = {type: 'field'};
+          return draft;
         })
       });
     }),
