@@ -140,9 +140,6 @@
     }
   },
   "on": {
-    "task.collect.done": {
-      "actions": "task-collect-done"
-    },
     "space.selected": {
       "actions": "forward-to-action-daemon"
     },
