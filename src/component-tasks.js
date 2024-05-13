@@ -11,6 +11,7 @@ class Tasks extends LitElement {
     }
 
     div {
+      white-space: pre-wrap;
       border: 1px solid black;
     }
 

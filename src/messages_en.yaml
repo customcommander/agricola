@@ -8,6 +8,17 @@ supply_clay: Clay ({qty})
 plow: Plow
 
 # Actions
+101: |-
+  Build room(s)
+  Wooden hutt: 5W+2R
+  Clay hutt: 5C+2R
+  Stone house: 5S+2R
+
+  and/or
+
+  Build Stable(s)
+  2W per stable
+
 104: "Plow 1 Field"
 107: "{qty} Wood"
 108: "{qty} Clay"
