@@ -58,5 +58,6 @@ const def = {
   }
 };
 
-export const plow = setup(src).createMachine(def);
+export const actor = setup(src).createMachine(def);
 
+export const input = () => ({count: 1});

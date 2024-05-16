@@ -1,9 +1,15 @@
 import {assign, enqueueActions, sendTo} from 'xstate';
 import {produce} from 'immer';
-import {collect} from './task-collect.js';
-import {plow} from './task-plow.js';
+import * as collect from './task-collect.js';
+import * as plow from './task-plow.js';
 
-export const task_start = enqueueActions(({enqueue, event, self}) => {
+const taskm =
+  {104: plow,
+   107: collect,
+   108: collect,
+   109: collect};
+
+export const task_start = enqueueActions(({enqueue, context, event, self}) => {
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
@@ -15,18 +21,15 @@ export const task_start = enqueueActions(({enqueue, event, self}) => {
 
   enqueue.assign({
     [spawn_id]: ({spawn}) => {
-      const is_collect = task_id == 107 || task_id == 108 || task_id == 109;
-      if (is_collect) return spawn(collect, {input: {task_id}});
+      const task = taskm[task_id];
 
-      const is_plow = task_id == 104;
-      if (is_plow) {
-        return spawn(plow, {
-          input: {
-            parent: self,
-            count: 1
-          }
-        });
-      }
+      return spawn(task.actor, {
+        input: {
+          ...task.input(context),
+          parent: self,
+          task_id
+        }
+      });
     }
   });
 });

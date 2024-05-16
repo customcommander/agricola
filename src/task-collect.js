@@ -6,7 +6,7 @@ const supply_key =
    108: 'clay',
    109: 'reed'};
 
-export const collect = fromCallback(({sendBack, input}) => {
+export const actor = fromCallback(({sendBack, input}) => {
   const {task_id} = input;
 
   sendBack({
@@ -28,3 +28,4 @@ export const collect = fromCallback(({sendBack, input}) => {
   });
 });
 
+export const input = () => null;
