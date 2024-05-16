@@ -9,30 +9,24 @@ const taskm =
    108: collect,
    109: collect};
 
-export const task_start = enqueueActions(({enqueue, context, event, self}) => {
+export const task_start = assign(({context, event, spawn, self}) => produce(context, draft => {
   const {task_id} = event;
+  const task = taskm[task_id];
   const spawn_id = `task-${task_id}-ref`;
 
-  enqueue.assign(({context}) => produce(context, draft => {
-    draft.workers -= 1;
-    draft.tasks[task_id].selected = true;
-    return draft;
-  }));
+  draft.workers -= 1;
+  draft.tasks[task_id].selected = true;
 
-  enqueue.assign({
-    [spawn_id]: ({spawn}) => {
-      const task = taskm[task_id];
-
-      return spawn(task.actor, {
-        input: {
-          ...task.input(context),
-          parent: self,
-          task_id
-        }
-      });
+  draft[spawn_id] = spawn(task.actor, {
+    input: {
+      ...task.input(context),
+      parent: self,
+      task_id
     }
   });
-});
+
+  return draft;
+}));
 
 export const task_stop = enqueueActions(({enqueue, event, context}) => {
   const {task_id} = event;
@@ -41,7 +35,7 @@ export const task_stop = enqueueActions(({enqueue, event, context}) => {
   enqueue.stopChild(spawn_id);
 
   enqueue.assign(() => produce(context, draft => {
-    delete draft[spawn_id];
+    draft[spawn_id] = undefined;
     draft.tasks[task_id].done = true;
     return draft;
   }));
