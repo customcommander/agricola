@@ -46,6 +46,10 @@ const src = {
   },
 
   guards: {
+    'task-available?': ({context, event}) => {
+      const {task_id} = event;
+      return context.tasks[task_id].selected === false;
+    },
     has_workers: ({context}) => {
       const check = context.workers > 0;
       return check;

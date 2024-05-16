@@ -45,10 +45,6 @@ class Tasks extends LitElement {
     const root = super.createRenderRoot();
 
     root.addEventListener('click', function (e) {
-      const already_selected = e.target.hasAttribute('selected');
-
-      if (already_selected) return;
-
       this.dispatchEvent(
         new CustomEvent('dispatch', {
           bubbles: true,

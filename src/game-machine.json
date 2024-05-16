@@ -72,6 +72,7 @@
           "on": {
             "task.selected": {
               "target": "perform_task",
+              "guard": "task-available?",
               "actions": "task-start"
             }
           }
