@@ -1,31 +1,46 @@
-import {fromCallback, assign} from 'xstate';
+import {enqueueActions, createMachine} from 'xstate';
 import {produce} from 'immer';
 
-const supply_key =
-  {107: 'wood',
-   108: 'clay',
-   109: 'reed'};
-
-export const actor = fromCallback(({sendBack, input}) => {
-  const {task_id} = input;
-
-  sendBack({
-    type: 'game.update',
-    from: {
+export const actor = createMachine({
+  context: ({input}) => {
+    const {parent, task_id} = input;
+    const resource_id = ( task_id == 107 ? 'wood'
+                        : task_id == 108 ? 'clay'
+                        : task_id == 109 ? 'reed'
+                                         : null);
+    return {
+      parent,
       task_id,
-    },
-    produce: produce((draft, {task_id}) => {
-      const {quantity} = draft.tasks[task_id];
-      draft.supply[supply_key[task_id]] += quantity;
-      draft.tasks[task_id].quantity = 0;
-      return draft;
-    })
-  });
+      resource_id
+    }; 
+  },
+  initial: 'collect',
+  states: {
+    collect: {
+      entry:
+      enqueueActions(({enqueue, context}) => {
+        enqueue.sendTo(context.parent, {
+          type: 'game.update',
+          from: {
+            task_id: context.task_id,
+            resource_id: context.resource_id
+          },
+          produce: produce((draft, {task_id, resource_id}) => {
+            const {quantity} = draft.tasks[task_id];
+            draft.supply[resource_id] += quantity;
+            draft.tasks[task_id].quantity = 0;
+            return draft;
+          })
+        });
 
-  sendBack({
-    type: 'task.completed',
-    task_id
-  });
+        enqueue.sendTo(context.parent, {
+          type: 'task.completed',
+          task_id: context.task_id
+        });
+      })
+    }
+  }
 });
 
 export const input = () => null;
+
