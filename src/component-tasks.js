@@ -10,16 +10,17 @@ class Tasks extends LitElement {
       row-gap: 1em;
     }
 
-    div {
+    li {
       white-space: pre-wrap;
       border: 1px solid black;
+      list-style-type: none;
     }
 
-    div:not([selected]) {
+    li:not([selected]) {
       cursor: pointer;
     }
 
-    div[selected] {
+    li[selected] {
       opacity: 0.2;
       cursor: not-allowed;
     }
@@ -41,34 +42,34 @@ class Tasks extends LitElement {
     });
   }
 
-  createRenderRoot() {
-    const root = super.createRenderRoot();
-
-    root.addEventListener('click', function (e) {
-      this.dispatchEvent(
-        new CustomEvent('dispatch', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            type: 'task.selected',
-            task_id: e.target.id
-          }
-        })
-      );
-    });
-
-    return root;
+  _notify(task_id) {
+    this.dispatchEvent(
+      new CustomEvent('dispatch', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          type: 'task.selected',
+          task_id
+        }
+      })
+    );
   }
 
   render() {
     const tasks = Object.entries(this.#tasks.value);
+    
     const task = ([id, t]) => html`
-      <div id=${id} ?selected=${t.selected}>
+      <li ?selected=${t.selected}
+          @click=${t.selected ? null : () => this._notify(id)}>
         ${this.#messages.value[id]({qty: t.quantity})}
-      </div>
+      </li>
     `;
 
-    return html`${map(tasks, task)}`;
+    return html`
+      <ol>
+        ${map(tasks, task)}
+      </ol>
+    `;
   }
 }
 
