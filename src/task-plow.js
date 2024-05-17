@@ -5,10 +5,12 @@ import {produce} from 'immer';
 const src = {
   actions: {
     plow: enqueueActions(({enqueue, context, event}) => {
+      // This is updating the local context
       enqueue.assign({
         count: context.count - 1
       });
 
+      // This is a request to update the game context
       enqueue.sendTo(context.parent, {
         type: 'game.update',
         from: event,
@@ -19,17 +21,28 @@ const src = {
       });
     }),
 
-    finalize: sendTo(({context}) => context.parent, {
+    'task->game': sendTo(({context}) => context.parent, {
       type: 'task.completed',
       task_id: 104
     })
   },
   guards: {
+    /*
+      Note to self:
+
+      Some occupations or minor improvement cards
+      allow a player to plow more than one field
+      in the same turn. While I don't predict
+      I'll go that far in my implementation of the game,
+      I thought it would be nice if this actor could be
+      reused to implement these cards.
+
+    */
     'repeat?': ({context: {count}}) => count > 1
   }
 };
 
-const def = {
+export const actor = setup(src).createMachine({
   context: ({input}) => ({
     parent: input.parent,
     count: input.count
@@ -53,11 +66,9 @@ const def = {
     },
     done: {
       type: 'final',
-      entry: 'finalize'
+      entry: 'task->game'
     }
   }
-};
-
-export const actor = setup(src).createMachine(def);
+});
 
 export const input = () => ({count: 1});
