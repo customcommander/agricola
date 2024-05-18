@@ -10,7 +10,6 @@ const taskm =
    109: collect};
 
 export const task_start = enqueueActions(({enqueue, context, event}) => {
-
   const {task_id} = event;
   const task = taskm[task_id];
 
@@ -21,8 +20,10 @@ export const task_start = enqueueActions(({enqueue, context, event}) => {
 
   enqueue.assign(({context, event}) => produce(context, draft => {
     const {task_id} = event;
+
     draft.workers -= 1;
     draft.tasks[task_id].selected = true;
+
     return draft;
   }));
 
@@ -45,7 +46,6 @@ export const task_start = enqueueActions(({enqueue, context, event}) => {
 
 
 export const task_stop = enqueueActions(({enqueue, event, context}) => {
-
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
