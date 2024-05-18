@@ -72,3 +72,6 @@ export const actor = setup(src).createMachine({
 });
 
 export const input = () => ({count: 1});
+
+// TODO: must check that we've got some space left.
+export const abort = () => false;

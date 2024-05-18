@@ -9,34 +9,55 @@ const taskm =
    108: collect,
    109: collect};
 
-export const task_start = assign(({context, event, spawn, self}) => produce(context, draft => {
+export const task_start = enqueueActions(({enqueue, context, event}) => {
+
   const {task_id} = event;
   const task = taskm[task_id];
-  const spawn_id = `task-${task_id}-ref`;
 
-  draft.workers -= 1;
-  draft.tasks[task_id].selected = true;
+  if (task.abort(context)) {
+    enqueue.log('task aborted');
+    return;
+  }
 
-  draft[spawn_id] = spawn(task.actor, {
-    input: {
-      ...task.input(context),
-      parent: self,
-      task_id
-    }
-  });
+  enqueue.assign(({context, event}) => produce(context, draft => {
+    const {task_id} = event;
+    draft.workers -= 1;
+    draft.tasks[task_id].selected = true;
+    return draft;
+  }));
 
-  return draft;
-}));
+  enqueue.assign(({context, event, spawn, self}) => produce(context, draft => {
+    const {task_id} = event;
+    const task = taskm[task_id];
+    const spawn_id = `task-${task_id}-ref`;
+
+    draft[spawn_id] = spawn(task.actor, {
+      input: {
+        ...task.input(context),
+        parent: self,
+        task_id
+      }
+    });
+
+    return draft;
+  }));
+});
+
 
 export const task_stop = enqueueActions(({enqueue, event, context}) => {
+
   const {task_id} = event;
   const spawn_id = `task-${task_id}-ref`;
 
   enqueue.stopChild(spawn_id);
 
-  enqueue.assign(() => produce(context, draft => {
+  enqueue.assign(({context}) => produce(context, draft => {
+    const {task_id} = event;
+    const spawn_id = `task-${task_id}-ref`;
+
     draft[spawn_id] = undefined;
     draft.tasks[task_id].done = true;
+
     return draft;
   }));
 });
