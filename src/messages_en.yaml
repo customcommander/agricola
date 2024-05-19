@@ -20,8 +20,8 @@ plow: Plow
 
 # Actions
 
-101: Build room(s) and/or Build Stable(s)
-104: "Plow 1 Field"
-107: "{qty} Wood"
-108: "{qty} Clay"
-109: "{qty} Reed"
+101: Build Rooms and/or Build Stables
+104: Plow 1 Field
+107: Take {qty} Wood
+108: Take {qty} Clay
+109: Take {qty} Reed
