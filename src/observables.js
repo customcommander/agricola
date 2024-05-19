@@ -63,3 +63,9 @@ export const selection$ = snapshot$ => snapshot$.pipe(
 
   distinctUntilChanged(deep_equal)
 );
+
+export const error$ = snapshot$ => snapshot$.pipe(
+  map(({context: {error}}) => error),
+  distinctUntilChanged()
+);
+

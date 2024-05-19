@@ -56,7 +56,8 @@
         "hidden": false,
         "quantity": 1
       }
-    }
+    },
+    "error": null
   },
   "initial": "init",
   "states": {
@@ -79,6 +80,10 @@
         },
         "perform_task": {
           "on": {
+            "task.aborted": {
+              "target": "select_task",
+              "actions": "task-aborted"
+            },
             "task.completed": [
               {
                 "target": "select_task",
@@ -150,6 +155,9 @@
     },
     "game.update": {
       "actions": "game-update"
+    },
+    "error.dismiss": {
+      "actions": "error-dismiss"
     }
   }
 }

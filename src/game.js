@@ -8,6 +8,7 @@ import {
 import {produce} from 'immer';
 
 import {
+  task_aborted,
   task_start,
   task_stop
 } from './task.js';
@@ -33,6 +34,7 @@ const src = {
       return draft;
     })),
 
+    'task-aborted': task_aborted,
     'task-start': task_start,
     'task-stop': task_stop,
 
@@ -42,7 +44,9 @@ const src = {
 
     'game-update': assign(({context, event}) => {
       return event.produce(context, event.from);
-    })
+    }),
+
+    'error-dismiss': assign({error: null})
   },
 
   guards: {

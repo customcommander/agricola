@@ -1,10 +1,13 @@
 import {assign, enqueueActions, sendTo} from 'xstate';
 import {produce} from 'immer';
+
+import * as t101 from './task-101.js'
 import * as collect from './task-collect.js';
 import * as plow from './task-plow.js';
 
 const taskm =
-  {104: plow,
+  {101: t101,
+   104: plow,
    107: collect,
    108: collect,
    109: collect};
@@ -13,8 +16,10 @@ export const task_start = enqueueActions(({enqueue, context, event}) => {
   const {task_id} = event;
   const task = taskm[task_id];
 
-  if (task.abort(context)) {
-    enqueue.log('task aborted');
+  const err = task.abort(context);
+
+  if (err) {
+    enqueue.raise({type: 'task.aborted', error: err});
     return;
   }
 
@@ -60,5 +65,9 @@ export const task_stop = enqueueActions(({enqueue, event, context}) => {
 
     return draft;
   }));
+});
+
+export const task_aborted = assign({
+  error: ({event: {error}}) => error
 });
 

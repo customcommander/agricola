@@ -4,6 +4,7 @@ import {createActor} from 'xstate';
 
 import {
   observe_game,
+  error$,
   farmyard$,
   selection$,
   supply$,
@@ -17,6 +18,7 @@ import messages from './messages_en.yaml';
 
 import game from './game.js';
 
+import './component-error.js';
 import './component-infobar.js';
 import './component-supply.js';
 import './component-tasks.js';
@@ -54,6 +56,7 @@ class App extends LitElement {
   #game;
   #messages;
 
+  #error;
   #farmyard;
   #selection;
   #supply;
@@ -69,6 +72,7 @@ class App extends LitElement {
 
     this.#messages = provide('messages');
 
+    this.#error = provide('error');
     this.#farmyard = provide('farmyard');
     this.#selection = provide('selection');
     this.#supply = provide('supply');
@@ -80,6 +84,7 @@ class App extends LitElement {
     const game$ = observe_game(this.#game);
     const observe = (fn, cb) => fn(game$).subscribe(cb);
 
+    observe(error$, error => this.#error.setValue(error));
     observe(farmyard$, farmyard => this.#farmyard.setValue(farmyard));
     observe(selection$, selection => this.#selection.setValue(selection));
     observe(supply$, supply => this.#supply.setValue(supply));
@@ -96,6 +101,7 @@ class App extends LitElement {
 
   render() {
     return html`
+      <agricola-error></agricola-error>
       <agricola-infobar></agricola-infobar>
       <agricola-supply></agricola-supply>
       <agricola-tasks></agricola-tasks>
