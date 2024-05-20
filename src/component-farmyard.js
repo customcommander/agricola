@@ -1,11 +1,11 @@
 import {LitElement, css, html, nothing} from 'lit';
 import {map} from 'lit/directives/map.js';
+import {when} from 'lit/directives/when.js';
 import {ContextConsumer} from '@lit/context';
 
 import {spaces} from './util-farmyard.js';
 
-import './component-farmyard-room.js';
-import './component-field.js';
+import './component-space.js';
 
 class FarmYard extends LitElement {
   static styles = css`
@@ -37,6 +37,7 @@ class FarmYard extends LitElement {
   `;
 
   #farmyard;
+  #messages;
   #selection;
 
   constructor() {
@@ -47,56 +48,51 @@ class FarmYard extends LitElement {
       subscribe: true
     });
 
+    this.#messages = new ContextConsumer(this, {
+      context: 'messages'
+    });
+
     this.#selection = new ContextConsumer(this, {
       context: 'selection',
       subscribe: true
     });
+
   }
 
-  _empty(id) {
-    return html`
-      <div id=${id}>
-        empty
-      </div>
-    `;
+  _dispatch(sel) {
+    this.dispatchEvent(
+      new CustomEvent('dispatch', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          ...sel,
+          type: 'space.selected'
+        }
+      })
+    );
   }
 
-  _room(id, space) {
+  _plow(sel) {
     return html`
-      <agricola-farmyard-room
-        id=${id}
-        type=${space.type}>
-      </agricola-farmyard-room>
-    `;
-  }
-
-
-  _field(space) {
-    return html`
-      <agricola-field
-        id=${space.space_id}
-        type=${space.type ?? nothing}
-        ?plow=${space.plow}>
-      </agricola-field>
+      <a href="#" @click=${() => this._dispatch(sel)}>
+        ${this.#messages.value.plow()}
+      </a>
     `;
   }
 
   _space(space_id) {
     const farmyard = this.#farmyard.value;
     const selection = this.#selection.value;
-
     const space = farmyard[space_id];
     const sel = selection?.find(sel => sel.space_id == space_id);
 
-    if (space?.type == 'field' || sel?.plow) {
-      return this._field({...space, ...sel});
-    }
-
-    if (space?.type == 'wooden_hut') {
-      return this._room(space_id, space);
-    }
-
-    return this._empty(space_id);
+    return html`
+      <agricola-space
+        id=${space_id}
+        type=${space?.type ?? nothing}>
+        ${when(sel?.plow, () => this._plow(sel))}
+      </agricola-space>
+    `;
   }
 
   render() {
