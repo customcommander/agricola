@@ -70,12 +70,13 @@ class FarmYard extends LitElement {
     `;
   }
 
-  _field(id, space, selection) {
+
+  _field(space) {
     return html`
       <agricola-field
-        id=${id}
-        type=${space?.type ?? nothing}
-        ?plow=${space == null && selection != null}>
+        id=${space.space_id}
+        type=${space.type ?? nothing}
+        ?plow=${space.plow}>
       </agricola-field>
     `;
   }
@@ -85,11 +86,10 @@ class FarmYard extends LitElement {
     const selection = this.#selection.value;
 
     const space = farmyard[space_id];
-    const selected = selection?.spaces.includes(space_id);
-    const task_id = selection?.task_id;
+    const sel = selection?.find(sel => sel.space_id == space_id);
 
-    if (space?.type == 'field' || (selected && task_id == 104)) {
-      return this._field(space_id, space, selection);
+    if (space?.type == 'field' || sel?.plow) {
+      return this._field({...space, ...sel});
     }
 
     if (space?.type == 'wooden_hut') {
