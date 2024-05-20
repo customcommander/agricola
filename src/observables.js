@@ -42,11 +42,6 @@ export const farmyard$ = snapshot$ => snapshot$.pipe(
   distinctUntilChanged(deep_equal)
 );
 
-function is_current_task(task) {
-  const {selected, done} = task;
-  return selected && !done;
-}
-
 export const selection$ = snapshot$ => snapshot$.pipe(
   map(({context: {tasks, farmyard}}) => {
     const task_id = [104,107,108,109].find(id => tasks[id].selected && !tasks[id].done);
