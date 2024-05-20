@@ -39,7 +39,7 @@ export const task_start = enqueueActions(({enqueue, context, event}) => {
 
     draft[spawn_id] = spawn(task.actor, {
       input: {
-        ...task.input(context),
+        ...context,
         parent: self,
         task_id
       }

@@ -42,6 +42,5 @@ export const actor = createMachine({
   }
 });
 
-export const input = () => null;
 export const abort = () => false;
 

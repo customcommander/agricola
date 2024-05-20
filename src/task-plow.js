@@ -45,7 +45,7 @@ const src = {
 export const actor = setup(src).createMachine({
   context: ({input}) => ({
     parent: input.parent,
-    count: input.count
+    count: 1
   }),
   initial: 'select-space',
   states: {
@@ -70,8 +70,6 @@ export const actor = setup(src).createMachine({
     }
   }
 });
-
-export const input = () => ({count: 1});
 
 // TODO: must check that we've got some space left.
 export const abort = () => false;
