@@ -1,7 +1,5 @@
 import {LitElement, css, html} from 'lit';
 
-import {createActor} from 'xstate';
-
 import {
   observe_game,
   error$,
@@ -66,7 +64,7 @@ class App extends LitElement {
   constructor() {
     super();
 
-    this.#game = createActor(game);
+    this.#game = game;
 
     const provide = context => new ContextProvider(this, {context});
 
@@ -96,6 +94,9 @@ class App extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.#game.subscribe(snap => {
+      console.log(snap.value);
+    });
     this.#game.start();
   }
 

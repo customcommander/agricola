@@ -43,22 +43,7 @@ export const farmyard$ = snapshot$ => snapshot$.pipe(
 );
 
 export const selection$ = snapshot$ => snapshot$.pipe(
-  map(({context: {tasks, farmyard}}) => {
-    const task_id = [104].find(id => tasks[id].selected && !tasks[id].done);
-
-    if (!task_id) {
-      return null;
-    }
-
-    if (task_id == 104) {
-      return empty_spaces(farmyard).map(space_id => ({
-        task_id,
-        space_id,
-        plow: true
-      }));
-    }
-  }),
-
+  map(({context: {selection}}) => selection),
   distinctUntilChanged(deep_equal)
 );
 

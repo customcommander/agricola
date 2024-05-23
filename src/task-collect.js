@@ -1,46 +1,67 @@
-import {enqueueActions, createMachine} from 'xstate';
-import {produce} from 'immer';
+import {
+  enqueueActions,
+  sendTo,
+  setup,
+} from 'xstate';
 
-export const actor = createMachine({
-  context: ({input}) => {
-    const {parent, task_id} = input;
-    const resource_id = ( task_id == 107 ? 'wood'
-                        : task_id == 108 ? 'clay'
-                        : task_id == 109 ? 'reed'
-                                         : null);
-    return {
-      parent,
-      task_id,
-      resource_id
-    }; 
-  },
-  initial: 'collect',
-  states: {
-    collect: {
-      entry:
-      enqueueActions(({enqueue, context}) => {
-        enqueue.sendTo(context.parent, {
-          type: 'game.update',
-          from: {
-            task_id: context.task_id,
-            resource_id: context.resource_id
-          },
-          produce: produce((draft, {task_id, resource_id}) => {
-            const {quantity} = draft.tasks[task_id];
-            draft.supply[resource_id] += quantity;
-            draft.tasks[task_id].quantity = 0;
-            return draft;
-          })
-        });
+import {
+  produce
+} from 'immer';
 
-        enqueue.sendTo(context.parent, {
-          type: 'task.completed',
-          task_id: context.task_id
-        });
-      })
-    }
+
+export default setup({
+  actions: {
+    reset:
+    enqueueActions(({enqueue, context, system}) => {
+      enqueue.sendTo(system.get('gamesys'), {
+        type: 'game.update',
+        produce: produce(draft => {
+          const {task_id} = context;
+          draft.tasks[task_id].selected = false;
+          return draft;
+        })
+      });
+
+      enqueue.sendTo(system.get('dispatcher'), {
+        type: 'task.ack'
+      });
+    }),
+
+    replenish:
+    enqueueActions(({enqueue, context, system}) => {
+      enqueue.sendTo(system.get('gamesys'), {
+        type: 'game.update',
+        produce: produce(draft => {
+          const {task_id, inc} = context;
+          draft.tasks[task_id].quantity += inc;
+          return draft;
+        })
+      });
+
+      enqueue.sendTo(system.get('dispatcher'), {
+        type: 'task.ack'
+      });
+    }),
+
+    collect:
+    enqueueActions(({enqueue, context, system}) => {
+      const {task_id, supply} = context;
+      
+      // applies the effect of carrying out the task
+      enqueue.sendTo(system.get('gamesys'), ({
+        type: 'game.update',
+        produce: produce(draft => {
+          const {quantity} = draft.tasks[task_id];
+          draft.supply[supply] += quantity;
+          draft.tasks[task_id].quantity = 0;
+          return draft;
+        })
+      }));
+
+      enqueue.sendTo(system.get('gamesys'), ({
+        type: 'task.completed'
+      }));
+    })
   }
 });
-
-export const abort = () => false;
 
