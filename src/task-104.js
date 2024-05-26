@@ -34,34 +34,28 @@ const src = setup({
 
     replenish: task_ack,
 
-    'display-selection': 
-    sendTo(({system}) => system.get('gamesys'), {
-      type: 'game.update',
-      produce: produce(draft => {
-        let space_ids;
-        space_ids = Object.keys(draft.farmyard);
-        space_ids = space_ids.filter(id => !draft.farmyard[id]);
-        draft.selection = space_ids.map(id => ({
-          task_id: 104,
-          space_id: id,
-          plow: true
-        }));
-        return draft;
-      })
+    'display-selection':
+    game_update(draft => {
+      let space_ids;
+      space_ids = Object.keys(draft.farmyard);
+      space_ids = space_ids.filter(id => !draft.farmyard[id]);
+      draft.selection = space_ids.map(id => ({
+        task_id: 104,
+        space_id: id,
+        plow: true
+      }));
+      return draft;
     }),
 
     plow:
     enqueueActions(({enqueue, event, system}) => {
       const {space_id} = event;
 
-      enqueue.sendTo(system.get('gamesys'), {
-        type: 'game.update',
-        produce: produce(draft => {
-          draft.farmyard[space_id] = {type: 'field'};
-          draft.selection = null;
-          return draft;
-        })
-      });
+      enqueue(game_update(draft => {
+        draft.farmyard[space_id] = {type: 'field'};
+        draft.selection = null;
+        return draft;
+      }));
 
       enqueue.sendTo(system.get('gamesys'), {
         type: 'task.completed'
