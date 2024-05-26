@@ -8,11 +8,10 @@ import {
   produce
 } from 'immer';
 
-const game_update = f =>
-  sendTo(({system}) => system.get('gamesys'), {
-    type: 'game.update',
-    produce: produce(f)
-  });
+import {
+  ack,
+  game_update,
+} from './task-lib.js'
 
 const task_ack =
   sendTo(({system}) => system.get('dispatcher'), {
@@ -22,14 +21,9 @@ const task_ack =
 const src = setup({
   actions: {
     reset:
-    enqueueActions(({enqueue, system}) => {
-
-      enqueue(game_update(draft => {
-        draft.tasks[104].selected = false;
-        return draft;
-      }));
-
-      enqueue(task_ack);
+    ack(draft => {
+      draft.tasks[104].selected = false;
+      return draft;
     }),
 
     replenish: task_ack,
