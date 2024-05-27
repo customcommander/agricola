@@ -56,7 +56,7 @@ const src = setup({
            ({event}) => event),
 
     'game-update': assign(({context, event}) => {
-      return event.produce(context, event.from);
+      return event.produce(context);
     }),
 
     'error-dismiss':
