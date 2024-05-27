@@ -103,6 +103,7 @@ const machine = src.createMachine({
     "family": 2,
     "workers": 2,
     "supply": {
+      "food": 0,
       "wood": 0,
       "clay": 0,
       "reed": 0
@@ -143,7 +144,8 @@ const machine = src.createMachine({
       "109": {
         "selected": false,
         "quantity": 0
-      }
+      },
+      110: {selected: false, quantity: 0}
     },
     "error": null
   },

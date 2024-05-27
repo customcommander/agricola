@@ -1,5 +1,6 @@
 turn: Turn ({turn})
 
+supply_food: Food ({qty})
 supply_wood: Wood ({qty})
 supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})
@@ -25,3 +26,6 @@ plow: Plow
 107: Take {qty} Wood
 108: Take {qty} Clay
 109: Take {qty} Reed
+110: |-
+  Fishing
+  Take {qty} Food
