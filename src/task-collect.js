@@ -1,66 +1,35 @@
 import {
-  enqueueActions,
-  sendTo,
   setup,
 } from 'xstate';
 
 import {
-  produce
-} from 'immer';
-
+  ack,
+  complete
+} from './task-lib.js';
 
 export default setup({
   actions: {
     reset:
-    enqueueActions(({enqueue, context, system}) => {
-      enqueue.sendTo(system.get('gamesys'), {
-        type: 'game.update',
-        produce: produce(draft => {
-          const {task_id} = context;
-          draft.tasks[task_id].selected = false;
-          return draft;
-        })
-      });
-
-      enqueue.sendTo(system.get('dispatcher'), {
-        type: 'task.ack'
-      });
+    ack(({context}, draft) => {
+      const {task_id} = context;
+      draft.tasks[task_id].selected = false;
+      return draft;
     }),
 
     replenish:
-    enqueueActions(({enqueue, context, system}) => {
-      enqueue.sendTo(system.get('gamesys'), {
-        type: 'game.update',
-        produce: produce(draft => {
-          const {task_id, inc} = context;
-          draft.tasks[task_id].quantity += inc;
-          return draft;
-        })
-      });
-
-      enqueue.sendTo(system.get('dispatcher'), {
-        type: 'task.ack'
-      });
+    ack(({context}, draft) => {
+      const {task_id, inc} = context;
+      draft.tasks[task_id].quantity += inc;
+      return draft;
     }),
 
     collect:
-    enqueueActions(({enqueue, context, system}) => {
+    complete(({context}, draft) => {
       const {task_id, supply} = context;
-      
-      // applies the effect of carrying out the task
-      enqueue.sendTo(system.get('gamesys'), ({
-        type: 'game.update',
-        produce: produce(draft => {
-          const {quantity} = draft.tasks[task_id];
-          draft.supply[supply] += quantity;
-          draft.tasks[task_id].quantity = 0;
-          return draft;
-        })
-      }));
-
-      enqueue.sendTo(system.get('gamesys'), ({
-        type: 'task.completed'
-      }));
+      const {quantity} = draft.tasks[task_id];
+      draft.supply[supply] += quantity;
+      draft.tasks[task_id].quantity = 0;
+      return draft;
     })
   }
 });

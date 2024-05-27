@@ -5,31 +5,25 @@ import {
 } from 'xstate';
 
 import {
-  produce
-} from 'immer';
-
-import {
   ack,
+  complete,
   game_update,
 } from './task-lib.js'
 
-const task_ack =
-  sendTo(({system}) => system.get('dispatcher'), {
-    type: 'task.ack'
-  });
 
 const src = setup({
   actions: {
     reset:
-    ack(draft => {
+    ack((_, draft) => {
       draft.tasks[104].selected = false;
       return draft;
     }),
 
-    replenish: task_ack,
+    replenish:
+    ack(),
 
     'display-selection':
-    game_update(draft => {
+    game_update((_, draft) => {
       let space_ids;
       space_ids = Object.keys(draft.farmyard);
       space_ids = space_ids.filter(id => !draft.farmyard[id]);
@@ -42,19 +36,12 @@ const src = setup({
     }),
 
     plow:
-    enqueueActions(({enqueue, event, system}) => {
+    complete(({event}, draft) => {
       const {space_id} = event;
-
-      enqueue(game_update(draft => {
-        draft.farmyard[space_id] = {type: 'field'};
-        draft.selection = null;
-        return draft;
-      }));
-
-      enqueue.sendTo(system.get('gamesys'), {
-        type: 'task.completed'
-      });
-    }),
+      draft.farmyard[space_id] = {type: 'field'};
+      draft.selection = null;
+      return draft;
+    })
   }
 });
 
