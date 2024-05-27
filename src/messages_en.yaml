@@ -19,13 +19,53 @@ NOT_ENOUGH_RESOURCES: >
 
 plow: Plow
 
-# Actions
+# Stage 0
 
 101: Build Rooms and/or Build Stables
+102: |
+  Storehouse
+  Take {qty} Food
+103: Take 1 Grain
 104: Plow 1 Field
+105: Build Stable and/or Bake bread
+106: Day Laborer
 107: Take {qty} Wood
 108: Take {qty} Clay
 109: Take {qty} Reed
 110: |-
   Fishing
   Take {qty} Food
+
+# Stage 1
+
+111: Fences
+112: Major Improvement
+113: Sow and/or Bake bread
+114: Take {qty} Sheep
+
+# Stage 2
+
+115: Family growth
+116: Take {qty} Stone
+117: After Renovation also Major Improvement
+
+# Stage 3
+
+118: Take 1 Vegetable
+119: Take {qty} Wild Boar
+
+# Stage 4
+
+120: Take {qty} Stone
+121: Take {qty} Cattle
+
+# Stage 5
+
+122: |-
+  Family growth
+  even without space in your home
+123: Plow 1 Field and/or Sow
+
+# Stage 6
+
+124: After Renovation also Fences
