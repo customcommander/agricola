@@ -1,26 +1,44 @@
 import {
-  sendTo,
   setup
 } from 'xstate';
 
+import {
+  abort,
+  ack,
+} from './task-lib.js';
+
 const src = setup({
   actions: {
+    reset:
+    ack((_, ctx) => {
+      ctx.tasks['101'].selected = false;
+      return ctx;
+    }),
+
+    replenish:
+    ack(),
+
     abort:
-    sendTo(({system}) => system.get('gamesys'),
-           () => ({
-             f:1,
-           }))
+    abort(101, 'NOT_ENOUGH_RESOURCES')
   }
 });
 
 export default src.createMachine({
-  on: {
-    'task.selected': [
-      {target: 'xx', guard: 'eligible?'},
-      {actions: 'abort'}
-    ]
+  initial: 'idle',
+  states: {
+    idle: {
+      on: {
+        'task.reset': {
+          actions: 'reset'
+        },
+        'task.replenish': {
+          actions: 'replenish'
+        },
+        'task.selected': [
+          {actions: 'abort'}
+        ]
+      }
+    }
   }
 });
 
-
-export const abort = () => "NOT_ENOUGH_RESOURCES";

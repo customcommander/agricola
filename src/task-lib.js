@@ -40,4 +40,9 @@ export const complete = f => {
   });
 };
 
-
+export const abort = (task_id, err) =>
+  sendTo(({system}) => system.get('gamesys'), {
+    type: 'task.aborted',
+    task_id,
+    err
+  });

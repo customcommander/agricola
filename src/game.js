@@ -50,6 +50,15 @@ const src = setup({
       draft.tasks[event.task_id].selected = true;
       return draft;
     })),
+
+    'task-aborted':
+    assign(({context, event}) => produce(context, draft => {
+      const {err, task_id} = event;
+      draft.workers += 1;
+      draft.tasks[task_id].selected = false;
+      draft.error = err;
+      return draft;
+    })),
  
     'task-forward':
     sendTo(({system, event}) => system.get(`task-${event.task_id}`),
@@ -130,6 +139,7 @@ const machine = src.createMachine({
       "C5": null
     },
     "tasks": {
+      101: {selected: false},
       "104": {
         "selected": false,
       },
