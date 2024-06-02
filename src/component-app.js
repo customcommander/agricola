@@ -2,6 +2,7 @@ import {LitElement, css, html} from 'lit';
 
 import {
   observe_game,
+  early_exit$,
   error$,
   farmyard$,
   selection$,
@@ -54,6 +55,7 @@ class App extends LitElement {
   #game;
   #messages;
 
+  #early_exit;
   #error;
   #farmyard;
   #selection;
@@ -70,6 +72,7 @@ class App extends LitElement {
 
     this.#messages = provide('messages');
 
+    this.#early_exit = provide('early_exit');
     this.#error = provide('error');
     this.#farmyard = provide('farmyard');
     this.#selection = provide('selection');
@@ -82,6 +85,7 @@ class App extends LitElement {
     const game$ = observe_game(this.#game);
     const observe = (fn, cb) => fn(game$).subscribe(cb);
 
+    observe(early_exit$, early_exit => this.#early_exit.setValue(early_exit));
     observe(error$, error => this.#error.setValue(error));
     observe(farmyard$, farmyard => this.#farmyard.setValue(farmyard));
     observe(selection$, selection => this.#selection.setValue(selection));

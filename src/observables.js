@@ -52,3 +52,8 @@ export const error$ = snapshot$ => snapshot$.pipe(
   distinctUntilChanged()
 );
 
+export const early_exit$ = snapshot$ => snapshot$.pipe(
+  map(({context: {early_exit}}) => early_exit),
+  distinctUntilChanged()
+);
+

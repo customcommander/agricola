@@ -48,6 +48,7 @@ const src = setup({
       const {task_id} = event;
       draft.workers -= 1;
       draft.tasks[event.task_id].selected = true;
+      draft.early_exit = false;
       return draft;
     })),
 
@@ -62,10 +63,26 @@ const src = setup({
  
     'task-forward':
     sendTo(({system, event}) => system.get(`task-${event.task_id}`),
-           ({event}) => event),
+           ({context, event}) => ({...event, game_context: context})),
 
-    'game-update': assign(({context, event}) => {
-      return event.produce(context);
+    'game-update':
+    enqueueActions(({enqueue, event}) => {
+
+      enqueue.assign(({context}) => {
+        return event.produce(context);
+      });
+
+      if (event.reply_to) {
+        const task_id = event.reply_to;
+
+        enqueue.sendTo(
+          ({system}) => system.get(`task-${task_id}`),
+          ({context}) => ({
+            type: 'game.updated',
+            game_context: context
+          })
+        );
+      }
     }),
 
     'error-dismiss':
@@ -115,8 +132,10 @@ const machine = src.createMachine({
       "food": 0,
       "wood": 0,
       "clay": 0,
-      "reed": 0
+      "reed": 0,
+      stone: 0
     },
+    house_type: 'wooden_hut',
     "farmyard": {
       "A1": null,
       "A2": null,
@@ -157,7 +176,8 @@ const machine = src.createMachine({
       },
       110: {selected: false, quantity: 0}
     },
-    "error": null
+    "error": null,
+    early_exit: null
   },
   "initial": "init",
   "states": {
@@ -278,6 +298,9 @@ const machine = src.createMachine({
     },
     "error.dismiss": {
       "actions": "error-dismiss"
+    },
+    'task.exit': {
+      actions: 'task-forward'
     }
   }
 });

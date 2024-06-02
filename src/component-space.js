@@ -13,6 +13,10 @@ class Space extends LitElement {
     :host([type="wooden_hut"]) {
       background-color: brown;
     }
+
+    :host([type="stable"]) {
+      background-color: orange;
+    }
   `;
 
   static properties = {

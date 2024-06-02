@@ -80,6 +80,17 @@ class FarmYard extends LitElement {
     `;
   }
 
+  _stable(sel) {
+    const ev = {task_id: sel.task_id,
+                space_id: sel.space_id,
+                'build-stable': true};
+    return html`
+      <a href="#" @click=${() => this._dispatch(ev)}>
+        stable
+      </a>
+    `;
+  }
+
   _space(space_id) {
     const farmyard = this.#farmyard.value;
     const selection = this.#selection.value;
@@ -91,6 +102,7 @@ class FarmYard extends LitElement {
         id=${space_id}
         type=${space?.type ?? nothing}>
         ${when(sel?.plow, () => this._plow(sel))}
+        ${when(sel?.['build-stable'], () => this._stable(sel))}
       </agricola-space>
     `;
   }

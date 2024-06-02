@@ -15,9 +15,10 @@ NOT_ENOUGH_RESOURCES: >
   You do not have all the resources
   to complete this action.
 
-# Verbs
+# Misc
 
 plow: Plow
+complete: Complete Task
 
 # Stage 0
 
