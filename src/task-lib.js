@@ -11,12 +11,11 @@ import {
 const gamesys = ({system}) => system.get('gamesys');
 
 export const game_update = f =>
-  sendTo(({system}) => system.get('gamesys'),
-         ({context, event}) => ({
-           type: 'game.update',
-           reply_to: context.task_id,
-           updater: produce(f.bind(null, {context, event}))
-         }));
+  sendTo(gamesys, ({context, event}) => ({
+    type: 'game.update',
+    reply_to: context.task_id,
+    updater: produce(f.bind(null, {context, event}))
+  }));
 
 export const early_exit = task_id =>
   game_update((_, draft) => {
@@ -40,8 +39,9 @@ export const ack = f => {
 };
 
 const _complete =
-  sendTo(({system}) => system.get('gamesys'),
-         ({type: 'task.completed'}));
+  sendTo(gamesys, {
+    type: 'task.completed'
+  });
 
 export const complete = f => {
   if (!f) {
@@ -55,7 +55,7 @@ export const complete = f => {
 };
 
 export const abort = (task_id, err) =>
-  sendTo(({system}) => system.get('gamesys'), {
+  sendTo(gamesys, {
     type: 'task.aborted',
     task_id,
     err
