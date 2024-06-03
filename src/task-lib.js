@@ -10,15 +10,6 @@ import {
 
 const gamesys = ({system}) => system.get('gamesys');
 
-export const early_exit = task_id =>
-  sendTo(gamesys, {
-    type: 'game.update',
-    updater: produce(game_context => {
-      game_context.early_exit = task_id;
-      return game_context;
-    })
-  });
-
 export const game_update = f =>
   sendTo(({system}) => system.get('gamesys'),
          ({context, event}) => ({
@@ -26,6 +17,12 @@ export const game_update = f =>
            reply_to: context.task_id,
            updater: produce(f.bind(null, {context, event}))
          }));
+
+export const early_exit = task_id =>
+  game_update((_, draft) => {
+    draft.early_exit = task_id;
+    return draft;
+  });
 
 const _ack =
   sendTo(({system}) => system.get('dispatcher'),
