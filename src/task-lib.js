@@ -13,7 +13,7 @@ const gamesys = ({system}) => system.get('gamesys');
 export const early_exit = task_id =>
   sendTo(gamesys, {
     type: 'game.update',
-    produce: produce(game_context => {
+    updater: produce(game_context => {
       game_context.early_exit = task_id;
       return game_context;
     })
@@ -24,7 +24,7 @@ export const game_update = f =>
          ({context, event}) => ({
            type: 'game.update',
            reply_to: context.task_id,
-           produce: produce(f.bind(null, {context, event}))
+           updater: produce(f.bind(null, {context, event}))
          }));
 
 const _ack =

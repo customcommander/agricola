@@ -14,7 +14,7 @@ const src = {
       enqueue.sendTo(context.parent, {
         type: 'game.update',
         from: event,
-        produce: produce((draft, {space_id}) => {
+        updater: produce((draft, {space_id}) => {
           draft.farmyard[space_id] = {type: 'field'};
           return draft;
         })

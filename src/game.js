@@ -69,7 +69,7 @@ const src = setup({
     enqueueActions(({enqueue, event}) => {
 
       enqueue.assign(({context}) => {
-        return event.produce(context);
+        return event.updater(context);
       });
 
       if (event.reply_to) {
