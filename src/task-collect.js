@@ -4,7 +4,6 @@ import {
   sendTo
 } from 'xstate';
 
-
 import {
   produce
 } from 'immer';
@@ -59,20 +58,23 @@ export default setup({
     sendTo(gamesys, {type: 'task.completed'}),
 
     'reset':
-    enqueueActions(({enqueue}, params) => {
-      enqueue({type: 'game-update', params: {...params, updater: reset}});
+    enqueueActions(({enqueue}, p) => {
+      const {updater = reset, ...params} = p;
+      enqueue({type: 'game-update', params: {...params, updater}});
       enqueue({type: 'ack'});
     }),
 
     'replenish':
-    enqueueActions(({enqueue}, params) => {
-      enqueue({type: 'game-update', params: {...params, updater: replenish}});
+    enqueueActions(({enqueue}, p) => {
+      const {updater = replenish, ...params} = p;
+      enqueue({type: 'game-update', params: {...params, updater}});
       enqueue({type: 'ack'});
     }),
 
     'collect':
-    enqueueActions(({enqueue}, params) => {
-      enqueue({type: 'game-update', params: {...params, updater: collect}});
+    enqueueActions(({enqueue}, p) => {
+      const {updater = collect, ...params} = p;
+      enqueue({type: 'game-update', params: {...params, updater}});
       enqueue({type: 'task-complete'});
     })
   }
