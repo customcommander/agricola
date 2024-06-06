@@ -8,12 +8,6 @@ import {
   produce
 } from 'immer';
 
-function reset({params}, draft) {
-  const {task_id} = params;
-  draft.tasks[task_id].selected = false;
-  return draft;
-}
-
 function replenish({params}, draft) {
   const {task_id, inc} = params;
   draft.tasks[task_id].quantity += inc;
@@ -86,13 +80,6 @@ export default setup({
 
     'task-complete':
     sendTo(gamesys, {type: 'task.completed'}),
-
-    'reset':
-    enqueueActions(({enqueue}, p) => {
-      const {updater = reset, ...params} = p;
-      enqueue({type: 'game-update', params: {...params, updater}});
-      enqueue({type: 'ack'});
-    }),
 
     'replenish':
     enqueueActions(({enqueue}, p) => {

@@ -132,9 +132,6 @@ export default src.createMachine({
   states: {
     idle: {
       on: {
-        'task.reset': {
-          actions: 'reset'
-        },
         'task.replenish': {
           actions: 'replenish'
         },

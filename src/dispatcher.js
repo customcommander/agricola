@@ -10,30 +10,18 @@ import {
 } from 'xstate';
 
 const src = setup({
+  context: {
+    jobs: []
+  },
   actions: {
     start:
-    assign(({event: {tasks, details}}) => ({
-      i: 0,
-      j: 0,
-      tasks,
-      events: details
-    })),
+    assign(({event: {jobs}}) => ({jobs})),
 
     dispatch:
     enqueueActions(({enqueue, context, system}) => {
-      const {i, j} = context;
-      const num_tasks = context.tasks.length;
-      const id = context.tasks[i];
-      const ev = context.events[j];
-
-      enqueue.sendTo(system.get(`task-${id}`), ev);
-
-      const next_cycle = i + 1 == num_tasks;
-
-      enqueue.assign({
-        i: (next_cycle ? 0 : i + 1), 
-        j: (next_cycle ? j + 1 : j)
-      });
+      const [{ev: type, task_id}, ...jobs] = context.jobs;
+      enqueue.sendTo(system.get(`task-${task_id}`), {type});
+      enqueue.assign({jobs});
     }),
 
     quit:
@@ -44,7 +32,7 @@ const src = setup({
 
   guards: {
     'repeat?':
-    ({context: {j, events}}) => j < events.length    
+    ({context: {jobs}}) => jobs.length > 0
   }
 });
 

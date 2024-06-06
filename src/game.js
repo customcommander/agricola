@@ -33,6 +33,11 @@ const src = setup({
     assign(({context}) => produce(context, draft => {
       draft.turn += 1;
       draft.workers = draft.family;
+      Object.keys(draft.tasks).forEach(id => {
+        if (draft.tasks[id].selected === true) {
+          draft.tasks[id].selected = false;
+        }
+      });
       return draft;
     })),
 
@@ -90,10 +95,9 @@ const src = setup({
 
     'dispatch':
     sendTo(({system}) => system.get('dispatcher'),
-           ({context, event}, details) => ({
+           (_, params) => ({
              type: 'dispatch',
-             tasks: Object.keys(context.tasks),
-             details,
+             jobs: params
            }))
   },
 
@@ -122,6 +126,14 @@ const src = setup({
     }
   }
 });
+
+const dispatcher_params =
+  (channels) => ({context}) => channels.flatMap(ch => {
+    let ids;
+    ids = Object.entries(context.tasks);
+    ids = ids.filter(([, t]) => t[ch] === true);
+    return ids.map(([id]) => ({ev: `task.${ch}`, task_id: id}));
+  });
 
 const machine = src.createMachine({
   "context": {
@@ -157,24 +169,13 @@ const machine = src.createMachine({
       "C4": null,
       "C5": null
     },
-    "tasks": {
+    tasks: {
       101: {selected: false},
-      "104": {
-        "selected": false,
-      },
-      "107": {
-        "selected": false,
-        "quantity": 0
-      },
-      "108": {
-        "selected": false,
-        "quantity": 0
-      },
-      "109": {
-        "selected": false,
-        "quantity": 0
-      },
-      110: {selected: false, quantity: 0}
+      104: {selected: false},
+      107: {selected: false, quantity: 0, replenish: true},
+      108: {selected: false, quantity: 0, replenish: true},
+      109: {selected: false, quantity: 0, replenish: true},
+      110: {selected: false, quantity: 0, replenish: true}
     },
     "error": null,
     early_exit: null
@@ -197,8 +198,8 @@ const machine = src.createMachine({
         'setup-new-turn',
         {
           type: 'dispatch',
-          params: () => [{type: 'task.reset'},
-                         {type: 'task.replenish'}]
+          params: dispatcher_params(['reset',
+                                     'replenish'])
         }
       ],
       on: {

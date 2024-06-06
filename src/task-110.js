@@ -5,14 +5,6 @@ export default setup.createMachine({
   states: {
     idle: {
       on: {
-        'task.reset':  {
-          actions: {
-            type: 'reset',
-            params: {
-              task_id: 110
-            }
-          }
-        },
         'task.replenish': {
           actions: {
             type: 'replenish',
