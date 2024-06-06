@@ -5,9 +5,6 @@ export default setup.createMachine({
   states: {
     idle: {
       on: {
-        'task.replenish': {
-          actions: 'ack'
-        },
         'task.selected': {
           target: 'select-space'
         }

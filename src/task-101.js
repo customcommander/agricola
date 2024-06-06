@@ -132,9 +132,6 @@ export default src.createMachine({
   states: {
     idle: {
       on: {
-        'task.replenish': {
-          actions: 'replenish'
-        },
         'task.selected': [
           {
             target: 'select-space',
