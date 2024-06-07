@@ -155,7 +155,7 @@ const dispatcher_params =
 const machine = src.createMachine({
   context: ({input}) => {
     return {
-      turn:    0,
+      turn:    1,
       family:  2,
       workers: 2,
       supply: {
@@ -174,10 +174,10 @@ const machine = src.createMachine({
       tasks: {
         101: {selected: false                              },
         104: {selected: false                              },
-        107: {selected: false, quantity: 0, replenish: true},
-        108: {selected: false, quantity: 0, replenish: true},
-        109: {selected: false, quantity: 0, replenish: true},
-        110: {selected: false, quantity: 0, replenish: true}
+        107: {selected: false, quantity: 2, replenish: true}, // wood
+        108: {selected: false, quantity: 1, replenish: true}, // clay
+        109: {selected: false, quantity: 1, replenish: true}, // reed
+        110: {selected: false, quantity: 1, replenish: true}, // fishing
       },
       error: null,
       early_exit: null
@@ -190,9 +190,9 @@ const machine = src.createMachine({
       "invoke": {
         "src": "task-loader",
         input: ({context}) => Object.keys(context.tasks),
-        "onDone": {
-          "target": 'new-turn',
-          "actions": "task-loader-done"
+        onDone: {
+          target: 'work',
+          actions: 'task-loader-done'
         }
       }
     },
