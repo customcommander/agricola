@@ -153,49 +153,35 @@ const dispatcher_params =
   });
 
 const machine = src.createMachine({
-  "context": {
-    "turn": 0,
-    "family": 2,
-    "workers": 2,
-    "supply": {
-      "food": 0,
-      "wood": 0,
-      "clay": 0,
-      "reed": 0,
-      stone: 0
-    },
-    house_type: 'wooden-hut',
-    "farmyard": {
-      "A1": null,
-      "A2": null,
-      "A3": null,
-      "A4": null,
-      "A5": null,
-      "B1": {
-        "type": "wooden-hut"
+  context: ({input}) => {
+    return {
+      turn:    0,
+      family:  2,
+      workers: 2,
+      supply: {
+        food:  0,
+        wood:  0,
+        clay:  0,
+        reed:  0,
+        stone: 0
       },
-      "B2": null,
-      "B3": null,
-      "B4": null,
-      "B5": null,
-      "C1": {
-        "type": "wooden-hut"
+      house_type: 'wooden-hut',
+      farmyard: {
+        A1:                 null, A2: null, A3: null, A4: null, A5: null,
+        B1: {type: 'wooden-hut'}, B2: null, B3: null, B4: null, B5: null,
+        C1: {type: 'wooden-hut'}, C2: null, C3: null, C4: null, C5: null
       },
-      "C2": null,
-      "C3": null,
-      "C4": null,
-      "C5": null
-    },
-    tasks: {
-      101: {selected: false},
-      104: {selected: false},
-      107: {selected: false, quantity: 0, replenish: true},
-      108: {selected: false, quantity: 0, replenish: true},
-      109: {selected: false, quantity: 0, replenish: true},
-      110: {selected: false, quantity: 0, replenish: true}
-    },
-    "error": null,
-    early_exit: null
+      tasks: {
+        101: {selected: false                              },
+        104: {selected: false                              },
+        107: {selected: false, quantity: 0, replenish: true},
+        108: {selected: false, quantity: 0, replenish: true},
+        109: {selected: false, quantity: 0, replenish: true},
+        110: {selected: false, quantity: 0, replenish: true}
+      },
+      error: null,
+      early_exit: null
+    };
   },
   "initial": "init",
   "states": {
