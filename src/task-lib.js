@@ -1,6 +1,6 @@
 import {
-  assign,
   enqueueActions,
+  setup,
   sendTo
 } from 'xstate';
 
@@ -8,55 +8,92 @@ import {
   produce
 } from 'immer';
 
+/*
+TODO:
+If things of the same kind already exist
+then only the **empty** spaces adjacent to
+those things should be considered.
+*/
+function selection({params}, draft) {
+  const {task_id, opts} = params;
+  const spaces = Object.entries(draft.farmyard);
+
+  draft.selection = opts.flatMap(opt => {
+    const avail = spaces.filter(([, sp]) => sp == null);
+    return avail.map(([space_id]) => ({task_id, space_id, opt}));
+  });
+
+  return draft;
+}
+
+function selection_clear({}, draft) {
+  draft.selection = null;
+  return draft;
+}
+
+function early_exit({params}, draft) {
+  const {task_id} = params;
+  draft.early_exit = task_id;
+  return draft;
+}
+
 const gamesys = ({system}) => system.get('gamesys');
 
-export const game_update = f =>
-  sendTo(gamesys, ({context, event}) => ({
-    type: 'game.update',
-    reply_to: context.task_id,
-    updater: produce(f.bind(null, {context, event}))
-  }));
+const dispatcher = ({system}) => system.get('dispatcher');
 
-export const early_exit = task_id =>
-  game_update((_, draft) => {
-    draft.early_exit = task_id;
-    return draft;
-  });
+export const base = setup({
+  actions: {
+    'game-update':
+    sendTo(gamesys, ({event}, p) => {
+      let {updater, reply_to, ...params} = p;
+      updater = updater.bind(null, {event, params});
+      return {
+        type: 'game.update',
+        reply_to,
+        updater: produce(updater)
+      };
+    }),
 
-const _ack =
-  sendTo(({system}) => system.get('dispatcher'),
-         ({type: 'task.ack'}));
+    'ack':
+    sendTo(dispatcher, {type: 'task.ack'}),
 
-export const ack = f => {
-  if (!f) {
-    return _ack;
+    'abort':
+    sendTo(gamesys, (_, {task_id, err}) => ({
+      type: 'task.aborted',
+      task_id,
+      err
+    })),
+
+    'task-complete':
+    sendTo(gamesys, {type: 'task.completed'}),
+
+    'display-selection':
+    enqueueActions(({enqueue}, p) => {
+      const updater = selection;
+      enqueue({type: 'game-update', params: {updater, ...p}});
+    }),
+
+    'clear-selection':
+    enqueueActions(({enqueue}) => {
+      const updater = selection_clear;
+      enqueue({type: 'game-update', params: {updater}});
+    }),
+
+    /*
+      Some cards
+     */
+    'early-exit-init':
+    enqueueActions(({enqueue}, p) => {
+      const {task_id} = p;
+      const updater = early_exit;
+      enqueue({type: 'game-update', params: {updater, task_id}});
+    }),
+
+    'early-exit-stop':
+    enqueueActions(({enqueue}) => {
+      const updater = early_exit;
+      enqueue({type: 'game-update', params: {updater, task_id: null}});
+    })
   }
+});
 
-  return enqueueActions(({enqueue, event}) => {
-    enqueue(game_update(f));
-    enqueue(_ack);
-  });
-};
-
-const _complete =
-  sendTo(gamesys, {
-    type: 'task.completed'
-  });
-
-export const complete = f => {
-  if (!f) {
-    return _complete;
-  }
-
-  return enqueueActions(({enqueue, event}) => {
-    enqueue(game_update(f));
-    enqueue(_complete);
-  });
-};
-
-export const abort = (task_id, err) =>
-  sendTo(gamesys, {
-    type: 'task.aborted',
-    task_id,
-    err
-  });

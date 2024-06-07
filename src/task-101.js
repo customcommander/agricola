@@ -1,6 +1,6 @@
 import {enqueueActions, or} from 'xstate';
 
-import setup from './task-collect.js';
+import {base} from './task-lib.js';
 
 function build_stable({params: {space_id}}, game_context) {
   game_context.supply.wood -= 2;
@@ -29,7 +29,7 @@ function build_stone_house({params: {space_id}}, game_context) {
   return game_context;
 }
 
-const machine = setup.createMachine({
+const machine = base.createMachine({
   initial: 'idle',
   states: {
     idle: {

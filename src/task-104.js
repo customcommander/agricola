@@ -1,4 +1,4 @@
-import setup from './task-collect.js';
+import {base} from './task-lib.js';
 
 function plow({params}, game_context) {
   const {space_id} = params;
@@ -6,7 +6,7 @@ function plow({params}, game_context) {
   return game_context;
 }
 
-export default setup.createMachine({
+export default base.createMachine({
   initial: 'idle',
   states: {
     idle: {
