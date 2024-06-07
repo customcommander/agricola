@@ -2,68 +2,6 @@ import {enqueueActions, or} from 'xstate';
 
 import setup from './task-collect.js';
 
-/*
-{
-  actions: {
-    reset:
-    ack((_, game_context) => {
-      game_context.tasks['101'].selected = false;
-      return game_context;
-    }),
-
-    replenish:
-    ack(),
-
-    abort:
-    abort(101, 'NOT_ENOUGH_RESOURCES'),
-
-    'display-selection':
-    game_update((_, game_context) => {
-      const caps = capabilities(game_context);
-      const spaces = Object.entries(game_context.farmyard);
-
-      game_context.selection =
-        spaces.flatMap(([id, sp]) =>
-          sp != null
-            ? []
-            : ({task_id: 101,
-                space_id: id,
-               ...caps}));
-
-      return game_context;
-    }),
-
-    build:
-    game_update(({event}, game_context) => {
-      const {space_id} = event;
-      } else {
-        // throw?
-      }
-      game_context.selection = null;
-      return game_context;
-    }),
-
-    'allow-early-exit':
-    early_exit(101),
-
-    done:
-    complete(game_context => {
-      game_context.early_exit = null; // TODO: the game engine should handle this
-      game_context.selection = null;
-      return game_context;
-    }),
-  },
-
-  guards: {
-    'enough-resources?':
-    ({event: {game_context}}) => {
-      const caps = capabilities(game_context);
-      return caps != null;
-    },
-  }
-}
-*/
-
 function build_stable({params: {space_id}}, game_context) {
   game_context.supply.wood -= 2;
   game_context.farmyard[space_id] = {type: 'stable'};
