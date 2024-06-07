@@ -8,26 +8,6 @@ import {
   produce
 } from 'immer';
 
-function replenish({params}, draft) {
-  const {task_id, inc} = params;
-  draft.tasks[task_id].quantity += inc;
-  return draft;
-}
-
-function collect({params}, draft) {
-  const {task_id, supply} = params;
-  const {quantity} = draft.tasks[task_id];
-  draft.supply[supply] += quantity;
-  draft.tasks[task_id].quantity = 0;
-  return draft;
-}
-
-function plow({params}, draft) {
-  const {space_id} = params;
-  draft.farmyard[space_id] = {type: 'field'};
-  return draft;
-}
-
 /*
 TODO:
 If things of the same kind already exist
@@ -37,18 +17,23 @@ those things should be considered.
 function selection({params}, draft) {
   const {task_id, opts} = params;
   const spaces = Object.entries(draft.farmyard);
-  const sel = opts.flatMap(opt => {
-    let avail;
-    avail = spaces.filter(([, sp]) => sp == null);
-    avail = avail.map(([space_id]) => ({task_id, space_id, [opt]: true}));
-    return avail;
+
+  draft.selection = opts.flatMap(opt => {
+    const avail = spaces.filter(([, sp]) => sp == null);
+    return avail.map(([space_id]) => ({task_id, space_id, opt}));
   });
-  draft.selection = sel;
+
   return draft;
 }
 
 function selection_clear({}, draft) {
   draft.selection = null;
+  return draft;
+}
+
+function early_exit({params}, draft) {
+  const {task_id} = params;
+  draft.early_exit = task_id;
   return draft;
 }
 
@@ -60,10 +45,11 @@ export default setup({
   actions: {
     'game-update':
     sendTo(gamesys, ({event}, p) => {
-      let {updater, ...params} = p;
+      let {updater, reply_to, ...params} = p;
       updater = updater.bind(null, {event, params});
       return {
         type: 'game.update',
+        reply_to,
         updater: produce(updater)
       };
     }),
@@ -81,27 +67,6 @@ export default setup({
     'task-complete':
     sendTo(gamesys, {type: 'task.completed'}),
 
-    'replenish':
-    enqueueActions(({enqueue}, p) => {
-      const {updater = replenish, ...params} = p;
-      enqueue({type: 'game-update', params: {...params, updater}});
-      enqueue({type: 'ack'});
-    }),
-
-    'collect':
-    enqueueActions(({enqueue}, p) => {
-      const {updater = collect, ...params} = p;
-      enqueue({type: 'game-update', params: {...params, updater}});
-      enqueue({type: 'task-complete'});
-    }),
-
-    'build':
-    enqueueActions(({enqueue}, p) => {
-      const {build, ...params} = p;
-      const updater = build == 'plow' ? plow : null;
-      enqueue({type: 'game-update', params: {updater, ...params}});
-    }),
-
     'display-selection':
     enqueueActions(({enqueue}, p) => {
       const updater = selection;
@@ -113,6 +78,22 @@ export default setup({
       const updater = selection_clear;
       enqueue({type: 'game-update', params: {updater}});
     }),
+
+    /*
+      Some cards
+     */
+    'early-exit-init':
+    enqueueActions(({enqueue}, p) => {
+      const {task_id} = p;
+      const updater = early_exit;
+      enqueue({type: 'game-update', params: {updater, task_id}});
+    }),
+
+    'early-exit-stop':
+    enqueueActions(({enqueue}) => {
+      const updater = early_exit;
+      enqueue({type: 'game-update', params: {updater, task_id: null}});
+    })
   }
 });
 

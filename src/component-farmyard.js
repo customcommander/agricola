@@ -72,37 +72,24 @@ class FarmYard extends LitElement {
     );
   }
 
-  _plow(sel) {
+  _cta(sel) {
+    const msg = this.#messages.value[sel.opt]();
     return html`
       <a href="#" @click=${() => this._dispatch(sel)}>
-        ${this.#messages.value.plow()}
+        ${msg}
       </a>
-    `;
+    `;    
   }
 
-  _stable(sel) {
-    const ev = {task_id: sel.task_id,
-                space_id: sel.space_id,
-                'build-stable': true};
-    return html`
-      <a href="#" @click=${() => this._dispatch(ev)}>
-        stable
-      </a>
-    `;
-  }
-
-  _space(space_id) {
-    const farmyard = this.#farmyard.value;
-    const selection = this.#selection.value;
-    const space = farmyard[space_id];
-    const sel = selection?.find(sel => sel.space_id == space_id);
+  _space(id) {
+    const space = this.#farmyard.value[id];
+    const selections = this.#selection.value?.filter(s => s.space_id === id);
 
     return html`
       <agricola-space
-        id=${space_id}
+        id=${id}
         type=${space?.type ?? nothing}>
-        ${when(sel?.plow, () => this._plow(sel))}
-        ${when(sel?.['build-stable'], () => this._stable(sel))}
+        ${map(selections ?? [], (sel) => this._cta(sel))}
       </agricola-space>
     `;
   }

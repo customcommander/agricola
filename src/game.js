@@ -33,11 +33,28 @@ const src = setup({
     assign(({context}) => produce(context, draft => {
       draft.turn += 1;
       draft.workers = draft.family;
-      Object.keys(draft.tasks).forEach(id => {
+
+      /*
+
+        By default, toggle the `selected` flag back on
+        if it was previously off.
+
+        Tasks that do have a 'reset cycle' will be contacted
+        by the dispatcher and will have to handle
+        this themselves.
+
+       */
+      let tasks;
+      tasks = Object.entries(draft.tasks);
+      tasks = tasks.filter(([, t]) => t.reset == null);
+      tasks = tasks.map(([id]) => id);
+
+      tasks.forEach(id => {
         if (draft.tasks[id].selected === true) {
           draft.tasks[id].selected = false;
         }
       });
+
       return draft;
     })),
 
@@ -147,7 +164,7 @@ const machine = src.createMachine({
       "reed": 0,
       stone: 0
     },
-    house_type: 'wooden_hut',
+    house_type: 'wooden-hut',
     "farmyard": {
       "A1": null,
       "A2": null,
@@ -155,14 +172,14 @@ const machine = src.createMachine({
       "A4": null,
       "A5": null,
       "B1": {
-        "type": "wooden_hut"
+        "type": "wooden-hut"
       },
       "B2": null,
       "B3": null,
       "B4": null,
       "B5": null,
       "C1": {
-        "type": "wooden_hut"
+        "type": "wooden-hut"
       },
       "C2": null,
       "C3": null,

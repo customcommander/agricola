@@ -1,5 +1,11 @@
 import setup from './task-collect.js';
 
+function plow({params}, game_context) {
+  const {space_id} = params;
+  game_context.farmyard[space_id] = {type: 'field'};
+  return game_context;
+}
+
 export default setup.createMachine({
   initial: 'idle',
   states: {
@@ -22,22 +28,20 @@ export default setup.createMachine({
         'space.selected': {
           target: 'work'
         }
-      }
+      },
+      exit: 'clear-selection'
     },
     work: {
       entry: {
-        type: 'build',
+        type: 'game-update',
         params: ({event}) => ({
           space_id: event.space_id,
-          build: 'plow'
+          updater: plow
         })
       },
       always: {
         target: 'idle',
-        actions: [
-          'clear-selection',
-          'task-complete'
-        ]
+        actions: 'task-complete'
       }
     }
   },

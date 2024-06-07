@@ -15,10 +15,14 @@ NOT_ENOUGH_RESOURCES: >
   You do not have all the resources
   to complete this action.
 
-# Misc
+# Actions & Misc
 
 plow: Plow
 complete: Complete Task
+stable: Stable
+wooden-hut: Wooden Hut
+clay-hut: Clay Hut
+stone-house: Stone House
 
 # Stage 0
 
