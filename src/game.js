@@ -323,7 +323,9 @@ const machine = src.createMachine({
   }
 });
 
-export default createActor(machine, {
-  systemId: 'gamesys'
-});
+export default () => {
+  return createActor(machine, {
+    systemId: 'gamesys'
+  });
+}
 

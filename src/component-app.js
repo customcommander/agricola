@@ -66,7 +66,7 @@ class App extends LitElement {
   constructor() {
     super();
 
-    this.#game = game;
+    this.#game = game();
 
     const provide = context => new ContextProvider(this, {context});
 
