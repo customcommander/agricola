@@ -49,6 +49,8 @@ class App extends LitElement {
 
     agricola-farmyard {
       grid-area: farmyard;
+      width: 750px;
+      height: 350px;
     }
   `;
 
