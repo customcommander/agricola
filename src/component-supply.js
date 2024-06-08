@@ -19,11 +19,12 @@ class Supply extends LitElement {
   }
 
   render() {
-    const {food, wood, reed, clay} = this.#supply.value;
+    const {food, grain, wood, reed, clay} = this.#supply.value;
     const msg = this.#messages.value;
     return html`
 <div>
 <span>${msg.supply_food({qty: food})}</span>
+<span>${msg.supply_grain({qty: grain})}</span>
 <span>${msg.supply_wood({qty: wood})}</span>
 <span>${msg.supply_reed({qty: reed})}</span>
 <span>${msg.supply_clay({qty: clay})}</span>
