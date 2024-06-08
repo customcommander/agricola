@@ -55,6 +55,14 @@ const src = setup({
         }
       });
 
+      tasks = Object.entries(draft.tasks);
+
+      tasks.forEach(([id, t]) => {
+        if (t.hidden === true && t.turn === draft.turn) {
+          draft.tasks[id].hidden = false;
+        }
+      });
+
       return draft;
     })),
 
@@ -148,14 +156,28 @@ const dispatcher_params =
   (channels) => ({context}) => channels.flatMap(ch => {
     let ids;
     ids = Object.entries(context.tasks);
-    ids = ids.filter(([, t]) => t[ch] === true);
+    ids = ids.filter(([, t]) => t[ch] === true && t.hidden !== true);
     return ids.map(([id]) => ({ev: `task.${ch}`, task_id: id}));
   });
 
 const machine = src.createMachine({
   context: ({input}) => {
+    const turn = input?.turn ?? 1;
+
+    /*
+      Running order.
+      TODO: randomise order for stage 1 to 5
+     */
+    const ro = [[ 1,  2, 3, 4], // stage 1
+                [ 5,  6, 7   ], // stage 2
+                [ 8,  9      ], // stage 3
+                [10, 11      ], // stage 4
+                [12, 13      ], // stage 5
+                [14          ]  // stage 6
+               ];
+
     return {
-      turn:    1,
+      turn,
       family:  2,
       workers: 2,
       supply: {
@@ -178,6 +200,12 @@ const machine = src.createMachine({
         108: {selected: false, quantity: 1, replenish: true}, // clay
         109: {selected: false, quantity: 1, replenish: true}, // reed
         110: {selected: false, quantity: 1, replenish: true}, // fishing
+
+        // Stage 1
+        111: {selected: false,                               turn: ro[0][0], hidden: (ro[0][0] > turn)}, // Fences
+        112: {selected: false,                               turn: ro[0][1], hidden: (ro[0][1] > turn)}, // Major Improvement
+        113: {selected: false,                               turn: ro[0][2], hidden: (ro[0][2] > turn)}, // Sow and/or Bake bread
+        114: {selected: false, quantity: 0, replenish: true, turn: ro[0][3], hidden: (ro[0][3] > turn)}, // Take x Sheep
       },
       error: null,
       early_exit: null

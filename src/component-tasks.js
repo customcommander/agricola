@@ -56,12 +56,13 @@ class Tasks extends LitElement {
   }
 
   render() {
+    const msg = this.#messages.value;
     const tasks = Object.entries(this.#tasks.value);
     
     const task = ([id, t]) => html`
       <li ?selected=${t.selected}
-          @click=${t.selected ? null : () => this._notify(id)}>
-        ${this.#messages.value[id]({qty: t.quantity})}
+          @click=${t.selected || t.hidden ? null : () => this._notify(id)}>
+        ${t.hidden ? msg['task-not-avail']({turn: t.turn}) : msg[id]({qty: t.quantity})}
       </li>
     `;
 
