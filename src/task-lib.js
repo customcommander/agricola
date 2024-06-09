@@ -94,6 +94,14 @@ export const base = setup({
       const updater = early_exit;
       enqueue({type: 'game-update', params: {updater, task_id: null}});
     })
+  },
+  guards: {
+    'enough-supply?':
+    ({event: {game_context}}, params) => {
+      const {supply} = game_context;
+      const checks = Object.entries(params);
+      return checks.every(([k, min]) => supply[k] >= min);
+    }
   }
 });
 
