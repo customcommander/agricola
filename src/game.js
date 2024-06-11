@@ -34,30 +34,13 @@ const src = setup({
       draft.turn += 1;
       draft.workers = draft.family;
 
-      /*
-
-        By default, toggle the `selected` flag back on
-        if it was previously off.
-
-        Tasks that do have a 'reset cycle' will be contacted
-        by the dispatcher and will have to handle
-        this themselves.
-
-       */
-      let tasks;
-      tasks = Object.entries(draft.tasks);
-      tasks = tasks.filter(([, t]) => t.reset == null);
-      tasks = tasks.map(([id]) => id);
-
-      tasks.forEach(id => {
-        if (draft.tasks[id].selected === true) {
-          draft.tasks[id].selected = false;
-        }
-      });
-
-      tasks = Object.entries(draft.tasks);
+      const tasks = Object.entries(draft.tasks);
 
       tasks.forEach(([id, t]) => {
+        if (t.selected === true) {
+          draft.tasks[id].selected = false;
+        }
+
         if (t.hidden === true && t.turn === draft.turn) {
           draft.tasks[id].hidden = false;
         }
