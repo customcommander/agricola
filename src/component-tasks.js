@@ -20,7 +20,8 @@ class Tasks extends LitElement {
       cursor: pointer;
     }
 
-    li[selected] {
+    li[selected],
+    li[masked] {
       opacity: 0.2;
       cursor: not-allowed;
     }
@@ -61,6 +62,7 @@ class Tasks extends LitElement {
     
     const task = ([id, t]) => html`
       <li ?selected=${t.selected}
+          ?masked=${t.hidden === true}
           @click=${t.selected || t.hidden ? null : () => this._notify(id)}>
         ${t.hidden ? msg['task-not-avail']({turn: t.turn}) : msg[id]({qty: t.quantity})}
       </li>
