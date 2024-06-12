@@ -21,12 +21,15 @@ TODO: >
 
 # Actions & Misc
 
-plow: Plow
 complete: Complete Task
-stable: Stable
-wooden-hut: Wooden Hut
-clay-hut: Clay Hut
-stone-house: Stone House
+
+# Selections
+
+select.plow: Plow
+select.stable: Stable
+select.wooden-hut: Wooden Hut
+select.clay-hut: Clay Hut
+select.stone-house: Stone House
 
 task-not-avail: >
   Not available until turn {turn}

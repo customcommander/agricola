@@ -20,7 +20,7 @@ function selection({params}, draft) {
 
   draft.selection = opts.flatMap(opt => {
     const avail = spaces.filter(([, sp]) => sp == null);
-    return avail.map(([space_id]) => ({task_id, space_id, opt}));
+    return avail.map(([space_id]) => ({type: opt, task_id, space_id}));
   });
 
   return draft;

@@ -64,16 +64,13 @@ class FarmYard extends LitElement {
       new CustomEvent('dispatch', {
         bubbles: true,
         composed: true,
-        detail: {
-          ...sel,
-          type: 'space.selected'
-        }
+        detail: sel
       })
     );
   }
 
   _cta(sel) {
-    const msg = this.#messages.value[sel.opt]();
+    const msg = this.#messages.value[sel.type]();
     return html`
       <a href="#" @click=${() => this._dispatch(sel)}>
         ${msg}

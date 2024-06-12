@@ -21,11 +21,11 @@ export default base.createMachine({
         type: 'display-selection',
         params: {
           task_id: 104,
-          opts: ['plow']
+          opts: ['select.plow']
         }
       },
       on: {
-        'space.selected': {
+        'select.plow': {
           target: 'work'
         }
       },

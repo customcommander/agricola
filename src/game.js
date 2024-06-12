@@ -307,8 +307,8 @@ const machine = src.createMachine({
     }
   },
   "on": {
-    "space.selected": {
-      "actions": "task-forward"
+    'select.*': {
+      actions: 'task-forward'
     },
     "game.update": {
       "actions": "game-update"

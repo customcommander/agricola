@@ -57,7 +57,7 @@ const machine = base.createMachine({
     'select-space': {
       entry: 'compute-&-display-selection',
       on: {
-        'space.selected': {
+        'select.*': {
           target: 'work',
         },
         'task.exit': {
@@ -71,14 +71,14 @@ const machine = base.createMachine({
     work: {
       entry: {
         type: 'game-update',
-        params: ({event: {space_id, opt}}) => ({
+        params: ({event: {type, space_id}}) => ({
           space_id,
           reply_to: 101,
-          updater: ( opt ===  'wooden-hut' ? build_wooden_hut
-                   : opt ===    'clay-hut' ? build_clay_hut
-                   : opt === 'stone-house' ? build_stone_house
-                   : opt ===      'stable' ? build_stable
-                                           : null /* throw? */)
+          updater: ( type === 'select.wooden-hut'  ? build_wooden_hut
+                   : type === 'select.clay-hut'    ? build_clay_hut
+                   : type === 'select.stone-house' ? build_stone_house
+                   : type === 'select.stable'      ? build_stable
+                                                   : null /* throw? */)
         })
       },
       on: {
@@ -111,12 +111,11 @@ export default machine.provide({
   actions: {
     'compute-&-display-selection':
     enqueueActions(({enqueue, check}) => {
-      const opts =
-        ( check( 'can-build-wooden-hut?') ? ['wooden-hut' , 'stable']
-        : check(   'can-build-clay-hut?') ? ['clay-hut'   , 'stable']
-        : check('can-build-stone-house?') ? ['stone-house', 'stable']
-                                          : ['stable'               ]);
-
+      const opts = [];
+      if (check('can-build-stable?'))      opts.push('select.stable');
+      if (check('can-build-wooden-hut?'))  opts.push('select.wooden-hut');
+      if (check('can-build-clay-hut?'))    opts.push('select.clay-hut');
+      if (check('can-build-stone-house?')) opts.push('select.stone-house');
       enqueue({type: 'display-selection', params: {task_id: 101, opts}});
     })
   },
