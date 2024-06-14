@@ -42,7 +42,7 @@ task-not-avail: >
   Take {qty} Food
 103: Take 1 Grain
 104: Plow 1 Field
-105: Build Stable and/or Bake bread
+105: 1 Occupation
 106: Day Laborer
 107: Take {qty} Wood
 108: Take {qty} Clay
