@@ -6,7 +6,7 @@ Implements the `1 Occupation` action space.
 
 import {base} from './task-lib.js';
 
-export default base.createMachine({
+const machine = base.createMachine({
   context: {
     /*
 
@@ -29,6 +29,10 @@ export default base.createMachine({
     idle: {
       on: {
         'task.selected': [
+          {
+            target: 'work',
+            guard: 'is-first-occupation?'
+          },
           {
             target: 'work',
             guard: {
@@ -63,4 +67,12 @@ export default base.createMachine({
 
   }
 });
+
+export default machine.provide({
+  guards: {
+    'is-first-occupation?':
+    ({context}) => context.count === 0
+  }
+});
+
 
