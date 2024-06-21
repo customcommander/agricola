@@ -62,6 +62,9 @@ const machine = base.createMachine({
           task_id: 105,
           err: 'TODO'
         }
+      },
+      always: {
+        target: 'idle'
       }
     }
 
