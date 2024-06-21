@@ -188,10 +188,28 @@ const machine = src.createMachine({
         110: {selected: false, quantity: 1, replenish: true}, // fishing
 
         // Stage 1
-        111: {selected: false,                               turn: ro[0][0], hidden: (ro[0][0] > turn)}, // Fences
-        112: {selected: false,                               turn: ro[0][1], hidden: (ro[0][1] > turn)}, // Major Improvement
-        113: {selected: false,                               turn: ro[0][2], hidden: (ro[0][2] > turn)}, // Sow and/or Bake bread
-        114: {selected: false, quantity: 0, replenish: true, turn: ro[0][3], hidden: (ro[0][3] > turn)}, // Take x Sheep
+
+        // Fences
+        111: {selected:  false,
+              turn:      ro[0][0],
+              hidden:    ro[0][0] > turn},
+
+        // Major Improvement
+        112: {selected:  false,
+              turn:      ro[0][1],
+              hidden:    ro[0][1] > turn},
+
+        // Sow and/or Bake bread
+        113: {selected:  false,
+              turn:      ro[0][2],
+              hidden:    ro[0][2] > turn},
+
+        // Take x Sheep
+        114: {selected:  false,
+              quantity:  0,
+              replenish: true,
+              turn:      ro[0][3],
+              hidden:    ro[0][3] > turn},
       },
       error: null,
       early_exit: null
