@@ -5,23 +5,20 @@ import {map} from 'lit/directives/map.js';
 class Tasks extends LitElement {
   static styles = css`
     :host {
-      display: flex;
-      flex-direction: column;
-      row-gap: 1em;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(4, 1fr);
     }
 
-    li {
-      white-space: pre-wrap;
-      border: 1px solid black;
-      list-style-type: none;
+    div {
     }
 
-    li:not([selected]) {
+    div:not([selected]) {
       cursor: pointer;
     }
 
-    li[selected],
-    li[masked] {
+    div[selected],
+    div[masked] {
       opacity: 0.2;
       cursor: not-allowed;
     }
@@ -61,17 +58,15 @@ class Tasks extends LitElement {
     const tasks = Object.entries(this.#tasks.value);
     
     const task = ([id, t]) => html`
-      <li ?selected=${t.selected}
+      <div ?selected=${t.selected}
           ?masked=${t.hidden === true}
           @click=${t.selected || t.hidden ? null : () => this._notify(id)}>
         ${t.hidden ? msg['task-not-avail']({turn: t.turn}) : msg[id]({qty: t.quantity})}
-      </li>
+      </div>
     `;
 
     return html`
-      <ol>
         ${map(tasks, task)}
-      </ol>
     `;
   }
 }

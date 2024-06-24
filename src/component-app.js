@@ -27,12 +27,17 @@ class App extends LitElement {
   static styles = css`
     :host {
       display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
+      width: 100vw;
+      height: 100vh;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: 3rem 3rem 1fr 3rem 1fr 3rem;
       grid-template-areas:
-        "info   info     info"
-        "supply supply   supply"
-        "tasks  farmyard improvements"
-        "score  score    score";
+        "info info sply sply sply sply sply  err"
+        "hd1  hd1  hd1  hd1  hd1  hd1  hd1  hd1 "
+        "stg0 stg0 stg0 stg0 stg0 stg0 stg0 stg0"
+        "hd2  hd2  hd2  hd2  hd2  hd2  hd2  hd2 "
+        "maj  maj  farm farm farm farm min   occ"
+        "foot foot foot foot foot foot foot foot";
     }
 
     agricola-infobar {
@@ -40,17 +45,20 @@ class App extends LitElement {
     }
 
     agricola-supply {
-      grid-area: supply;
+      grid-area: sply;
     }
 
     agricola-tasks {
-      grid-area: tasks;
+      grid-area: stg0;
+      overflow: scroll;
     }
 
     agricola-farmyard {
-      grid-area: farmyard;
-      width: 750px;
-      height: 350px;
+      grid-area: farm;
+    }
+
+    agricola-error {
+      grid-area: err;
     }
   `;
 
