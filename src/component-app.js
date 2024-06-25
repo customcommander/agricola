@@ -29,15 +29,13 @@ class App extends LitElement {
       display: grid;
       width: 100vw;
       height: 100vh;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: 3rem 3rem 1fr 3rem 1fr 3rem;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 3rem 1fr 1fr 3rem;
       grid-template-areas:
-        "info info sply sply sply sply sply  err"
-        "hd1  hd1  hd1  hd1  hd1  hd1  hd1  hd1 "
-        "stg0 stg0 stg0 stg0 stg0 stg0 stg0 stg0"
-        "hd2  hd2  hd2  hd2  hd2  hd2  hd2  hd2 "
-        "maj  maj  farm farm farm farm min   occ"
-        "foot foot foot foot foot foot foot foot";
+        "info    supply"
+        "actions farm"
+        "actions mmoc"
+        "footer  err";
     }
 
     agricola-infobar {
@@ -45,11 +43,11 @@ class App extends LitElement {
     }
 
     agricola-supply {
-      grid-area: sply;
+      grid-area: supply;
     }
 
     agricola-tasks {
-      grid-area: stg0;
+      grid-area: actions;
       overflow: scroll;
     }
 
