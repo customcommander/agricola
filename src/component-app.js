@@ -21,6 +21,7 @@ import './component-error.js';
 import './component-infobar.js';
 import './component-supply.js';
 import './component-tasks.js';
+import './component-secondary-tasks.js';
 import './component-farmyard.js';
 
 class App extends LitElement {
@@ -48,6 +49,11 @@ class App extends LitElement {
 
     agricola-tasks {
       grid-area: actions;
+      overflow: scroll;
+    }
+
+    agricola-secondary-tasks {
+      grid-area: mmoc;
       overflow: scroll;
     }
 
@@ -118,6 +124,7 @@ class App extends LitElement {
       <agricola-infobar></agricola-infobar>
       <agricola-supply></agricola-supply>
       <agricola-tasks></agricola-tasks>
+      <agricola-secondary-tasks></agricola-secondary-tasks>
       <agricola-farmyard></agricola-farmyard>
     `;
   }

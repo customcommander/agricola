@@ -7,6 +7,9 @@ supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})
 
 stage: Stage {num}
+major_improvements: Major Improvements
+minor_improvements: Minor Improvements
+occupations: Occupations
 
 # Dialogs
 
