@@ -110,8 +110,8 @@ class Tasks extends LitElement {
     
     const task = ([id, t]) => html`
       <div id="t${id}"
-           ?selected=${t.selected}
-           ?masked=${t.hidden === true}
+          ?selected=${t.selected}
+          ?masked=${t.hidden === true}
           @click=${t.selected || t.hidden ? null : () => this._notify(id)}>
         ${t.hidden ? msg['task-not-avail']({turn: t.turn}) : msg[id]({qty: t.quantity})}
       </div>
