@@ -29,6 +29,14 @@ class Tasks extends LitElement {
         "t123  .    ";
     }
 
+    .head  {font-weight: bold}
+    #head1 {grid-area:  head1}
+    #head2 {grid-area:  head2}
+    #head3 {grid-area:  head3}
+    #head4 {grid-area:  head4}
+    #head5 {grid-area:  head5}
+    #head6 {grid-area:  head6}
+
     #t101 {grid-area: t101}
     #t102 {grid-area: t102}
     #t103 {grid-area: t103}
@@ -110,7 +118,13 @@ class Tasks extends LitElement {
     `;
 
     return html`
-        ${map(tasks, task)}
+      <div id="head1" class="head">${msg.stage({num: 1})}</div>
+      <div id="head2" class="head">${msg.stage({num: 2})}</div>
+      <div id="head3" class="head">${msg.stage({num: 3})}</div>
+      <div id="head4" class="head">${msg.stage({num: 4})}</div>
+      <div id="head5" class="head">${msg.stage({num: 5})}</div>
+      <div id="head6" class="head">${msg.stage({num: 6})}</div>
+      ${map(tasks, task)}
     `;
   }
 }

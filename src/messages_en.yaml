@@ -6,6 +6,8 @@ supply_wood: Wood ({qty})
 supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})
 
+stage: Stage {num}
+
 # Dialogs
 
 action_ok: Ok
