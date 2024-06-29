@@ -12,11 +12,22 @@ class FarmYard extends LitElement {
     :host {
       display: grid;
       gap: 0;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px;
+      grid-template-rows:    5px 1fr 5px 1fr 5px 1fr;
       grid-template-areas:
-        "A1 A2 A3 A4 A5"
-        "B1 B2 B3 B4 B5"
-        "C1 C2 C3 C4 C5";
+        " .  F01 .  F02 .  F03 .  F04 .  F05 . "
+
+        "F06 A1 F07 A2 F08 A3 F09 A4 F10 A5 F11"
+
+        " .  F12 .  F13 .  F14 .  F15 .  F16 . "
+
+        "F17 B1 F18 B2 F19 B3 F20 B4 F21 B5 F22"
+
+        " .  F23 .  F24 .  F25 .  F26 .  F27 . "
+
+        "F28 C1 F29 C2 F30 C3 F31 C4 F32 C5 F33"
+
+        " .  F34 .  F35 .  F36 .  F37 .  F38 . ";
     }
 
     #A1 {grid-area: A1}
