@@ -11,7 +11,7 @@ class FarmYard extends LitElement {
   static styles = css`
     :host {
       display: grid;
-      gap: 2px;
+      gap: 0;
       grid-template-columns: repeat(5, 1fr);
       grid-template-areas:
         "A1 A2 A3 A4 A5"
