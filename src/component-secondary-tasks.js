@@ -8,12 +8,6 @@ class SecondaryTasks extends LitElement {
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(14, 3rem);
       grid-template-areas:
-        "head1 .    "
-        "t201  t206 "
-        "t202  t207 "
-        "t203  t208 "
-        "t204  t209 "
-        "t205  t210 "
         "head2 head3"
         "m001  o001 "
         "m002  o002 "
@@ -21,7 +15,13 @@ class SecondaryTasks extends LitElement {
         "m004  o004 "
         "m005  o005 "
         "m006  o006 "
-        "m007  o007 ";
+        "m007  o007 "
+        "head1 .    "
+        "t201  t206 "
+        "t202  t207 "
+        "t203  t208 "
+        "t204  t209 "
+        "t205  t210 ";
     }
 
     .head  {font-weight: bold}
