@@ -182,6 +182,7 @@ const machine = src.createMachine({
         103: {selected: false                              }, // take grain
         104: {selected: false                              },
         105: {selected: false                              },
+        106: {selected: false},
         107: {selected: false, quantity: 2, replenish: true}, // wood
         108: {selected: false, quantity: 1, replenish: true}, // clay
         109: {selected: false, quantity: 1, replenish: true}, // reed
