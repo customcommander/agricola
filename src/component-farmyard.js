@@ -30,6 +30,32 @@ class FarmYard extends LitElement {
         " .  F34 .  F35 .  F36 .  F37 .  F38 . ";
     }
 
+    #F01 {grid-area: F01} #F11 {grid-area: F11}
+    #F02 {grid-area: F02} #F12 {grid-area: F12}
+    #F03 {grid-area: F03} #F13 {grid-area: F13}
+    #F04 {grid-area: F04} #F14 {grid-area: F14}
+    #F05 {grid-area: F05} #F15 {grid-area: F15}
+    #F06 {grid-area: F06} #F16 {grid-area: F16}
+    #F07 {grid-area: F07} #F17 {grid-area: F17}
+    #F08 {grid-area: F08} #F18 {grid-area: F18}
+    #F09 {grid-area: F09} #F19 {grid-area: F19}
+    #F10 {grid-area: F10} #F20 {grid-area: F20}
+
+    #F21 {grid-area: F21} #F31 {grid-area: F31} 
+    #F22 {grid-area: F22} #F32 {grid-area: F32}
+    #F23 {grid-area: F23} #F33 {grid-area: F33}
+    #F24 {grid-area: F24} #F34 {grid-area: F34}
+    #F25 {grid-area: F25} #F35 {grid-area: F35}
+    #F26 {grid-area: F26} #F36 {grid-area: F36}
+    #F27 {grid-area: F27} #F37 {grid-area: F37}
+    #F28 {grid-area: F28} #F38 {grid-area: F38}
+    #F29 {grid-area: F29}
+    #F30 {grid-area: F30}
+
+    .fence {
+      background-color: pink;
+    }
+
     #A1 {grid-area: A1}
     #A2 {grid-area: A2}
     #A3 {grid-area: A3}
@@ -103,7 +129,48 @@ class FarmYard extends LitElement {
   }
 
   render() {
-    return html`${map(spaces, id => this._space(id))}`;
+    return html`
+      <div id="F01" class="fence"></div>
+      <div id="F02" class="fence"></div>
+      <div id="F03" class="fence"></div>
+      <div id="F04" class="fence"></div>
+      <div id="F05" class="fence"></div>
+      <div id="F06" class="fence"></div>
+      <div id="F07" class="fence"></div>
+      <div id="F08" class="fence"></div>
+      <div id="F09" class="fence"></div>
+      <div id="F10" class="fence"></div>
+      <div id="F11" class="fence"></div>
+      <div id="F12" class="fence"></div>
+      <div id="F13" class="fence"></div>
+      <div id="F14" class="fence"></div>
+      <div id="F15" class="fence"></div>
+      <div id="F16" class="fence"></div>
+      <div id="F17" class="fence"></div>
+      <div id="F18" class="fence"></div>
+      <div id="F19" class="fence"></div>
+      <div id="F20" class="fence"></div>
+      <div id="F21" class="fence"></div>
+      <div id="F22" class="fence"></div>
+      <div id="F23" class="fence"></div>
+      <div id="F24" class="fence"></div>
+      <div id="F25" class="fence"></div>
+      <div id="F26" class="fence"></div>
+      <div id="F27" class="fence"></div>
+      <div id="F28" class="fence"></div>
+      <div id="F29" class="fence"></div>
+      <div id="F30" class="fence"></div>
+      <div id="F31" class="fence"></div>
+      <div id="F32" class="fence"></div>
+      <div id="F33" class="fence"></div>
+      <div id="F34" class="fence"></div>
+      <div id="F35" class="fence"></div>
+      <div id="F36" class="fence"></div>
+      <div id="F37" class="fence"></div>
+      <div id="F38" class="fence"></div>
+
+      ${map(spaces, id => this._space(id))}
+    `;
   }
 }
 
