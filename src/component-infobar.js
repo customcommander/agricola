@@ -48,13 +48,13 @@ class InfoBar extends LitElement {
   }
 
   render() {
-    const msg_turn = () => {
-      const turn = this.#turn.value;
-      return this.#messages.value.turn({turn});
-    };
-
+    const msg = this.#messages.value;
+    const {turn, workers} = this.#turn.value;
     return html`
-      <span>${msg_turn()}</span>
+      <span>${msg.turn({turn})}</span>
+      <span title=${msg.num_workers_description({num: workers})}>
+        ${msg.num_workers({num:workers})}
+      </span>
       ${this._early_exit()}
     `;
   }

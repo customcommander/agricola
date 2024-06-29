@@ -1,6 +1,5 @@
 import {
   Subject,
-  distinct,
   distinctUntilChanged,
   fromEventPattern,
   map,
@@ -23,8 +22,8 @@ export const observe_game = game =>
   );
 
 export const turn$ = snapshot$ => snapshot$.pipe(
-  map(snapshot => snapshot.context.turn),
-  distinct()
+  map(({context: {turn, workers}}) => ({turn, workers})),
+  distinctUntilChanged(deep_equal)
 );
 
 export const tasks$ = snapshot$ => snapshot$.pipe(

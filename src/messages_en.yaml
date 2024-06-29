@@ -1,4 +1,9 @@
-turn: Turn ({turn})
+turn: Turn {turn}
+num_workers: "Workers: {num}"
+num_workers_description:
+  You have {num, plural, =0    {no workers}
+                         one   {# worker}
+                         other {# workers}} left to place
 
 supply_food: Food ({qty})
 supply_grain: Grain ({qty})
