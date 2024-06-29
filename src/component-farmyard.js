@@ -12,8 +12,8 @@ class FarmYard extends LitElement {
     :host {
       display: grid;
       gap: 0;
-      grid-template-columns: 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px;
-      grid-template-rows:    5px 1fr 5px 1fr 5px 1fr 5px;
+      grid-template-columns: 7px 1fr 7px 1fr 7px 1fr 7px 1fr 7px 1fr 7px;
+      grid-template-rows:    7px 1fr 7px 1fr 7px 1fr 7px;
       grid-template-areas:
         " .  F01 .  F02 .  F03 .  F04 .  F05 . "
 
@@ -54,6 +54,7 @@ class FarmYard extends LitElement {
 
     .fence {
       background-color: pink;
+      cursor: pointer;
     }
 
     #A1 {grid-area: A1}
