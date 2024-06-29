@@ -13,7 +13,7 @@ class FarmYard extends LitElement {
       display: grid;
       gap: 0;
       grid-template-columns: 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px;
-      grid-template-rows:    5px 1fr 5px 1fr 5px 1fr;
+      grid-template-rows:    5px 1fr 5px 1fr 5px 1fr 5px;
       grid-template-areas:
         " .  F01 .  F02 .  F03 .  F04 .  F05 . "
 
