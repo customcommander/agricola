@@ -1,5 +1,7 @@
 /*
-  Dispatch events to tasks.
+  Dispatch events to tasks one by one,
+  waiting for each task to acknowledge the
+  event before dispatching to the next task.
 */
 
 import {
