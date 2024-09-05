@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "webpack serve --open"
+    "start": "webpack serve --open",
+    "build": "webpack --env production"
   },
   "keywords": [],
   "author": "",
