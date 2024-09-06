@@ -19,7 +19,7 @@
     "xstate": "^5.18.1"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^10.9.0",
+    "@cucumber/cucumber": "^11.0.0",
     "@messageformat/core": "^3.3.0",
     "@messageformat/loader": "^1.0.0",
     "html-webpack-plugin": "^5.6.0",
