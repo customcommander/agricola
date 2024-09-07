@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --open",
-    "build": "webpack --env production"
+    "build": "webpack --env production",
+    "test": "cucumber-js"
   },
   "keywords": [],
   "author": "",
