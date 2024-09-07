@@ -9,7 +9,7 @@ class AgricolaFooter extends LitElement {
 
   render() {
     return html`
-      <div>version: ${VERSION}</div>
+      <div>Version: ${VERSION}</div>
     `;
   }
 }
