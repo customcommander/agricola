@@ -1,10 +1,10 @@
-import {Given, When} from '@cucumber/cucumber';
+import {Given, Then} from '@cucumber/cucumber';
 
 Given('I start playing', function () {
-
+  this.start();
 });
 
-When('I will have fun', function () {
-
+Then('the current turn is {int}', async function (expected_turn) {
+  await this.assert(({turn}) => turn === expected_turn);
 });
 
