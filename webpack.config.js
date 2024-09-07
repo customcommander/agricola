@@ -1,3 +1,4 @@
+import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export default function webpack_config(env, argv) {
@@ -25,7 +26,11 @@ export default function webpack_config(env, argv) {
       new HtmlWebpackPlugin({
         title: 'Agricola',
         scriptLoading: 'module'
-      })
+      }),
+      new webpack.DefinePlugin({
+        // see deploy.yml
+        VERSION: (env.version ?? JSON.stringify('dev'))
+      }),
     ]
   };
 }

@@ -23,6 +23,7 @@ import './component-supply.js';
 import './component-tasks.js';
 import './component-secondary-tasks.js';
 import './component-farmyard.js';
+import './component-footer.js';
 
 class App extends LitElement {
   static styles = css`
@@ -63,6 +64,10 @@ class App extends LitElement {
 
     agricola-error {
       grid-area: err;
+    }
+
+    agricola-footer {
+      grid-area: footer;
     }
   `;
 
@@ -126,6 +131,7 @@ class App extends LitElement {
       <agricola-tasks></agricola-tasks>
       <agricola-secondary-tasks></agricola-secondary-tasks>
       <agricola-farmyard></agricola-farmyard>
+      <agricola-footer></agricola-footer>
     `;
   }
 }
