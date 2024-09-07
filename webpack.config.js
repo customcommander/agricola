@@ -28,8 +28,8 @@ export default function webpack_config(env, argv) {
         scriptLoading: 'module'
       }),
       new webpack.DefinePlugin({
-        // see deploy.yml
-        VERSION: (env.version ?? JSON.stringify('dev'))
+        // version is injected during production build. see deploy.yml
+        VERSION: JSON.stringify(env.version ?? 'dev')
       }),
     ]
   };
