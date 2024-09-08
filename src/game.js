@@ -342,9 +342,23 @@ const machine = src.createMachine({
   }
 });
 
-export default () => {
-  return createActor(machine, {
-    systemId: 'gamesys'
-  });
+export default function () {
+  return new class {
+    constructor() {
+      this.actor = createActor(machine, {systemId: 'gamesys'});
+    }
+    start() {
+      this.actor.start();
+    }
+    send(event) {
+      this.actor.send(event);
+    }
+    subscribe(handler) {
+      return this.actor.subscribe(handler);
+    }
+    getSnapshot() {
+      return this.actor.getSnapshot();
+    }
+  };
 }
 
