@@ -82,6 +82,9 @@ class App extends LitElement {
   #tasks;
   #turn;
 
+  // All events emitted by the player.
+  #log = [];
+
   constructor() {
     super();
 
@@ -112,14 +115,14 @@ class App extends LitElement {
     observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(turn$, turn => this.#turn.setValue(turn));
 
-    this.addEventListener('dispatch', (e) => this.#game.send(e.detail));
+    this.addEventListener('dispatch', (e) => {
+      this.#log.push({$version: VERSION, ...e.detail});
+      this.#game.send(e.detail);
+    });
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.#game.subscribe(snap => {
-      console.log(snap.value);
-    });
     this.#game.start();
   }
 
