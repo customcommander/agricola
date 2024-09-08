@@ -1,6 +1,12 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
+import {when} from 'lit/directives/when.js';
 
 class AgricolaFooter extends LitElement {
+  static styles = css`
+    #warning {
+      color: red;
+    }
+  `;
 
   constructor() {
     super();
@@ -9,7 +15,11 @@ class AgricolaFooter extends LitElement {
 
   render() {
     return html`
-      <div>Version: ${VERSION}</div>
+      <div>
+        Version: ${VERSION}
+        ${when(PRODUCTION,
+          () => html`<strong id="warning">This game is not ready yet! Work in progress...</strong>`)}
+      </div>
     `;
   }
 }

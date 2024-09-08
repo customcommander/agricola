@@ -29,7 +29,8 @@ export default function webpack_config(env, argv) {
       }),
       new webpack.DefinePlugin({
         // version is injected during production build. see deploy.yml
-        VERSION: JSON.stringify(env.version ?? 'dev')
+        VERSION: JSON.stringify(env.version ?? 'dev'),
+        PRODUCTION: env.production === true,
       }),
     ]
   };
