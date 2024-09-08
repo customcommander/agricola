@@ -211,6 +211,13 @@ const machine = src.createMachine({
               replenish: true,
               turn:      ro[0][3],
               hidden:    ro[0][3] > turn},
+
+        // Stage 2
+
+        // Family growth
+        115: {selected:  false,
+              turn:      ro[1][0],
+              hidden:    ro[1][0] > turn}
       },
       error: null,
       early_exit: null
