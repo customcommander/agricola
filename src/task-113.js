@@ -4,6 +4,7 @@
 
 */
 
+import {and, or} from 'xstate';
 import {base} from './task-lib.js';
 
 const machine = base.createMachine({
@@ -14,12 +15,16 @@ const machine = base.createMachine({
         'task.selected': [
           {
             target: 'work',
-            guard: {
-              type: 'enough-supply?',
+            guard: and(['has-empty-fields?', or(['has-grain?',
+                                                 'has-vegetable?'])]),
+            actions: {
+              type: 'abort',
               params: {
-                grain: 1
+                task_id: 113,
+                err: 'TODO'
               }
             }
+
           },
           {
             actions: {

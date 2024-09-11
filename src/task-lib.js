@@ -101,6 +101,32 @@ export const base = setup({
       const {supply} = game_context;
       const checks = Object.entries(params);
       return checks.every(([k, min]) => supply[k] >= min);
+    },
+
+    // True if there is at least one grain available in the supply.
+    'has-grain?':
+    ({event: {game_context}}) => {
+      const {supply} = game_context;
+      return supply.grain > 0;
+    },
+
+    // True if there is at least one vegetable available in the supply.
+    'has-vegetable?':
+    ({event: {game_context}}) => {
+      const {supply} = game_context;
+      return supply.vegetable > 0;
+    },
+
+    // True if there is at least one empty field.
+    'has-empty-fields?':
+    ({event: {game_context}}) => {
+      const {farmyard} = game_context;
+      const spaces = Object.values(farmyard);
+      return spaces.some(space => {
+        if (space?.type !== 'field') return false;
+        const {grain = 0, vegetable = 0} = space;
+        return !grain && !vegetable;
+      });
     }
   }
 });
