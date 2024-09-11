@@ -1,6 +1,6 @@
 import {World, setWorldConstructor} from '@cucumber/cucumber';
 import {waitFor} from 'xstate';
-import game from '../src/game.js';
+import game from '../../src/game.js';
 
 setWorldConstructor(class extends World {
 

@@ -3,6 +3,6 @@ default:
   format:
     - summary
   paths:
-    - 'test/**/*.feature'
+    - 'test/acceptance/**/*.feature'
   import:
-    - 'test/*.js'
+    - 'test/acceptance/*.js'
