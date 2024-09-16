@@ -10,6 +10,10 @@ class Space extends LitElement {
       background-color: green;
     }
 
+    :host([type="field"][grain]) {
+      background-color: yellow;
+    }
+
     :host([type="wooden-hut"]) {
       background-color: brown;
     }

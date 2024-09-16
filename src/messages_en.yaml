@@ -40,6 +40,8 @@ select.stable: Stable
 select.wooden-hut: Wooden Hut
 select.clay-hut: Clay Hut
 select.stone-house: Stone House
+select.sow-grain: Sow Grain
+select.sow-vegetable: Sow Vegetable
 
 task-not-avail: >
   Not available until turn {turn}

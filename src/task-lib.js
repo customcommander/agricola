@@ -8,6 +8,13 @@ import {
   produce
 } from 'immer';
 
+
+function is_empty_field(space) {
+  if (space?.type !== 'field') return false;
+  const {grain = 0, vegetable = 0} = space;
+  return !grain && !vegetable;
+}
+
 /*
 TODO:
 If things of the same kind already exist
@@ -19,7 +26,14 @@ function selection({params}, draft) {
   const spaces = Object.entries(draft.farmyard);
 
   draft.selection = opts.flatMap(opt => {
-    const avail = spaces.filter(([, sp]) => sp == null);
+    let avail;
+
+    if (opt === 'select.sow-grain' || opt === 'select.sow-vegetable') {
+      avail = spaces.filter(([, sp]) => is_empty_field(sp));
+    } else {
+      avail = spaces.filter(([, sp]) => sp == null);
+    }
+
     return avail.map(([space_id]) => ({type: opt, task_id, space_id}));
   });
 
@@ -122,11 +136,7 @@ export const base = setup({
     ({event: {game_context}}) => {
       const {farmyard} = game_context;
       const spaces = Object.values(farmyard);
-      return spaces.some(space => {
-        if (space?.type !== 'field') return false;
-        const {grain = 0, vegetable = 0} = space;
-        return !grain && !vegetable;
-      });
+      return spaces.some(space => is_empty_field(space));
     }
   }
 });
