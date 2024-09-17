@@ -8,9 +8,19 @@ setWorldConstructor(class extends World {
     super(options);
   }
 
-  start() {
+  async start() {
     this.game = game();
     this.game.start();
+    await this.wait(200);
+  }
+
+  async send(ev) {
+    this.game.send(ev);
+    await this.wait(200);
+  }
+
+  async wait(ms) {
+    await new Promise(res => setTimeout(res, ms));
   }
 
   async assert(predicate) {
