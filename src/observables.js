@@ -3,8 +3,7 @@ import {
   distinctUntilChanged,
   fromEventPattern,
   map,
-  multicast,
-  refCount,
+  share,
 } from 'rxjs';
 
 import deep_equal from 'fast-deep-equal';
@@ -17,8 +16,7 @@ export const observe_game = game =>
     (_, subscription) => subscription.unsubscribe()
   )
   .pipe(
-    multicast(new Subject()),
-    refCount()
+    share()
   );
 
 export const turn$ = snapshot$ => snapshot$.pipe(
