@@ -17,14 +17,14 @@
     "immer": "^10.1.1",
     "lit": "^3.2.0",
     "rxjs": "^7.8.1",
-    "xstate": "^5.18.1"
+    "xstate": "^5.18.2"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^11.0.0",
+    "@cucumber/cucumber": "^11.0.1",
     "@messageformat/core": "^3.3.0",
     "@messageformat/loader": "^1.0.0",
     "html-webpack-plugin": "^5.6.0",
-    "webpack": "^5.94.0",
+    "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.1.0"
   }
