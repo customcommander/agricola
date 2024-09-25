@@ -71,7 +71,6 @@ class App extends LitElement {
     }
   `;
 
-  #game;
   #messages;
 
   #early_exit;
@@ -88,9 +87,9 @@ class App extends LitElement {
   constructor() {
     super();
 
-    this.#game = game();
-
-    const provide = context => new ContextProvider(this, {context});
+    const provide = (context) => {
+      return new ContextProvider(this, {context});
+    };
 
     this.#messages = provide('messages');
 
@@ -104,8 +103,24 @@ class App extends LitElement {
 
     this.#messages.setValue(messages);
 
-    const game$ = observe_game(this.#game);
-    const observe = (fn, cb) => fn(game$).subscribe(cb);
+    this.addEventListener('dispatch', (e) => {
+      this.#log.push({$version: VERSION, ...e.detail});
+      this.game.send(e.detail);
+    });
+  }
+
+  start() {
+    if (this.game) {
+      this.game$.unsubscribe();
+      this.game$ = null;
+    }
+
+    this.game = game();
+    this.game$ = observe_game(this.game);
+
+    const observe = (fn, cb) => {
+      fn(this.game$).subscribe(cb);
+    };
 
     observe(early_exit$, early_exit => this.#early_exit.setValue(early_exit));
     observe(error$, error => this.#error.setValue(error));
@@ -115,15 +130,12 @@ class App extends LitElement {
     observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(turn$, turn => this.#turn.setValue(turn));
 
-    this.addEventListener('dispatch', (e) => {
-      this.#log.push({$version: VERSION, ...e.detail});
-      this.#game.send(e.detail);
-    });
+    this.game.start();
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.#game.start();
+    this.start();
   }
 
   render() {
