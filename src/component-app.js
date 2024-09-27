@@ -112,25 +112,113 @@ class App extends LitElement {
 
     this.#messages.setValue(messages);
 
-    this._restart$ = fromEvent(this, 'restart-game').pipe(share());
+    /*
+      When this emits it means that the player
+      has decided to restart the game and
+      replay some of their moves.
 
-    this._event$ = (new Subject).pipe(
-      concatMap(({replay, ...ev}) =>
-        replay
-          ? of(ev).pipe(delay(1000))
-          : of(ev))
+      This observable is used as a notification
+      mechanism for several other observables
+      so the emission needs to be multicasted.
+
+      TODO: rename `game.restart`
+     */
+    this._restart$ = fromEvent(this, 'restart-game').pipe(
+      map(() => true),
+      share()
     );
 
+    /*
+
+      There are two sources of XState events.
+
+      1. From playing the game.
+
+      The player moves are dispatched through a dedicated
+      CustomEvent channel `player.move` (TODO: rename).
+
+      This observable subscribes to that channel.
+
+      Note: any component can (and must) use that channel
+      but only this one has access to the game engine
+      where these events are ultimately forwarded to.
+
+      2. From replaying the moves.
+
+      We also buffer all events until a player decides
+      to restart the game.
+
+      When this happens we resend each of these events
+      back to this observable.
+
+     */
+    this._event$ = (new Subject).pipe(
+      concatMap(ev => {
+        const {replay, ...detail} = ev;
+        const obs = of(detail);
+        // Small delay between replay events so we can see what's going on.
+        return replay ? obs.pipe(delay(1000)) : obs;
+      })
+    );
+
+    // TODO: rename to `player.move`.
+    //       allow to unsubscribe from it.
     fromEvent(this, 'dispatch')
       .pipe(map(ev => ev.detail))
       .subscribe(this._event$);
 
-    this._replay$ = this._event$.pipe(buffer(this._restart$));
 
+    /*
+
+      This emits only after a player has decided
+      to restart the game and it emits an array
+      with all the moves a player has made so far.
+
+      Notes:
+
+      1. A player can restart the game as many times
+         as they want, whenever they want.
+
+      2. As `_event$` is multicast, buffering events
+         does not prevent them from being forwarded
+         to the game engine.
+
+      3. As buffered events are sent back to `_event$`,
+         they will automatically be buffered again,
+         which is definitely what we want.
+
+     */
+    this._replay$ = this._event$.pipe(
+      buffer(this._restart$)
+    );
+
+    /*
+
+      At this point we do not know whether it
+      is a new player move or a replay of a
+      previous move.
+
+      The only thing we know is that anything
+      that `_event$` emits has to be forwarded
+      to the game engine.
+
+     */
     this._event$.subscribe(ev => {
       this._game.send(ev);
     });
 
+    /*
+
+      At this point we need to restart the game
+      from scratch and replay each player move
+      one by one.
+
+      TODO:
+      The player should not be allowed to
+      interact with the game until the events
+      are all replayed.
+
+     */
     this._replay$.subscribe(evs => {
       this._game.stop();
       this._init();
