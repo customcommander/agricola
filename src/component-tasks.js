@@ -93,7 +93,7 @@ class Tasks extends LitElement {
 
   _notify(task_id) {
     this.dispatchEvent(
-      new CustomEvent('dispatch', {
+      new CustomEvent('player.move', {
         bubbles: true,
         composed: true,
         detail: {

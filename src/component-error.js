@@ -40,7 +40,7 @@ class Err extends LitElement {
 
   _dismiss() {
     this.dispatchEvent(
-      new CustomEvent('dispatch', {
+      new CustomEvent('player.move', {
         bubbles: true,
         composed: true,
         detail: {

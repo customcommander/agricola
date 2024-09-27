@@ -26,7 +26,7 @@ class InfoBar extends LitElement {
 
   _dispatch(task_id) {
     this.dispatchEvent(
-      new CustomEvent('dispatch', {
+      new CustomEvent('player.move', {
         bubbles: true,
         composed: true,
         detail: {

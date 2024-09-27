@@ -99,7 +99,7 @@ class FarmYard extends LitElement {
 
   _dispatch(sel) {
     this.dispatchEvent(
-      new CustomEvent('dispatch', {
+      new CustomEvent('player.move', {
         bubbles: true,
         composed: true,
         detail: sel

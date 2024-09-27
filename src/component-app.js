@@ -88,9 +88,8 @@ class App extends LitElement {
       mechanism for several other observables
       so the emission needs to be multicasted.
 
-      TODO: rename `game.restart`
      */
-    this._restart$ = fromEvent(this, 'restart-game').pipe(
+    this._restart$ = fromEvent(this, 'game.restart').pipe(
       map(() => true),
       share()
     );
@@ -102,7 +101,7 @@ class App extends LitElement {
       1. From playing the game.
 
       The player moves are dispatched through a dedicated
-      CustomEvent channel `player.move` (TODO: rename).
+      CustomEvent channel `player.move`.
 
       This observable subscribes to that channel.
 
@@ -128,12 +127,9 @@ class App extends LitElement {
       })
     );
 
-    // TODO: rename to `player.move`.
-    //       allow to unsubscribe from it.
-    fromEvent(this, 'dispatch')
+    fromEvent(this, 'player.move')
       .pipe(map(ev => ev.detail))
       .subscribe(this._event$);
-
 
     /*
 

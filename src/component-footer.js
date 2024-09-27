@@ -14,7 +14,7 @@ class AgricolaFooter extends LitElement {
 
   _restart() {
     this.dispatchEvent(
-      new CustomEvent('restart-game', {
+      new CustomEvent('game.restart', {
         bubbles: true,
         composed: true
       })
