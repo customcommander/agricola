@@ -83,36 +83,25 @@ class App extends LitElement {
     }
   `;
 
-  #messages;
-
-  #early_exit;
-  #error;
-  #farmyard;
-  #selection;
-  #supply;
-  #tasks;
-  #turn;
-
   constructor() {
     super();
 
-    const provide = (context) => {
-      return new ContextProvider(this, {context});
-    };
+    this._provide('messages');
+    this._messages.setValue(messages);
 
-    this.#messages = provide('messages');
-
-    this.#early_exit = provide('early_exit');
-    this.#error = provide('error');
-    this.#farmyard = provide('farmyard');
-    this.#selection = provide('selection');
-    this.#supply = provide('supply');
-    this.#tasks = provide('tasks');
-    this.#turn = provide('turn');
-
-    this.#messages.setValue(messages);
+    // These are values generated from the game engine
+    // and made available to components at any level
+    // via the Context API.
+    this._provide('early_exit');
+    this._provide('error');
+    this._provide('farmyard');
+    this._provide('selection');
+    this._provide('supply');
+    this._provide('tasks');
+    this._provide('turn');
 
     /*
+
       When this emits it means that the player
       has decided to restart the game and
       replay some of their moves.
@@ -228,6 +217,18 @@ class App extends LitElement {
     });
   }
 
+  _provide(resource) {
+    this[`_${resource}`] = new ContextProvider(this, {
+      context: resource
+    });
+  }
+
+  _observe(fn, resource) {
+    fn(this._game$).subscribe(val => {
+      this[`_${resource}`].setValue(val);
+    });
+  }
+
   _init() {
     this._game = game();
 
@@ -239,17 +240,13 @@ class App extends LitElement {
       share()
     );
 
-    const observe = (fn, cb) => {
-      fn(this._game$).subscribe(cb);
-    };
-
-    observe(early_exit$, early_exit => this.#early_exit.setValue(early_exit));
-    observe(error$, error => this.#error.setValue(error));
-    observe(farmyard$, farmyard => this.#farmyard.setValue(farmyard));
-    observe(selection$, selection => this.#selection.setValue(selection));
-    observe(supply$, supply => this.#supply.setValue(supply));
-    observe(tasks$, tasks => this.#tasks.setValue(tasks));
-    observe(turn$, turn => this.#turn.setValue(turn));
+    this._observe(early_exit$, 'early_exit');
+    this._observe(error$, 'error');
+    this._observe(farmyard$, 'farmyard');
+    this._observe(selection$, 'selection');
+    this._observe(supply$, 'supply');
+    this._observe(tasks$, 'tasks');
+    this._observe(turn$, 'turn');
 
     this._game.start();
   }
