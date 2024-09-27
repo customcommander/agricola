@@ -1,7 +1,19 @@
 import {LitElement, css, html} from 'lit';
 
 import {
-  observe_game,
+  Subject,
+  buffer,
+  concatMap,
+  delay,
+  fromEvent,
+  fromEventPattern,
+  map,
+  of,
+  share,
+  takeUntil,
+} from 'rxjs';
+
+import {
   early_exit$,
   error$,
   farmyard$,
@@ -81,9 +93,6 @@ class App extends LitElement {
   #tasks;
   #turn;
 
-  // All events emitted by the player.
-  #log = [];
-
   constructor() {
     super();
 
@@ -103,23 +112,47 @@ class App extends LitElement {
 
     this.#messages.setValue(messages);
 
-    this.addEventListener('dispatch', (e) => {
-      this.#log.push({$version: VERSION, ...e.detail});
-      this.game.send(e.detail);
+    this._restart$ = fromEvent(this, 'restart-game').pipe(share());
+
+    this._event$ = (new Subject).pipe(
+      concatMap(({replay, ...ev}) =>
+        replay
+          ? of(ev).pipe(delay(1000))
+          : of(ev))
+    );
+
+    fromEvent(this, 'dispatch')
+      .pipe(map(ev => ev.detail))
+      .subscribe(this._event$);
+
+    this._replay$ = this._event$.pipe(buffer(this._restart$));
+
+    this._event$.subscribe(ev => {
+      this._game.send(ev);
+    });
+
+    this._replay$.subscribe(evs => {
+      this._game.stop();
+      this._init();
+      evs.forEach(ev => {
+        this._event$.next({replay: true, ...ev});
+      });
     });
   }
 
-  start() {
-    if (this.game) {
-      this.game$.unsubscribe();
-      this.game$ = null;
-    }
+  _init() {
+    this._game = game();
 
-    this.game = game();
-    this.game$ = observe_game(this.game);
+    this._game$ = fromEventPattern(
+      (handler) => this._game.subscribe(handler),
+      (_, subscription) => subscription.unsubscribe()
+    ).pipe(
+      takeUntil(this._restart$),
+      share()
+    );
 
     const observe = (fn, cb) => {
-      fn(this.game$).subscribe(cb);
+      fn(this._game$).subscribe(cb);
     };
 
     observe(early_exit$, early_exit => this.#early_exit.setValue(early_exit));
@@ -130,12 +163,12 @@ class App extends LitElement {
     observe(tasks$, tasks => this.#tasks.setValue(tasks));
     observe(turn$, turn => this.#turn.setValue(turn));
 
-    this.game.start();
+    this._game.start();
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.start();
+    this._init();
   }
 
   render() {

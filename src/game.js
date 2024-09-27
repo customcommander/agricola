@@ -357,6 +357,9 @@ export default function () {
     start() {
       this.actor.start();
     }
+    stop() {
+      this.actor.stop();
+    }
     send(event) {
       this.actor.send(event);
     }

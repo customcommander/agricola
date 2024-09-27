@@ -1,27 +1,15 @@
 import {
-  Subject,
   distinctUntilChanged,
-  fromEventPattern,
   map,
-  share,
 } from 'rxjs';
 
 import deep_equal from 'fast-deep-equal';
 
 import {empty_spaces} from './util-farmyard.js';
 
-export const observe_game = game =>
-  fromEventPattern(
-    (handler) => game.subscribe(handler),
-    (_, subscription) => subscription.unsubscribe()
-  )
-  .pipe(
-    share()
-  );
-
 export const turn$ = snapshot$ => snapshot$.pipe(
   map(({context: {turn, workers}}) => ({turn, workers})),
-  distinctUntilChanged(deep_equal)
+  distinctUntilChanged(deep_equal),
 );
 
 export const tasks$ = snapshot$ => snapshot$.pipe(

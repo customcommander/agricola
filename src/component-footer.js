@@ -12,6 +12,14 @@ class AgricolaFooter extends LitElement {
     super();
   }
 
+  _restart() {
+    this.dispatchEvent(
+      new CustomEvent('restart-game', {
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
 
   render() {
     return html`
@@ -19,6 +27,7 @@ class AgricolaFooter extends LitElement {
         Version: ${VERSION}
         ${when(PRODUCTION,
           () => html`<strong id="warning">This game is not ready yet! Work in progress...</strong>`)}
+        <button type="button" @click=${() => this._restart()}>restart</button>
       </div>
     `;
   }
