@@ -52,35 +52,13 @@ class App extends LitElement {
         "footer  err";
     }
 
-    agricola-infobar {
-      grid-area: info;
-    }
-
-    agricola-supply {
-      grid-area: supply;
-    }
-
-    agricola-tasks {
-      grid-area: actions;
-      overflow: scroll;
-    }
-
-    agricola-secondary-tasks {
-      grid-area: mmoc;
-      overflow: scroll;
-    }
-
-    agricola-farmyard {
-      grid-area: farm;
-    }
-
-    agricola-error {
-      grid-area: err;
-    }
-
-    agricola-footer {
-      grid-area: footer;
-    }
+    agricola-infobar         { grid-area: info   }
+    agricola-supply          { grid-area: supply }
+    agricola-tasks           { grid-area: actions; overflow: scroll }
+    agricola-secondary-tasks { grid-area: mmoc   ; overflow: scroll }
+    agricola-farmyard        { grid-area: farm   }
+    agricola-error           { grid-area: err    }
+    agricola-footer          { grid-area: footer }
   `;
 
   constructor() {
