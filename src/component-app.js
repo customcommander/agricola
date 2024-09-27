@@ -217,12 +217,12 @@ class App extends LitElement {
     );
 
     this._observe(early_exit$, 'early_exit');
-    this._observe(error$, 'error');
-    this._observe(farmyard$, 'farmyard');
-    this._observe(selection$, 'selection');
-    this._observe(supply$, 'supply');
-    this._observe(tasks$, 'tasks');
-    this._observe(turn$, 'turn');
+    this._observe(error$     , 'error'     );
+    this._observe(farmyard$  , 'farmyard'  );
+    this._observe(selection$ , 'selection' );
+    this._observe(supply$    , 'supply'    );
+    this._observe(tasks$     , 'tasks'     );
+    this._observe(turn$      , 'turn'      );
 
     this._game.start();
   }
