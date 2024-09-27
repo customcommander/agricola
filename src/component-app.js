@@ -64,8 +64,7 @@ class App extends LitElement {
   constructor() {
     super();
 
-    this._provide('messages');
-    this._messages.setValue(messages);
+    this._provide('messages', messages);
 
     // These are values generated from the game engine
     // and made available to components at any level
@@ -191,10 +190,13 @@ class App extends LitElement {
     });
   }
 
-  _provide(resource) {
+  _provide(resource, val) {
     this[`_${resource}`] = new ContextProvider(this, {
       context: resource
     });
+    if (val) {
+      this[`_${resource}`].setValue(val);
+    }
   }
 
   _observe(fn, resource) {
