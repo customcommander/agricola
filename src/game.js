@@ -179,6 +179,7 @@ const machine = src.createMachine({
       },
       tasks: {
         101: {selected: false                              },
+        102: {selected: false},
         103: {selected: false                              }, // take grain
         104: {selected: false                              },
         105: {selected: false                              },

@@ -50,8 +50,9 @@ task-not-avail: >
 
 101: Build Rooms and/or Build Stables
 102: |
-  Storehouse
-  Take {qty} Food
+  Starting Player
+  and/or
+  1 Minor Improvement
 103: Take 1 Grain
 104: Plow 1 Field
 105: 1 Occupation
