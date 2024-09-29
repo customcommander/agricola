@@ -242,8 +242,7 @@ const machine = src.createMachine({
         'setup-new-turn',
         {
           type: 'dispatch',
-          params: dispatcher_params(['reset',
-                                     'replenish'])
+          params: dispatcher_params(['replenish'])
         }
       ],
       on: {
