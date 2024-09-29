@@ -350,25 +350,6 @@ const machine = src.createMachine({
 });
 
 export default function () {
-  return new class {
-    constructor() {
-      this.actor = createActor(machine, {systemId: 'gamesys'});
-    }
-    start() {
-      this.actor.start();
-    }
-    stop() {
-      this.actor.stop();
-    }
-    send(event) {
-      this.actor.send(event);
-    }
-    subscribe(handler) {
-      return this.actor.subscribe(handler);
-    }
-    getSnapshot() {
-      return this.actor.getSnapshot();
-    }
-  };
+  return createActor(machine, {systemId: 'gamesys'});
 }
 
