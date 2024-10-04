@@ -1,4 +1,9 @@
-import {LitElement, css, html} from 'lit';
+import {
+  LitElement,
+  css,
+  html,
+  nothing,
+} from 'lit';
 
 class Space extends LitElement {
   static styles = css`
@@ -24,12 +29,14 @@ class Space extends LitElement {
   `;
 
   static properties = {
-    type: {}
+    type:  {},
+    grain: {}
   }
 
   render() {
     return html`
       <div>
+        <span>${this.grain ?? nothing}</span>
         <slot></slot>
       </div>
     `;
