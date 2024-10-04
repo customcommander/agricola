@@ -136,7 +136,7 @@ const src = setup({
 });
 
 const dispatcher_params =
-  (channels) => ({context}) => channels.flatMap(ch => {
+  (channel) => ({context}) => [channel].flatMap(ch => {
     const task_not_hidden = id => context.tasks[id].hidden !== true;
     const ids = context.__dispatch[ch].filter(task_not_hidden);
     return ids.map((id) => ({ev: `task.${ch}`, task_id: id}));
@@ -251,7 +251,7 @@ const machine = src.createMachine({
         replenish: {
           entry: {
             type: 'dispatch',
-            params: dispatcher_params(['replenish'])
+            params: dispatcher_params('replenish')
           },
           on: {
             'dispatch.done': {
