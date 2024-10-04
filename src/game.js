@@ -137,10 +137,9 @@ const src = setup({
 
 const dispatcher_params =
   (channels) => ({context}) => channels.flatMap(ch => {
-    let ids;
-    ids = Object.entries(context.tasks);
-    ids = ids.filter(([, t]) => t[ch] === true && t.hidden !== true);
-    return ids.map(([id]) => ({ev: `task.${ch}`, task_id: id}));
+    const task_not_hidden = id => context.tasks[id].hidden !== true;
+    const ids = context.__dispatch[ch].filter(task_not_hidden);
+    return ids.map((id) => ({ev: `task.${ch}`, task_id: id}));
   });
 
 const machine = src.createMachine({
@@ -178,16 +177,16 @@ const machine = src.createMachine({
         C1: {type: 'wooden-hut'}, C2: null, C3: null, C4: null, C5: null
       },
       tasks: {
-        101: {selected: false                              },
-        102: {selected: false},
-        103: {selected: false                              }, // take grain
-        104: {selected: false                              },
-        105: {selected: false                              },
-        106: {selected: false},
-        107: {selected: false, quantity: 2, replenish: true}, // wood
-        108: {selected: false, quantity: 1, replenish: true}, // clay
-        109: {selected: false, quantity: 1, replenish: true}, // reed
-        110: {selected: false, quantity: 1, replenish: true}, // fishing
+        101: {selected: false             },
+        102: {selected: false             },
+        103: {selected: false             }, // take grain
+        104: {selected: false             },
+        105: {selected: false             },
+        106: {selected: false             },
+        107: {selected: false, quantity: 2}, // wood
+        108: {selected: false, quantity: 1}, // clay
+        109: {selected: false, quantity: 1}, // reed
+        110: {selected: false, quantity: 1}, // fishing
 
         // Stage 1
 
@@ -209,7 +208,6 @@ const machine = src.createMachine({
         // Take x Sheep
         114: {selected:  false,
               quantity:  0,
-              replenish: true,
               turn:      ro[0][3],
               hidden:    ro[0][3] > turn},
 
@@ -221,7 +219,11 @@ const machine = src.createMachine({
               hidden:    ro[1][0] > turn}
       },
       error: null,
-      early_exit: null
+      early_exit: null,
+
+      __dispatch: {
+        replenish: ['107','108','109','110','114']
+      }
     };
   },
   "initial": "init",
@@ -238,17 +240,31 @@ const machine = src.createMachine({
       }
     },
     'new-turn': {
-      entry: [
-        'setup-new-turn',
-        {
-          type: 'dispatch',
-          params: dispatcher_params(['replenish'])
+      initial: 'init-new-turn',
+      states: {
+        'init-new-turn': {
+          always: {
+            actions: 'setup-new-turn',
+            target: 'replenish'
+          }
+        },
+        replenish: {
+          entry: {
+            type: 'dispatch',
+            params: dispatcher_params(['replenish'])
+          },
+          on: {
+            'dispatch.done': {
+              target: 'done'
+            }
+          },
+        },
+        done: {
+          type: 'final'
         }
-      ],
-      on: {
-        'dispatch.done': {
-          target: 'work'
-        }
+      },
+      onDone: {
+        target: 'work'
       }
     },
     "work": {
