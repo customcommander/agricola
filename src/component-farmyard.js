@@ -124,7 +124,7 @@ class FarmYard extends LitElement {
       <agricola-space
         id=${id}
         type=${space?.type ?? nothing}
-        grain=${space?.grain ?? nothing}>
+        grain=${space?.grain || nothing}>
         ${map(selections ?? [], (sel) => this._cta(sel))}
       </agricola-space>
     `;

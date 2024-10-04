@@ -13,7 +13,14 @@ export const turn$ = snapshot$ => snapshot$.pipe(
 );
 
 export const tasks$ = snapshot$ => snapshot$.pipe(
-  map(snapshot => snapshot.context.tasks),
+  map(({context: {tasks}}) => {
+    // Do I need a better way to exclude system tasks?
+    const {
+      '001': _001,
+      ...rest
+    } = tasks;
+    return rest;
+  }),
   distinctUntilChanged(deep_equal)
 );
 

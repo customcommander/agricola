@@ -177,6 +177,8 @@ const machine = src.createMachine({
         C1: {type: 'wooden-hut'}, C2: null, C3: null, C4: null, C5: null
       },
       tasks: {
+        '001': {},
+
         101: {selected: false             },
         102: {selected: false             },
         103: {selected: false             }, // take grain
@@ -222,7 +224,8 @@ const machine = src.createMachine({
       early_exit: null,
 
       __dispatch: {
-        replenish: ['107','108','109','110','114']
+        replenish: ['107','108','109','110','114'],
+        'harvest-fields': ['001']
       }
     };
   },
@@ -317,8 +320,14 @@ const machine = src.createMachine({
       "initial": "fields",
       "states": {
         "fields": {
-          "after": {
-            "200": "feed"
+          entry: {
+            type: 'dispatch',
+            params: dispatcher_params('harvest-fields')
+          },
+          on: {
+            'dispatch.done': {
+              target: 'feed'
+            }
           }
         },
         "feed": {
