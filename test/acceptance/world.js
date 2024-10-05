@@ -11,12 +11,12 @@ setWorldConstructor(class extends World {
   async start() {
     this.game = game();
     this.game.start();
-    await this.wait(200);
+    await this.wait(250);
   }
 
   async send(ev) {
+    await this.wait(250);
     this.game.send(ev);
-    await this.wait(200);
   }
 
   async wait(ms) {

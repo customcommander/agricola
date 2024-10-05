@@ -1,7 +1,7 @@
 import {base} from './task-lib.js';
 
 function plow({params}, game_context) {
-  const {space_id} = params;
+  const {space_id} = params; // throw if undefined?
   game_context.farmyard[space_id] = {type: 'field'};
   return game_context;
 }

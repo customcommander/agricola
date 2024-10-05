@@ -332,12 +332,12 @@ const machine = src.createMachine({
         },
         "feed": {
           "after": {
-            "200": "breed"
+            "50": "breed"
           }
         },
         "breed": {
           "after": {
-            "200": "done"
+            "50": "done"
           }
         },
         "done": {

@@ -27,14 +27,7 @@ const machine = base.createMachine({
         'task.selected': [
           {
             target: 'select-space',
-            guard: and(['has-empty-fields?', or(['has-grain?', 'has-vegetable?'])]),
-            actions: {
-              type: 'display-selection',
-              params: {
-                task_id: 113,
-                opts: ['select.sow']
-              }
-            }
+            guard: and(['has-empty-fields?', or(['has-grain?', 'has-vegetable?'])])
           },
           {
             actions: {
