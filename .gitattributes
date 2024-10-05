@@ -1,0 +1,2 @@
+# Tell GitHub Linguist to ignore my Gherkin files when computing stats for this repo
+test/acceptance/*.feature -linguist-detectable
