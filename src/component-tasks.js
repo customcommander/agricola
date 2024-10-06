@@ -80,14 +80,14 @@ class Tasks extends LitElement {
 
   constructor() {
     super();
+    this._consume('tasks');
+    this._consume('messages');
+  }
 
-    this.#tasks = new ContextConsumer(this, {
-      context: 'tasks',
-      subscribe: true
-    });
-
-    this.#messages = new ContextConsumer(this, {
-      context: 'messages'
+  _consume(k) {
+    this[`_${k}`] = new ContextConsumer(this, {
+      context: k,
+      subscribe: k !== 'messages'
     });
   }
 
@@ -104,11 +104,9 @@ class Tasks extends LitElement {
     );
   }
 
-  render() {
-    const msg = this.#messages.value;
-    const tasks = Object.entries(this.#tasks.value);
-    
-    const task = ([id, t]) => html`
+  _render_task([id, t]) {
+    const msg = this._messages.value;
+    return html`
       <div id="t${id}"
           ?selected=${t.selected}
           ?masked=${t.hidden === true}
@@ -116,7 +114,10 @@ class Tasks extends LitElement {
         ${t.hidden ? msg['task-not-avail']({turn: t.turn}) : msg[id]({qty: t.quantity})}
       </div>
     `;
+  }
 
+  render() {
+    const msg = this._messages.value;
     return html`
       <div id="head1" class="head">${msg.stage({num: 1})}</div>
       <div id="head2" class="head">${msg.stage({num: 2})}</div>
@@ -124,7 +125,7 @@ class Tasks extends LitElement {
       <div id="head4" class="head">${msg.stage({num: 4})}</div>
       <div id="head5" class="head">${msg.stage({num: 5})}</div>
       <div id="head6" class="head">${msg.stage({num: 6})}</div>
-      ${map(tasks, task)}
+      ${map(this._tasks.value, (task) => this._render_task(task))}
     `;
   }
 }
