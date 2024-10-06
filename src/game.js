@@ -213,6 +213,13 @@ const machine = src.createMachine({
       error: null,
       early_exit: null,
 
+      /*
+
+        The `on_*` properties are list of tasks ids
+        to be contact when the game reaches the
+        corresponding state.
+
+      */
       on_replenish: ['107','108','109','110','114'],
       on_fields:    ['001']
     };
