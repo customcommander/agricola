@@ -31,7 +31,7 @@ function harvest_fields(_, game_context) {
 export default base.createMachine({
   context: {},
   on: {
-    'task.harvest-fields': {
+    'task.fields': {
       actions: {
         type: 'game-update',
         params: {

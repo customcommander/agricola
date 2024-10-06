@@ -26,9 +26,6 @@ const src = setup({
   },
 
   actions: {
-    'init-dispatcher':
-    spawnChild('dispatcher', {systemId: 'dispatcher'}),
-
     'setup-new-turn':
     assign(({context}) => produce(context, draft => {
       draft.turn += 1;
@@ -135,13 +132,6 @@ const src = setup({
   }
 });
 
-const dispatcher_params =
-  (channel) => ({context}) => [channel].flatMap(ch => {
-    const task_not_hidden = id => context.tasks[id].hidden !== true;
-    const ids = context.__dispatch[ch].filter(task_not_hidden);
-    return ids.map((id) => ({ev: `task.${ch}`, task_id: id}));
-  });
-
 const machine = src.createMachine({
   context: ({input}) => {
     const turn = input?.turn ?? 1;
@@ -223,18 +213,15 @@ const machine = src.createMachine({
       error: null,
       early_exit: null,
 
-      __dispatch: {
-        replenish: ['107','108','109','110','114'],
-        'harvest-fields': ['001']
-      }
+      on_replenish: ['107','108','109','110','114'],
+      on_fields:    ['001']
     };
   },
   "initial": "init",
   "states": {
     "init": {
-      "entry": "init-dispatcher",
-      "invoke": {
-        "src": "task-loader",
+      invoke: {
+        src: 'task-loader',
         input: ({context}) => Object.keys(context.tasks),
         onDone: {
           target: 'work',
@@ -252,15 +239,27 @@ const machine = src.createMachine({
           }
         },
         replenish: {
-          entry: {
-            type: 'dispatch',
-            params: dispatcher_params('replenish')
-          },
-          on: {
-            'dispatch.done': {
+          invoke: {
+            src: 'dispatcher',
+            systemId: 'dispatcher',
+            input: ({context}) => {
+              const {on_replenish: notify, tasks} = context;
+
+              const jobs = notify.reduce((acc, task_id) => {
+                const available = tasks[task_id].hidden !== true;
+                // Ignore tasks not yet available
+                if (available) {
+                  acc.push({task_id, ev: 'task.replenish'});
+                }
+                return acc;
+              }, []);
+
+              return {jobs};
+            },
+            onDone: {
               target: 'done'
             }
-          },
+          }
         },
         done: {
           type: 'final'
@@ -320,15 +319,18 @@ const machine = src.createMachine({
       "initial": "fields",
       "states": {
         "fields": {
-          entry: {
-            type: 'dispatch',
-            params: dispatcher_params('harvest-fields')
-          },
-          on: {
-            'dispatch.done': {
+          invoke: {
+            src: 'dispatcher',
+            systemId: 'dispatcher',
+            input: ({context}) => {
+              const {on_fields: notify} = context;
+              const jobs = notify.map(task_id => ({task_id, ev: 'task.fields'}));
+              return {jobs};
+            },
+            onDone: {
               target: 'feed'
             }
-          }
+          },
         },
         "feed": {
           "after": {
