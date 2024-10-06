@@ -5,9 +5,7 @@
 */
 
 import {
-  assign,
   enqueueActions,
-  sendTo,
   setup
 } from 'xstate';
 
