@@ -13,13 +13,9 @@ export const turn$ = snapshot$ => snapshot$.pipe(
 );
 
 export const tasks$ = snapshot$ => snapshot$.pipe(
-  map(({context: {tasks}}) => {
-    // Do I need a better way to exclude system tasks?
-    const {
-      '001': _001,
-      ...rest
-    } = tasks;
-    return rest;
+  map(({context}) => {
+    const tasks = Object.entries(context.tasks);
+    return tasks.filter(([id]) => id > '100' && id < '200');
   }),
   distinctUntilChanged(deep_equal)
 );
