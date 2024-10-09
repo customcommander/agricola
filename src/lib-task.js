@@ -59,27 +59,21 @@ export default function (definitions) {
         }
       },
 
-      replenish: (
-        typeof replenish == 'function' ?
-        {
-          entry: {
-            type: 'game-update',
-            params: {
-              fn: replenish,
-              reply_to: id
-            }
-          },
-          on: {
-            'game.updated': {
-              target: 'idle',
-              actions: 'task-ack'
-            }
+      replenish: {
+        entry: {
+          type: 'game-update',
+          params: {
+            fn: replenish,
+            reply_to: id
+          }
+        },
+        on: {
+          'game.updated': {
+            target: 'idle',
+            actions: 'task-ack'
           }
         }
-
-      : null
-
-      ),
+      },
 
       selection: {
         entry: {
@@ -105,23 +99,21 @@ export default function (definitions) {
         }
       },
 
-      execute: (
-        {
-          entry: {
-            type: 'game-update',
-            params: {
-              fn: execute,
-              reply_to: id
-            }
-          },
-          on: {
-            'game.updated': {
-              target: 'idle',
-              actions: 'task-complete'
-            }
+      execute: {
+        entry: {
+          type: 'game-update',
+          params: {
+            fn: execute,
+            reply_to: id
+          }
+        },
+        on: {
+          'game.updated': {
+            target: 'idle',
+            actions: 'task-complete'
           }
         }
-      )
+      }
     }
   };
 
