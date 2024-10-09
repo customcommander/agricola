@@ -39,6 +39,7 @@ export default function (definitions) {
     execute,
     id,
     replenish,
+    selection,
   } = definitions;
 
   const m = {
@@ -53,7 +54,7 @@ export default function (definitions) {
           },
 
           'task.selected': {
-            target: 'execute'
+            target: selection ? 'selection' : 'execute'
           }
         }
       },
@@ -80,6 +81,30 @@ export default function (definitions) {
 
       ),
 
+      selection: {
+        entry: {
+          type: 'game-update',
+          params: {
+            fn: selection,
+            reply_to: id,
+          }
+        },
+        on: {
+          'select.*': {
+            target: 'execute',
+            actions: {
+              type: 'game-update',
+              params: {
+                fn: function clear_selection(_, game) {
+                  game.selection = null;
+                  return game;
+                }
+              }
+            }
+          }
+        }
+      },
+
       execute: (
         {
           entry: {
@@ -103,6 +128,10 @@ export default function (definitions) {
   if (!replenish) {
     delete m.states.idle.on['task.replenish'];
     delete m.states.replenish;
+  }
+
+  if (!selection) {
+    delete m.states.selection;
   }
 
   // console.log(JSON.stringify(m, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));

@@ -1,48 +1,21 @@
-import {base} from './task-lib.js';
+import task from './lib-task.js';
 
-function plow({params}, game_context) {
-  const {space_id} = params; // throw if undefined?
-  game_context.farmyard[space_id] = {type: 'field'};
-  return game_context;
-}
-
-export default base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.selected': {
-          target: 'select-space'
-        }
-      }
-    },
-    'select-space': {
-      entry: {
-        type: 'display-selection',
-        params: {
-          task_id: 104,
-          opts: ['select.plow']
-        }
-      },
-      on: {
-        'select.plow': {
-          target: 'work'
-        }
-      },
-      exit: 'clear-selection'
-    },
-    work: {
-      entry: {
-        type: 'game-update',
-        params: ({event}) => ({
-          space_id: event.space_id,
-          updater: plow
-        })
-      },
-      always: {
-        target: 'idle',
-        actions: 'task-complete'
-      }
-    }
+export default task({
+  id: '104',
+  selection: (_, game) => {
+    let spaces;
+    spaces = Object.entries(game.farmyard);
+    spaces = spaces.filter(([_, sp]) => sp == null);
+    game.selection = spaces.map(([space_id]) => ({
+      type: 'select.plow',
+      task_id: '104',
+      space_id
+    }));
+    return game;
   },
+  execute: ({event: {space_id}}, game) => {
+    game.farmyard[space_id] = {type: 'field'};
+    return game;
+  }
 });
+
