@@ -26,6 +26,13 @@ const lib = setup({
       reply_to
     })),
 
+    'task-abort':
+    sendTo(gamesys, (_, {task_id, err}) => ({
+      type: 'task.aborted',
+      task_id,
+      err
+    })),
+
     'task-ack':
     sendTo(dispatcher, {type: 'task.ack'}),
 
@@ -40,6 +47,7 @@ export default function (definitions) {
     id,
     replenish,
     selection,
+    todo
   } = definitions;
 
   const m = {
@@ -100,13 +108,24 @@ export default function (definitions) {
       },
 
       execute: {
-        entry: {
-          type: 'game-update',
-          params: {
-            fn: execute,
-            reply_to: id
+        entry: (
+          todo ?
+          {
+            type: 'task-abort',
+            params: {
+              err: 'TODO',
+              task_id: id
+            }
           }
-        },
+        : //
+          {
+            type: 'game-update',
+            params: {
+              fn: execute,
+              reply_to: id
+            }
+          }
+        ),
         on: {
           'game.updated': {
             target: 'idle',

@@ -6,28 +6,10 @@
 
 */
 
-import {
-  base
-} from './task-lib.js';
+import task from './lib-task.js';
 
-const machine = base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.selected': {
-          actions: {
-            type: 'abort',
-            params: {
-              task_id: 102,
-              err: 'TODO'
-            }
-          }
-        }
-      }
-    }
-  }
+export default task({
+  id: '102',
+  todo: true
 });
-
-export default machine;
 
