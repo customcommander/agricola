@@ -15,6 +15,7 @@ import {
 } from 'immer';
 
 const gamesys = ({system}) => system.get('gamesys');
+
 const dispatcher = ({system}) => system.get('dispatcher');
 
 const lib = setup({
@@ -61,9 +62,23 @@ export default function (definitions) {
             target: 'replenish'
           },
 
-          'task.selected': {
-            target: selection ? 'selection' : 'execute'
-          }
+          'task.selected': (
+            todo ?
+            {
+              actions: {
+                type: 'task-abort',
+                params: {
+                  task_id: id,
+                  err: 'TODO'
+                }
+              }
+            }
+
+          : //
+            {
+              target: selection ? 'selection' : 'execute'
+            }
+          )
         }
       },
 
@@ -108,24 +123,13 @@ export default function (definitions) {
       },
 
       execute: {
-        entry: (
-          todo ?
-          {
-            type: 'task-abort',
-            params: {
-              err: 'TODO',
-              task_id: id
-            }
+        entry: {
+          type: 'game-update',
+          params: {
+            fn: execute,
+            reply_to: id
           }
-        : //
-          {
-            type: 'game-update',
-            params: {
-              fn: execute,
-              reply_to: id
-            }
-          }
-        ),
+        },
         on: {
           'game.updated': {
             target: 'idle',
@@ -143,6 +147,10 @@ export default function (definitions) {
 
   if (!selection) {
     delete m.states.selection;
+  }
+
+  if (!execute) {
+    delete m.states.execute;
   }
 
   // console.log(JSON.stringify(m, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));
