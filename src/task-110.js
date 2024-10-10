@@ -1,36 +1,22 @@
-import {base} from './task-lib.js';
+/*
 
-function replenish(_, game_context) {
-  game_context.tasks[110].quantity += 1;
-  return game_context;
-}
+Fishing
+Take x Food
 
-function collect(_, game_context) {
-  const {quantity} = game_context.tasks[110];
-  game_context.supply.food += quantity;
-  game_context.tasks[110].quantity = 0;
-  return game_context;
-}
+*/
+import task from './lib-task.js';
 
-export default base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.replenish': {
-          actions: [
-            {type: 'game-update', params: {updater: replenish}},
-            {type: 'ack'}
-          ]
-        },
-        'task.selected': {
-          actions: [
-            {type: 'game-update', params: {updater: collect}},
-            {type: 'task-complete'}
-          ]
-        }
-      }
-    }
+export default task({
+  id: '110',
+  replenish: (_, game) => {
+    game.tasks[110].quantity += 1;
+    return game;
+  },
+  execute: (_, game) => {
+    const {quantity} = game.tasks[110];
+    game.supply.food += quantity;
+    game.tasks[110].quantity = 0;
+    return game;
   }
 });
 

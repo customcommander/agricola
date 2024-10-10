@@ -1,20 +1,13 @@
-import {base} from './task-lib.js';
+/*
 
-export default base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.selected': {
-          actions: {
-            type: 'abort',
-            params: {
-              task_id: 111,
-              err: 'TODO'
-            }
-          }
-        }
-      }
-    }
-  }
+Fences
+
+*/
+
+import task from './lib-task.js';
+
+export default task({
+  id: '111',
+  todo: true
 });
+
