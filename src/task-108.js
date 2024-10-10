@@ -1,37 +1,21 @@
-import {base} from './task-lib.js';
+/*
+@fileoverview
+Take x CLay
+*/
 
-function replenish(_, game_context) {
-  game_context.tasks[108].quantity += 1;
-  return game_context;
-}
+import task from './lib-task.js';
 
-function collect(_, game_context) {
-  const {quantity} = game_context.tasks[108];
-  game_context.supply.clay += quantity;
-  game_context.tasks[108].quantity = 0;
-  return game_context;
-}
-
-
-export default base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.replenish': {
-          actions: [
-            {type: 'game-update', params: {updater: replenish}},
-            {type: 'ack'}
-          ]
-        },
-        'task.selected': {
-          actions: [
-            {type: 'game-update', params: {updater: collect}},
-            {type: 'task-complete'}
-          ]
-        }
-      }
-    }
+export default task({
+  id: '108',
+  replenish: (_, game) => {
+    game.tasks['108'].quantity += 1;
+    return game;
+  },
+  execute: (_, game) => {
+    const {quantity} = game.tasks['108'];
+    game.supply.clay += quantity;
+    game.tasks['108'].quantity = 0;
+    return game;
   }
 });
 
