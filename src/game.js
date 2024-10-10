@@ -94,6 +94,15 @@ const src = setup({
         );
       }
     }),
+    
+    'game-response':
+    sendTo(
+      ({event, system}) => system.get(event.reply_to),
+      ({event: {query, ...ev}, context}) => ({
+        type: 'game.response',
+        response: query({event: ev}, context)
+      })
+    ),
 
     'error-dismiss':
     assign({error: null}),
@@ -373,6 +382,9 @@ const machine = src.createMachine({
     },
     "game.update": {
       "actions": "game-update"
+    },
+    'game.query': {
+      'actions': 'game-response'
     },
     "error.dismiss": {
       "actions": "error-dismiss"

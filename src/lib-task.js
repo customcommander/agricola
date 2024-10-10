@@ -27,6 +27,13 @@ const lib = setup({
       reply_to
     })),
 
+    'game-query':
+    sendTo(gamesys, (_, {fn, reply_to, ...params}) => ({
+      type: 'game.query',
+      query: fn,
+      reply_to
+    })),
+
     'task-abort':
     sendTo(gamesys, (_, {task_id, err}) => ({
       type: 'task.aborted',
@@ -39,12 +46,20 @@ const lib = setup({
 
     'task-complete':
     sendTo(gamesys, {type: 'task.completed'})
+  },
+
+  guards: {
+    'response-ok?':
+    ({event: {response}}) => {
+      return response === true;
+    }
   }
 });
 
 export default function (definitions) {
   const {
     execute,
+    check,
     id,
     replenish,
     selection,
@@ -76,7 +91,9 @@ export default function (definitions) {
 
           : //
             {
-              target: selection ? 'selection' : 'execute'
+              target: ( check     ? 'check'
+                      : selection ? 'selection' 
+                                  : 'execute'   )
             }
           )
         }
@@ -95,6 +112,35 @@ export default function (definitions) {
             target: 'idle',
             actions: 'task-ack'
           }
+        }
+      },
+
+      check: {
+        entry: {
+          type: 'game-query',
+          params: {
+            fn: check,
+            reply_to: `task-${id}`
+          }
+        },
+        on: {
+          'game.response': [
+            {
+              guard: 'response-ok?',
+              target: ( selection ? 'selection' 
+                                  : 'execute'   )
+            },
+            {
+              target: 'idle',
+              actions: {
+                type: 'task-abort',
+                params: {
+                  task_id: id,
+                  err: 'NOT_ENOUGH_RESOURCES'
+                }
+              }
+            }
+          ]
         }
       },
 
@@ -143,6 +189,10 @@ export default function (definitions) {
   if (!replenish) {
     delete m.states.idle.on['task.replenish'];
     delete m.states.replenish;
+  }
+
+  if (!check) {
+    delete m.states.check;
   }
 
   if (!selection) {

@@ -2,6 +2,12 @@ import task from './lib-task.js';
 
 export default task({
   id: '104',
+
+  check: (_, game) => {
+    const spaces = Object.values(game.farmyard);
+    return spaces.some(space => space == null);
+  },
+
   selection: (_, game) => {
     let spaces;
     spaces = Object.entries(game.farmyard);
@@ -13,6 +19,7 @@ export default task({
     }));
     return game;
   },
+
   execute: ({event: {space_id}}, game) => {
     game.farmyard[space_id] = {type: 'field'};
     return game;
