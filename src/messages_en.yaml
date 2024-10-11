@@ -22,6 +22,9 @@ action_ok: Ok
 
 # Errors
 
+NOTHING_TO_SOW: >
+  You have no grains and no vegetables.
+
 NOT_ENOUGH_RESOURCES: >
   You do not have all the resources
   to complete this action.

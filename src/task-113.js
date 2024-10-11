@@ -14,8 +14,9 @@ export default task({
   check: (_, game) => {
     const {supply: {grain, vegetable}, farmyard} = game;
 
-    // TODO: specific error code
-    if (!grain && !vegetable) return false;
+    if (!grain && !vegetable) {
+      return 'NOTHING_TO_SOW';
+    }
 
     const spaces = Object.values(farmyard);
 

@@ -52,10 +52,10 @@ const lib = setup({
     })),
 
     'task-abort':
-    sendTo(gamesys, (_, {task_id, err}) => ({
+    sendTo(gamesys, ({event}, {task_id, err}) => ({
       type: 'task.aborted',
       task_id,
-      err
+      err: event.response || err || 'NOT_ENOUGH_RESOURCES'
     })),
 
     'task-ack':
@@ -208,7 +208,6 @@ export default function (definitions) {
                 type: 'task-abort',
                 params: {
                   task_id: id,
-                  err: 'NOT_ENOUGH_RESOURCES'
                 }
               }
             }
