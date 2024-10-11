@@ -103,6 +103,7 @@ const lib = setup({
 export default function (definitions) {
   const {
     execute,
+    fields,
     check,
     id,
     repeat = false,
@@ -110,6 +111,24 @@ export default function (definitions) {
     selection,
     todo
   } = definitions;
+
+  const target = (name, impl) => impl && ({
+    [name]: {
+      entry: {
+        type: 'game-update',
+        params: {
+          fn: impl,
+          reply_to: id
+        }
+      },
+      on: {
+        'game.updated': {
+          target: 'idle',
+          actions: 'task-ack'
+        }
+      }
+    }
+  });
 
   const m = {
     context: {
@@ -134,9 +153,8 @@ export default function (definitions) {
 
       idle: {
         on: {
-          'task.replenish': {
-            target: 'replenish'
-          },
+          ...(replenish && {'task.replenish': 'replenish'}),
+          ...(fields    && {'task.fields'   : 'fields'   }),
 
           'task.selected': (
             todo ?
@@ -150,31 +168,21 @@ export default function (definitions) {
               }
             }
 
-          : //
+          : execute ?
             {
               target: ( check     ? 'check'
                       : selection ? 'selection' 
                                   : 'execute' )
             }
+          : 
+            {
+            }
           )
         }
       },
 
-      replenish: {
-        entry: {
-          type: 'game-update',
-          params: {
-            fn: replenish,
-            reply_to: id
-          }
-        },
-        on: {
-          'game.updated': {
-            target: 'idle',
-            actions: 'task-ack'
-          }
-        }
-      },
+      ...(target('replenish', replenish)),
+      ...(target('fields'   , fields   )),
 
       check: {
         entry: {
@@ -240,36 +248,33 @@ export default function (definitions) {
         }
       },
 
-      execute: {
-        entry: {
-          type: 'game-update',
-          params: {
-            fn: execute,
-            reply_to: id
+      ...(execute && {
+        execute: {
+          entry: {
+            type: 'game-update',
+            params: {
+              fn: execute,
+              reply_to: id
+            }
+          },
+          on: {
+            'game.updated': (
+              repeat ?
+              {
+                target: 'check',
+                actions: 'exec++'
+              }
+            : /* no repeat*/
+              {
+                target: 'idle',
+                actions: 'task-complete'
+              }
+            )
           }
-        },
-        on: {
-          'game.updated': (
-            repeat ?
-            {
-              target: 'check',
-              actions: 'exec++'
-            }
-          : /* no repeat*/
-            {
-              target: 'idle',
-              actions: 'task-complete'
-            }
-          )
         }
-      }
+      })
     }
   };
-
-  if (!replenish) {
-    delete m.states.idle.on['task.replenish'];
-    delete m.states.replenish;
-  }
 
   if (!check) {
     delete m.states.check;
@@ -277,10 +282,6 @@ export default function (definitions) {
 
   if (!selection) {
     delete m.states.selection;
-  }
-
-  if (!execute) {
-    delete m.states.execute;
   }
 
   // console.log(JSON.stringify(m, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));

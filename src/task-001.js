@@ -4,45 +4,31 @@
 
 */
 
-import {or} from 'xstate';
-import {base} from './task-lib.js';
+import task from './lib-task.js';
 
-function harvest_fields(_, game_context) {
-  const {supply, farmyard} = game_context;
-  const ids = Object.keys(farmyard);
+export default task({
+  id: '001',
 
-  for (let id of Object.keys(farmyard)) {
-    if (farmyard[id]?.type != 'field') {
-      continue;
+  fields: (_, game) => {
+    const ids = Object.keys(game.farmyard);
+
+    for (let id of ids) {
+      if (game.farmyard[id]?.type != 'field') {
+        continue;
+      }
+
+      if (game.farmyard[id].grain) {
+        game.farmyard[id].grain -= 1;
+        game.supply.grain += 1;
+      }
+
+      if (game.farmyard[id].vegetable) {
+        game.farmyard[id].vegetable -= 1;
+        game.supply.vegetable += 1;
+      }
     }
 
-    if (farmyard[id].grain) {
-      farmyard[id].grain -= 1;
-      supply.grain += 1;
-    }
-
-    if (farmyard[id].vegetable) {
-      farmyard[id].vegetable -= 1;
-      supply.vegetable += 1;
-    }
-  }
-}
-
-export default base.createMachine({
-  context: {},
-  on: {
-    'task.fields': {
-      actions: {
-        type: 'game-update',
-        params: {
-          reply_to: '001',
-          updater: harvest_fields
-        }
-      }      
-    },
-    'game.updated': {
-      actions: 'ack'
-    }
+    return game;
   }
 });
 
