@@ -130,7 +130,7 @@ export default function (definitions) {
     }
   });
 
-  const m = {
+  const machine = {
     context: {
       /*
 
@@ -156,9 +156,8 @@ export default function (definitions) {
           ...(replenish && {'task.replenish': 'replenish'}),
           ...(fields    && {'task.fields'   : 'fields'   }),
 
-          'task.selected': (
-            todo ?
-            {
+          ...(todo && {
+            'task.selected': {
               actions: {
                 type: 'task-abort',
                 params: {
@@ -167,86 +166,88 @@ export default function (definitions) {
                 }
               }
             }
+          }),
 
-          : execute ?
-            {
+          ...(execute && {
+            'task.selected': {
               target: ( check     ? 'check'
-                      : selection ? 'selection' 
+                      : selection ? 'selection'
                                   : 'execute' )
             }
-          : 
-            {
-            }
-          )
+          })
         }
       },
 
       ...(target('replenish', replenish)),
       ...(target('fields'   , fields   )),
 
-      check: {
-        entry: {
-          type: 'game-query',
-          params: {
-            fn: check,
-            reply_to: `task-${id}`
-          }
-        },
-        on: {
-          'game.response': [
-            {
-              guard: 'response-ok?',
-              target: ( selection ? 'selection' 
-                                  : 'execute'   ),
-              actions: {
-                type: 'allow-early-exit',
-                params: {
-                  task_id: id
+      ...(check && {
+        check: {
+          entry: {
+            type: 'game-query',
+            params: {
+              fn: check,
+              reply_to: `task-${id}`
+            }
+          },
+          on: {
+            'game.response': [
+              {
+                guard: 'response-ok?',
+                target: ( selection ? 'selection' 
+                                    : 'execute'   ),
+                actions: {
+                  type: 'allow-early-exit',
+                  params: {
+                    task_id: id
+                  }
+                }
+              },
+              {
+                guard: 'silent-failure?',
+                target: 'idle',
+                actions: 'task-complete'
+              },
+              {
+                target: 'idle',
+                actions: {
+                  type: 'task-abort',
+                  params: {
+                    task_id: id,
+                  }
                 }
               }
+            ]
+          }
+        }
+      }),
+
+      ...(selection && {
+        selection: {
+          entry: {
+            type: 'game-update',
+            params: {
+              fn: selection,
+              task_id: id
+            }
+          },
+          on: {
+            'select.*': {
+              target: 'execute',
             },
-            {
-              guard: 'silent-failure?',
+            'task.exit': {
               target: 'idle',
               actions: 'task-complete'
-            },
-            {
-              target: 'idle',
-              actions: {
-                type: 'task-abort',
-                params: {
-                  task_id: id,
-                }
-              }
             }
-          ]
-        }
-      },
-
-      selection: {
-        entry: {
-          type: 'game-update',
-          params: {
-            fn: selection,
-            task_id: id
-          }
-        },
-        on: {
-          'select.*': {
-            target: 'execute',
           },
-          'task.exit': {
-            target: 'idle',
-            actions: 'task-complete'
-          }
-        },
-        exit: {
-          type: 'game-update',
-          params: {
-            fn: selection_clear
+          exit: {
+            type: 'game-update',
+            params: {
+              fn: selection_clear
+            }
           }
         }
-      },
+      }),
 
       ...(execute && {
         execute: {
@@ -258,34 +259,27 @@ export default function (definitions) {
             }
           },
           on: {
-            'game.updated': (
-              repeat ?
-              {
+            ...(repeat && {
+              'game.updated': {
                 target: 'check',
                 actions: 'exec++'
               }
-            : /* no repeat*/
-              {
+            }),
+
+            ...(!repeat && {
+              'game.updated': {
                 target: 'idle',
                 actions: 'task-complete'
               }
-            )
+            })
           }
         }
       })
     }
   };
 
-  if (!check) {
-    delete m.states.check;
-  }
-
-  if (!selection) {
-    delete m.states.selection;
-  }
-
   // console.log(JSON.stringify(m, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));
 
-  return lib.createMachine(m);
+  return lib.createMachine(machine);
 }
 
