@@ -10,6 +10,7 @@ supply_grain: Grain ({qty})
 supply_wood: Wood ({qty})
 supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})
+supply_stone: Stone ({qty})
 
 stage: Stage {num}
 major_improvements: Major Improvements

@@ -217,7 +217,19 @@ const machine = src.createMachine({
         // Family growth
         115: {selected:  false,
               turn:      ro[1][0],
-              hidden:    ro[1][0] > turn}
+              hidden:    ro[1][0] > turn},
+
+        // Take x Stone
+        116: {selected:  false,
+              quantity:  0,
+              turn:      ro[1][1],
+              hidden:    ro[1][1] > turn},
+
+        // After Renovation also Major Improvement
+        117: {selected:  false,
+              turn:      ro[1][2],
+              hidden:    ro[1][2] > turn}
+
       },
       error: null,
       early_exit: null,
@@ -229,7 +241,7 @@ const machine = src.createMachine({
         corresponding state.
 
       */
-      on_replenish: ['107','108','109','110','114'],
+      on_replenish: ['107','108','109','110','114', '116'],
       on_fields:    ['001']
     };
   },
