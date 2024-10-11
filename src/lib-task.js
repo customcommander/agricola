@@ -221,6 +221,7 @@ export default function (definitions) {
           type: 'game-update',
           params: {
             fn: selection,
+            task_id: id
           }
         },
         on: {

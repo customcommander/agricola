@@ -1,101 +1,66 @@
 /*
 
-  Sow and/or Bake bread
+Sow and/or Bake bread
 
 */
 
-import {and, or, enqueueActions} from 'xstate';
-import {base} from './task-lib.js';
+import task from './lib-task.js';
 
-function sow_grain({params: {space_id}}, game_context) {
-  game_context.supply.grain -= 1;
-  game_context.farmyard[space_id].grain = 3;
-  return game_context;
-}
+export default task({
+  id: '113',
 
-function sow_vegetable({params: {space_id}}, game_context) {
-  game_context.supply.vegetable -= 1;
-  game_context.farmyard[space_id].vegetable = 2;
-  return game_context;
-}
+  repeat: true,
 
-const machine = base.createMachine({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.selected': [
-          {
-            target: 'select-space',
-            guard: and(['has-empty-fields?', or(['has-grain?', 'has-vegetable?'])])
-          },
-          {
-            actions: {
-              type: 'abort',
-              params: {
-                task_id: 113,
-                err: 'NOT_ENOUGH_RESOURCES'
-              }
-            }
-          }
-        ]
-      }
-    },
-    'select-space': {
-      entry: 'compute-&-display-selection',
-      on: {
-        'select.*': {
-          target: 'work',
-        },
-        'task.exit': {
-          target: 'idle',
-          actions: ['early-exit-stop', 'task-complete']
-        }
-      },
-      exit: 'clear-selection'
-    },
-    work: {
-      entry: {
-        type: 'game-update',
-        params: ({event: {type, space_id}}) => ({
-          space_id,
-          reply_to: 113,
-          updater: ( type === 'select.sow-grain'     ? sow_grain
-                   : type === 'select.sow-vegetable' ? sow_vegetable
-                                                     : null /* throw? */)
-        })
-      },
-      on: {
-        'game.updated': [
-          {
-            target: 'select-space',
-            guard: and(['has-empty-fields?', or(['has-grain?', 'has-vegetable?'])]),
-            actions: {
-              type: 'early-exit-init',
-              params: {
-                task_id: 113
-              }
-            }
-          },
-          {
-            target: 'idle',
-            actions: ['early-exit-stop', 'task-complete']
-          }
-        ]
-      }
+  check: (_, game) => {
+    const {supply: {grain, vegetable}, farmyard} = game;
+
+    // TODO: specific error code
+    if (!grain && !vegetable) return false;
+
+    const spaces = Object.values(farmyard);
+
+    const has_empty_fields = spaces.some(space => {
+      const {type, grain, vegetable} = space ?? {};
+      return type == 'field' && !grain && !vegetable
+    });
+
+    // TODO: specific error code
+    if (!has_empty_fields) return false;
+
+    return true;
+  },
+
+  selection: (_, game) => {
+    const task_id = '113';
+    const spaces  = Object.entries(game.farmyard);
+    const opts    = [];
+
+    if (game.supply.grain)     opts.push('select.sow-grain');
+    if (game.supply.vegetable) opts.push('select.sow-vegetable');
+
+    game.selection = spaces.flatMap(([space_id, space]) => {
+      const {type, grain, vegetable} = space ?? {};
+      const exit = type != 'field' || (grain || vegetable);
+      return exit ? [] : opts.map(type => ({type, task_id, space_id}));
+    });
+
+    return game;
+  },
+
+  execute: ({event}, game) => {
+    const {type, space_id} = event;
+
+    if (type == 'select.sow-grain') {
+      game.supply.grain -= 1;
+      game.farmyard[space_id].grain = 3;
     }
-  }
-});
 
-export default machine.provide({
-  actions: {
-    'compute-&-display-selection':
-    enqueueActions(({enqueue, check}) => {
-      const opts = [];
-      if (check('has-grain?'))     opts.push('select.sow-grain');
-      if (check('has-vegetable?')) opts.push('select.sow-vegetable');
-      enqueue({type: 'display-selection', params: {task_id: 113, opts}});
-    })
+    if (type == 'select.sow-vegetable') {
+      game.supply.vegetable -= 1;
+      game.farmyard[space_id].vegetable = 2;
+    }
+
+    return game;
   }
 });
 
