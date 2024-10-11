@@ -5,6 +5,8 @@
 */
 
 import {
+  assign,
+  enqueueActions,
   fromPromise,
   sendTo,
   setup,
@@ -17,6 +19,21 @@ import {
 const gamesys = ({system}) => system.get('gamesys');
 
 const dispatcher = ({system}) => system.get('dispatcher');
+
+function early_exit_init({params}, game) {
+  game.early_exit = params.task_id;
+  return game;
+}
+
+function early_exit_stop(_, game) {
+  game.early_exit = null;
+  return game;
+}
+
+function selection_clear(_, game) {
+  game.selection = null;
+  return game;
+}
 
 const lib = setup({
   actions: {
@@ -45,13 +62,40 @@ const lib = setup({
     sendTo(dispatcher, {type: 'task.ack'}),
 
     'task-complete':
-    sendTo(gamesys, {type: 'task.completed'})
+    enqueueActions(({enqueue, context}) => {
+      if (context.exec > 0) {
+        enqueue.assign({exec: 0});
+        enqueue({type: 'game-update', params: {fn: early_exit_stop}});
+      }
+      enqueue.sendTo(gamesys, {type: 'task.completed'});
+    }),
+
+    'allow-early-exit':
+    enqueueActions(({enqueue, context}, params) => {
+      if (context.exec === 1) {
+        enqueue({
+          type: 'game-update',
+          params: {
+            fn: early_exit_init,
+            task_id: params.task_id
+          }
+        });
+      }
+    }),
+
+    'exec++':
+    assign({exec: ({context}) => context.exec + 1})
   },
 
   guards: {
     'response-ok?':
     ({event: {response}}) => {
       return response === true;
+    },
+
+    'silent-failure?':
+    ({event: {response}, context: {exec}}) => {
+      return response !== true && exec > 0;
     }
   }
 });
@@ -61,12 +105,29 @@ export default function (definitions) {
     execute,
     check,
     id,
+    repeat = false,
     replenish,
     selection,
     todo
   } = definitions;
 
   const m = {
+    context: {
+      /*
+
+        All tasks will go through their execution
+        cycle at least once.
+
+        Some can go over it multiple times if the
+        player chooses to. (e.g sowing fields)
+
+        In that case we need to allow the player to
+        exit the execution cycle.
+
+       */
+      exec: 0
+    },
+
     initial: 'idle',
 
     states: {
@@ -93,7 +154,7 @@ export default function (definitions) {
             {
               target: ( check     ? 'check'
                       : selection ? 'selection' 
-                                  : 'execute'   )
+                                  : 'execute' )
             }
           )
         }
@@ -128,7 +189,18 @@ export default function (definitions) {
             {
               guard: 'response-ok?',
               target: ( selection ? 'selection' 
-                                  : 'execute'   )
+                                  : 'execute'   ),
+              actions: {
+                type: 'allow-early-exit',
+                params: {
+                  task_id: id
+                }
+              }
+            },
+            {
+              guard: 'silent-failure?',
+              target: 'idle',
+              actions: 'task-complete'
             },
             {
               target: 'idle',
@@ -149,21 +221,21 @@ export default function (definitions) {
           type: 'game-update',
           params: {
             fn: selection,
-            reply_to: id,
           }
         },
         on: {
           'select.*': {
             target: 'execute',
-            actions: {
-              type: 'game-update',
-              params: {
-                fn: function clear_selection(_, game) {
-                  game.selection = null;
-                  return game;
-                }
-              }
-            }
+          },
+          'task.exit': {
+            target: 'idle',
+            actions: 'task-complete'
+          }
+        },
+        exit: {
+          type: 'game-update',
+          params: {
+            fn: selection_clear
           }
         }
       },
@@ -177,10 +249,18 @@ export default function (definitions) {
           }
         },
         on: {
-          'game.updated': {
-            target: 'idle',
-            actions: 'task-complete'
-          }
+          'game.updated': (
+            repeat ?
+            {
+              target: 'check',
+              actions: 'exec++'
+            }
+          : /* no repeat*/
+            {
+              target: 'idle',
+              actions: 'task-complete'
+            }
+          )
         }
       }
     }
