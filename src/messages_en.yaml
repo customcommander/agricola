@@ -7,6 +7,7 @@ num_workers_description:
 
 supply_food: Food ({qty})
 supply_grain: Grain ({qty})
+supply_vegetable: Vegetable ({qty})
 supply_wood: Wood ({qty})
 supply_reed: Reed ({qty})
 supply_clay: Clay ({qty})

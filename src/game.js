@@ -162,12 +162,13 @@ const machine = src.createMachine({
       family:  2,
       workers: 2,
       supply: {
-        food:  0,
-        grain: 0,
-        wood:  0,
-        clay:  0,
-        reed:  0,
-        stone: 0
+        food:      0,
+        grain:     0,
+        vegetable: 0,
+        wood:      0,
+        clay:      0,
+        reed:      0,
+        stone:     0
       },
       house_type: 'wooden-hut',
       farmyard: {
@@ -228,7 +229,15 @@ const machine = src.createMachine({
         // After Renovation also Major Improvement
         117: {selected:  false,
               turn:      ro[1][2],
-              hidden:    ro[1][2] > turn}
+              hidden:    ro[1][2] > turn},
+
+        // Stage 3
+
+        // Take x Vegetable
+        118: {selected:  false,
+              turn:      ro[2][0],
+              hidden:    ro[2][0] > turn}
+
 
       },
       error: null,
