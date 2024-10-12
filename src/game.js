@@ -236,7 +236,13 @@ const machine = src.createMachine({
         // Take x Vegetable
         118: {selected:  false,
               turn:      ro[2][0],
-              hidden:    ro[2][0] > turn}
+              hidden:    ro[2][0] > turn},
+
+        // Take {qty} Wild Boar
+        119: {selected:  false,
+              quantity:  0,
+              turn:      ro[2][1],
+              hidden:    ro[2][1] > turn}
 
 
       },
@@ -246,11 +252,11 @@ const machine = src.createMachine({
       /*
 
         The `on_*` properties are list of tasks ids
-        to be contact when the game reaches the
+        to be contacted when the game reaches the
         corresponding state.
 
       */
-      on_replenish: ['107','108','109','110','114', '116'],
+      on_replenish: ['107','108','109','110','114', '116', '119'],
       on_fields:    ['001']
     };
   },
