@@ -400,9 +400,10 @@ const machine = src.createMachine({
             }
           }
         },
-        "breed": {
-          "after": {
-            "50": "done"
+        breed: {
+          always: {
+            target: 'done',
+            actions: () => console.log('breed: todo')
           }
         },
         "done": {
