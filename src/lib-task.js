@@ -149,6 +149,8 @@ export default function (definitions) {
   });
 
   let machine = {
+    id: `task-${id}-actor`,
+
     context: {
       /*
 
