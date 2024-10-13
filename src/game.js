@@ -106,13 +106,6 @@ const src = setup({
 
     'error-dismiss':
     assign({error: null}),
-
-    'dispatch':
-    sendTo(({system}) => system.get('dispatcher'),
-           (_, params) => ({
-             type: 'dispatch',
-             jobs: params
-           }))
   },
 
   guards: {
