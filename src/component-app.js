@@ -17,6 +17,7 @@ import {
   early_exit$,
   error$,
   farmyard$,
+  feed_phase$,
   selection$,
   supply$,
   tasks$,
@@ -72,6 +73,7 @@ class App extends LitElement {
     this._provide('early_exit');
     this._provide('error');
     this._provide('farmyard');
+    this._provide('feed_phase');
     this._provide('selection');
     this._provide('supply');
     this._provide('tasks');
@@ -219,6 +221,7 @@ class App extends LitElement {
     this._observe(early_exit$, 'early_exit');
     this._observe(error$     , 'error'     );
     this._observe(farmyard$  , 'farmyard'  );
+    this._observe(feed_phase$, 'feed_phase');
     this._observe(selection$ , 'selection' );
     this._observe(supply$    , 'supply'    );
     this._observe(tasks$     , 'tasks'     );

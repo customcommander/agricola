@@ -137,6 +137,18 @@ const src = setup({
       const check = turn === 14;
       console.log(`is last turn? ${turn} ${check}`);
       return check;
+    },
+
+    'is-feeding-task?':
+    ({context, event}) => {
+      const {task_id} = event;
+      return context.tasks[task_id].feeding === true;
+    },
+
+    'is-main-feeding-task?':
+    ({context, event}) => {
+      const {task_id} = event;
+      return task_id === '002';
     }
   }
 });
@@ -178,6 +190,7 @@ const machine = src.createMachine({
       },
       tasks: {
         '001': {},
+        '002': {feeding: true},
 
         101: {selected: false             },
         102: {selected: false             },
@@ -257,7 +270,7 @@ const machine = src.createMachine({
 
       */
       on_replenish: ['107','108','109','110','114', '116', '119'],
-      on_fields:    ['001']
+      on_fields:    ['001'],
     };
   },
   "initial": "init",
@@ -375,9 +388,16 @@ const machine = src.createMachine({
             }
           },
         },
-        "feed": {
-          "after": {
-            "50": "breed"
+        feed: {
+          on: {
+            'task.selected': {
+              guard: 'is-feeding-task?',
+              actions: ['task-forward', ({event}) => console.log('wwww', event)]
+            },
+            'task.completed': {
+              guard: 'is-main-feeding-task?',
+              target: 'breed'
+            }
           }
         },
         "breed": {

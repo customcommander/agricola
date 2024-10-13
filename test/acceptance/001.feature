@@ -28,6 +28,8 @@ Scenario: Fields are automatically harvested
    And I have 2 grain on A1
    And I have 2 grain on A2
 
+  When I feed my family
+
   # Turn 5
   * I select "Take x Clay"
   * I select "Take x Reed"

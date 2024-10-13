@@ -45,3 +45,8 @@ export const early_exit$ = snapshot$ => snapshot$.pipe(
   distinctUntilChanged()
 );
 
+export const feed_phase$ = snapshot$ => snapshot$.pipe(
+  map(snapshot => snapshot.matches({harvest: 'feed'})),
+  distinctUntilChanged(),
+);
+

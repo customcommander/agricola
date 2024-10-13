@@ -19,8 +19,13 @@ setWorldConstructor(class extends World {
     this.game.send(ev);
   }
 
-  async wait(ms) {
-    await new Promise(res => setTimeout(res, ms));
+  async wait(predicate) {
+    if (typeof predicate == 'number') {
+      await new Promise(res => setTimeout(res, predicate));
+    }
+    else {
+      await waitFor(this.game, predicate);
+    }
   }
 
   async assert(predicate) {

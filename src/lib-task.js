@@ -1,6 +1,23 @@
 /*
 
-  Defines a blueprint for most tasks.
+The purpose of this module is to generate
+a state machine for a given task according
+to a shared and unique blueprint.
+
+The main export takes a task definition
+and returns the corresponding state machine
+for it.
+
+A task definition is an object with
+the following properties:
+
+** id **
+
+A unique task identifier.
+
+** execute **
+
+This should implement the purpose of the task.
 
 */
 
@@ -62,12 +79,13 @@ const lib = setup({
     sendTo(dispatcher, {type: 'task.ack'}),
 
     'task-complete':
-    enqueueActions(({enqueue, context}) => {
+    enqueueActions(({enqueue, context}, params) => {
+      const {task_id} = params;
       if (context.exec > 0) {
         enqueue.assign({exec: 0});
         enqueue({type: 'game-update', params: {fn: early_exit_stop}});
       }
-      enqueue.sendTo(gamesys, {type: 'task.completed'});
+      enqueue.sendTo(gamesys, {type: 'task.completed', task_id});
     }),
 
     'allow-early-exit':
@@ -130,7 +148,7 @@ export default function (definitions) {
     }
   });
 
-  const machine = {
+  let machine = {
     context: {
       /*
 
@@ -206,7 +224,12 @@ export default function (definitions) {
               {
                 guard: 'silent-failure?',
                 target: 'idle',
-                actions: 'task-complete'
+                actions: {
+                  type: 'task-complete',
+                  params: {
+                    task_id: id
+                  }
+                }
               },
               {
                 target: 'idle',
@@ -237,7 +260,12 @@ export default function (definitions) {
             },
             'task.exit': {
               target: 'idle',
-              actions: 'task-complete'
+              actions: {
+                type: 'task-complete',
+                params: {
+                  task_id: id
+                }
+              }
             }
           },
           exit: {
@@ -269,7 +297,12 @@ export default function (definitions) {
             ...(!repeat && {
               'game.updated': {
                 target: 'idle',
-                actions: 'task-complete'
+                actions: {
+                  type: 'task-complete',
+                  params: {
+                    task_id: id
+                  }
+                }
               }
             })
           }
@@ -278,8 +311,10 @@ export default function (definitions) {
     }
   };
 
-  // console.log(JSON.stringify(m, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));
+  // console.log(JSON.stringify(machine, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));
 
-  return lib.createMachine(machine);
+  machine = lib.createMachine(machine);
+
+  return machine;
 }
 

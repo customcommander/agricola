@@ -60,3 +60,8 @@ Then('I have the following stock on the board', async function (table) {
   }));
 });
 
+When('I feed my family', async function () {
+  await this.wait(state => state.matches({harvest: 'feed'}));
+  await this.send({type: 'task.completed', task_id: '002'});
+});
+
