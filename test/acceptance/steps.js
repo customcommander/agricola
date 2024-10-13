@@ -19,7 +19,7 @@ const stock_map = {
   'Food': 110,
   'Reed': 109,
   'Wood': 107,
-}
+};
 
 Given('I start playing', async function () {
   await this.start();
