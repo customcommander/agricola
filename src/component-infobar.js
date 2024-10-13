@@ -56,7 +56,7 @@ class InfoBar extends LitElement {
 
     return html`
       <button type="button" @click=${() => this._dispatch(ev)}>
-        FEED
+        ${this._messages.value.feed_family()}
       </button>
     `;
   }
