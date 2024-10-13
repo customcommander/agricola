@@ -392,7 +392,7 @@ const machine = src.createMachine({
           on: {
             'task.selected': {
               guard: 'is-feeding-task?',
-              actions: ['task-forward', ({event}) => console.log('wwww', event)]
+              actions: 'task-forward'
             },
             'task.completed': {
               guard: 'is-main-feeding-task?',
