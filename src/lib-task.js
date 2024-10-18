@@ -132,18 +132,12 @@ export default function (definitions) {
 
   const target = (name, impl) => impl && ({
     [name]: {
-      entry: {
-        type: 'game-update',
-        params: {
-          fn: impl,
-          reply_to: id
-        }
-      },
-      on: {
-        'game.updated': {
-          target: 'idle',
-          actions: 'task-ack'
-        }
+      always: {
+        target: 'idle',
+        actions: [
+          {type: 'game-update', params: {fn: impl}},
+          {type: 'task-ack'}
+        ]
       }
     }
   });
