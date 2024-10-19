@@ -130,6 +130,19 @@ export default function (definitions) {
     todo
   } = definitions;
 
+  /*
+
+    Defines a state for transient or secondary subtasks.
+
+    Example: "Take x Wood" task
+
+    The main objective is to update the supply, however it
+    can participate in the `replenish` phase of the game.
+
+    Note: the main purpose of a task should be implemented
+    in the `execute` function.
+
+  */
   const target = (name, impl) => impl && ({
     [name]: {
       always: {
