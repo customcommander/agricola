@@ -5,13 +5,14 @@ import {
 } from '@cucumber/cucumber';
 
 const task_map = {
-  'Day Laborer'          : 106,
-  'Plow 1 Field'         : 104,
-  'Sow and/or Bake bread': 113,
-  'Take 1 Grain'         : 103,
-  'Take x Clay'          : 108,
-  'Take x Reed'          : 109,
-  'Take x Wood'          : 107,
+  'Build Rooms and/or Build Stables': 101,
+  'Day Laborer'                     : 106,
+  'Plow 1 Field'                    : 104,
+  'Sow and/or Bake bread'           : 113,
+  'Take 1 Grain'                    : 103,
+  'Take x Clay'                     : 108,
+  'Take x Reed'                     : 109,
+  'Take x Wood'                     : 107,
 };
 
 const stock_map = {
@@ -63,5 +64,9 @@ Then('I have the following stock on the board', async function (table) {
 When('I feed my family', async function () {
   await this.wait(state => state.matches({harvest: 'feed'}));
   await this.send({type: 'task.completed', task_id: '002'});
+});
+
+Then('the game tells me I do not have enough resources', async function () {
+  await this.assert(game => game.error === 'NOT_ENOUGH_RESOURCES');
 });
 
