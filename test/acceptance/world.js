@@ -15,7 +15,7 @@ setWorldConstructor(class extends World {
   }
 
   async send(ev) {
-    await this.wait(250);
+    await this.wait(100);
     this.game.send(ev);
   }
 
