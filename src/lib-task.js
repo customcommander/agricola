@@ -24,7 +24,6 @@ This should implement the purpose of the task.
 import {
   assign,
   enqueueActions,
-  fromPromise,
   sendTo,
   setup,
 } from 'xstate';
@@ -62,7 +61,7 @@ const lib = setup({
     })),
 
     'game-query':
-    sendTo(gamesys, (_, {fn, reply_to, ...params}) => ({
+    sendTo(gamesys, (_, {fn, reply_to}) => ({
       type: 'game.query',
       query: fn,
       reply_to
