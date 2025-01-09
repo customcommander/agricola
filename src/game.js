@@ -2,7 +2,6 @@ import {
   assign,
   createActor,
   enqueueActions,
-  fromPromise,
   sendTo,
   setup,
   spawnChild,
@@ -12,20 +11,24 @@ import {
   produce
 } from 'immer';
 
+import bootstrap from './bootstrap.js';
 import dispatcher from './dispatcher.js';
 
 const src = setup({
   actors: {
-    'task-loader':
-    fromPromise(({input: tasks}) =>
-      Promise.all(tasks.map(id =>
-        import(/* webpackInclude: /\d+.js$/ */`./task-${id}.js`)
-          .then(task => [id, task.default])))),
-
     dispatcher
   },
 
   actions: {
+    bootstrap:
+    spawnChild(bootstrap),
+
+    'bootstrap-finalize':
+    assign(({context, event}) => produce(context, draft => {
+      draft.tasks = event.data;
+      return draft;
+    })),
+
     'setup-new-turn':
     assign(({context}) => produce(context, draft => {
       draft.turn += 1;
@@ -45,13 +48,6 @@ const src = setup({
 
       return draft;
     })),
-
-    'task-loader-done':
-    enqueueActions(({enqueue, event}) => {
-      for (let [id, task] of event.output) {
-        enqueue.spawnChild(task, {systemId: `task-${id}`});
-      }
-    }),
 
     'task-start':
     assign(({context, event}) => produce(context, draft => {
@@ -147,23 +143,9 @@ const src = setup({
 });
 
 const machine = src.createMachine({
-  context: ({input}) => {
-    const turn = input?.turn ?? 1;
-
-    /*
-      Running order.
-      TODO: randomise order for stage 1 to 5
-     */
-    const ro = [[ 1,  2, 3, 4], // stage 1
-                [ 5,  6, 7   ], // stage 2
-                [ 8,  9      ], // stage 3
-                [10, 11      ], // stage 4
-                [12, 13      ], // stage 5
-                [14          ]  // stage 6
-               ];
-
+  context: () => {
     return {
-      turn,
+      turn: 1,
       family:  2,
       workers: 2,
       supply: {
@@ -181,77 +163,8 @@ const machine = src.createMachine({
         B1: {type: 'wooden-hut'}, B2: null, B3: null, B4: null, B5: null,
         C1: {type: 'wooden-hut'}, C2: null, C3: null, C4: null, C5: null
       },
-      tasks: {
-        '001': {},
-        '002': {feeding: true},
-
-        101: {selected: false             },
-        102: {selected: false             },
-        103: {selected: false             }, // take grain
-        104: {selected: false             },
-        105: {selected: false             },
-        106: {selected: false             },
-        107: {selected: false, quantity: 2}, // wood
-        108: {selected: false, quantity: 1}, // clay
-        109: {selected: false, quantity: 1}, // reed
-        110: {selected: false, quantity: 1}, // fishing
-
-        // Stage 1
-
-        // Fences
-        111: {selected:  false,
-              turn:      ro[0][0],
-              hidden:    ro[0][0] > turn},
-
-        // Major Improvement
-        112: {selected:  false,
-              turn:      ro[0][1],
-              hidden:    ro[0][1] > turn},
-
-        // Sow and/or Bake bread
-        113: {selected:  false,
-              turn:      ro[0][2],
-              hidden:    ro[0][2] > turn},
-
-        // Take x Sheep
-        114: {selected:  false,
-              quantity:  0,
-              turn:      ro[0][3],
-              hidden:    ro[0][3] > turn},
-
-        // Stage 2
-
-        // Family growth
-        115: {selected:  false,
-              turn:      ro[1][0],
-              hidden:    ro[1][0] > turn},
-
-        // Take x Stone
-        116: {selected:  false,
-              quantity:  0,
-              turn:      ro[1][1],
-              hidden:    ro[1][1] > turn},
-
-        // After Renovation also Major Improvement
-        117: {selected:  false,
-              turn:      ro[1][2],
-              hidden:    ro[1][2] > turn},
-
-        // Stage 3
-
-        // Take x Vegetable
-        118: {selected:  false,
-              turn:      ro[2][0],
-              hidden:    ro[2][0] > turn},
-
-        // Take {qty} Wild Boar
-        119: {selected:  false,
-              quantity:  0,
-              turn:      ro[2][1],
-              hidden:    ro[2][1] > turn}
-
-
-      },
+      // The data for each task is fetched during the bootstrap phase.
+      tasks: {},
       error: null,
       early_exit: null,
 
@@ -269,12 +182,14 @@ const machine = src.createMachine({
   "initial": "init",
   "states": {
     "init": {
-      invoke: {
-        src: 'task-loader',
-        input: ({context}) => Object.keys(context.tasks),
-        onDone: {
+      entry: 'bootstrap',
+      on: {
+        'boot.success': {
           target: 'work',
-          actions: 'task-loader-done'
+          actions: 'bootstrap-finalize'
+        },
+        'boot.failure': {
+          target: 'failure'
         }
       }
     },
@@ -415,6 +330,9 @@ const machine = src.createMachine({
     },
     "game_over": {
       "type": "final"
+    },
+    failure: {
+      type: 'final'
     }
   },
   "on": {
