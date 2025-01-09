@@ -143,42 +143,39 @@ const src = setup({
 });
 
 const machine = src.createMachine({
-  context: () => {
-    return {
-      turn: 1,
-      family:  2,
-      workers: 2,
-      supply: {
-        food:      0,
-        grain:     0,
-        vegetable: 0,
-        wood:      0,
-        clay:      0,
-        reed:      0,
-        stone:     0
-      },
-      house_type: 'wooden-hut',
-      farmyard: {
-        A1:                 null, A2: null, A3: null, A4: null, A5: null,
-        B1: {type: 'wooden-hut'}, B2: null, B3: null, B4: null, B5: null,
-        C1: {type: 'wooden-hut'}, C2: null, C3: null, C4: null, C5: null
-      },
-      // The data for each task is fetched during the bootstrap phase.
-      tasks: {},
-      error: null,
-      early_exit: null,
+  context: () => ({
+    turn: 1,
+    family: 2,
+    workers: 2,
+    supply: {
+      food: 0,
+      grain: 0,
+      vegetable: 0,
+      wood: 0,
+      clay: 0,
+      reed: 0,
+      stone: 0
+    },
+    house_type: 'wooden-hut',
+    farmyard: {
+      A1:                   null, A2: null, A3: null, A4: null, A5: null,
+      B1: { type: 'wooden-hut' }, B2: null, B3: null, B4: null, B5: null,
+      C1: { type: 'wooden-hut' }, C2: null, C3: null, C4: null, C5: null
+    },
+    // The data for each task is fetched during the bootstrap phase.
+    tasks: {},
+    error: null,
+    early_exit: null,
+    /*
 
-      /*
+      The `on_*` properties are list of tasks ids
+      to be contacted when the game reaches the
+      corresponding state.
 
-        The `on_*` properties are list of tasks ids
-        to be contacted when the game reaches the
-        corresponding state.
-
-      */
-      on_replenish: ['107','108','109','110','114', '116', '119'],
-      on_fields:    ['001'],
-    };
-  },
+    */
+    on_replenish: ['107', '108', '109', '110', '114', '116', '119'],
+    on_fields: ['001'],
+  }),
   "initial": "init",
   "states": {
     "init": {
