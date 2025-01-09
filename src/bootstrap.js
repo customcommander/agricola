@@ -1,6 +1,24 @@
 /*
 
-bootstrap.
+Bootstrap.
+
+001 Fields
+002 Feed
+
+103 Take Grain
+107 Take x Wood
+108 Take x Clay
+109 Take x Reed
+110 Fishing
+111 Fences
+112 Major/Minor Improvement
+113 Sow and/or Bake bread
+114 Take x Sheep
+115 Family Growth
+116 Take x Stone
+117 After Renovation also Major Improvement
+118 Take Vegetable
+119 Take x Wild Boar
 
 */
 
@@ -12,42 +30,26 @@ import {
 } from 'xstate';
 
 const taskdefs = {
-  // Fields
   '001': {},
-  // Feed
   '002': {feeding: true},
   '101': {selected: false},
   '102': {selected: false},
-  // Take Grain
   '103': {selected: false},
   '104': {selected: false},
   '105': {selected: false},
   '106': {selected: false},
-  // Take x Wood
   '107': {selected: false, quantity: 2},
-  // Take x Clay
   '108': {selected: false, quantity: 1},
-  // Take x Reed
   '109': {selected: false, quantity: 1},
-  // Fishing
   '110': {selected: false, quantity: 1},
-  // Fences
   '111': {selected: false, turn: 1, hidden: false},
-  // Major Improvement
   '112': {selected: false, turn: 2, hidden: true},
-  // Sow and/or Bake bread
   '113': {selected: false, turn: 3, hidden: true},
-  // Take x Sheep
   '114': {selected: false, turn: 4, quantity: 1, hidden: true},
-  // Family Growth
   '115': {selected: false, turn: 5, hidden: true},
-  // Take x Stone
   '116': {selected: false, turn: 6, quantity: 1, hidden: true},
-  // After Renovation also Major Improvement
   '117': {selected: false, turn: 7, hidden: true},
-  // Take Vegetable
   '118': {selected: false, turn: 8, hidden: true},
-  // Take x Wild Boar
   '119': {selected: false, turn: 9, quantity: 1, hidden: true},
 };
 
