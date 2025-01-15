@@ -174,7 +174,6 @@ const machine = src.createMachine({
 
     */
     on_replenish: ['107', '108', '109', '110', '114', '116', '119'],
-    on_fields: ['001'],
   }),
   "initial": "init",
   "states": {
@@ -284,8 +283,13 @@ const machine = src.createMachine({
             src: 'dispatcher',
             systemId: 'dispatcher',
             input: ({context}) => {
-              const {on_fields: notify} = context;
-              const jobs = notify.map(task_id => ({task_id, ev: 'task.fields'}));
+              const entries = Object.entries(context.tasks);
+              const jobs = entries.reduce(
+                (acc, [task_id, def]) => 
+                  def.fields === true
+                    ? acc.concat({task_id, ev: 'task.fields'})
+                    : acc
+                , []);
               return {jobs};
             },
             onDone: {

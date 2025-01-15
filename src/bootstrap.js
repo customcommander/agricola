@@ -2,9 +2,13 @@
 
 Bootstrap.
 
+0XX Game Stuff
+---
 001 Fields
 002 Feed
 
+1XX Actions (on the board)
+---
 103 Take Grain
 107 Take x Wood
 108 Take x Clay
@@ -20,6 +24,11 @@ Bootstrap.
 118 Take Vegetable
 119 Take x Wild Boar
 
+What does each property mean?
+
+fields:
+  The task will be invoked during the field phase.
+
 */
 
 import {
@@ -30,7 +39,7 @@ import {
 } from 'xstate';
 
 const taskdefs = {
-  '001': {},
+  '001': {fields: true},
   '002': {feeding: true},
   '101': {selected: false},
   '102': {selected: false},
