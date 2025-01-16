@@ -23,35 +23,16 @@ const acknowledge_task = sendTo(dispatcher, {
   type: 'task.ack'
 });
 
-export const todo =
-  setup({
-    actions: {
-      abort_task
-    }
-  })
-  .createMachine({
-    context: ({input}) => ({
-      task_id: input.task_id
-    }),
-    initial: 'execute',
-    states: {
-      execute: {
-        always: {
-          target: 'done',
-          actions: {
-            type: 'abort_task',
-            params: ({context}) => ({
-              task_id: context.task_id,
-              err: 'TODO'
-            })
-          }
-        }
-      },
-      done: {
-        type: 'final'
-      }
-    }
-  });
+const complete_task = sendTo(game, (_, {task_id}) => ({
+  type: 'task.completed',
+  task_id
+}));
+
+export const todo = fromPromise(() => 'TODO');
+
+function is_todo({event}) {
+  return event.output === 'TODO';
+}
 
 export const game_updater = fn =>
   setup({
@@ -79,54 +60,94 @@ export const game_updater = fn =>
     }
   });
 
-const task = task_id =>
-  setup({
-    actors: {
-      fields: service_not_implemented,
-      selected: service_not_implemented
-    },
-    actions: {
-      acknowledge_task,
-    },
-  })
-  .createMachine({
-    context: {
-      task_id,
-    },
-    initial: 'idle',
-    states: {
-      idle: {
-        on: {
-          'task.fields': {
-            target: 'fields'
-          },
-          'task.selected': {
-            target: 'selected'
-          }
-        }
-      },
-      fields: {
-        invoke: {
-          src: 'fields',
-          onDone: {
-            target: 'idle',
-            actions: 'acknowledge_task'
-          }
-        }
-      },
-      selected: {
-        invoke: {
-          src: 'selected',
-          input: ({context}) => ({
-            task_id: context.task_id
-          }),
-          onDone: {
-            target: 'idle',
-          }
+const task_setup = setup({
+  actors: {
+    fields: service_not_implemented,
+    selected: service_not_implemented
+  },
+  actions: {
+    abort_task,
+    acknowledge_task,
+    complete_task
+  },
+  guards: {
+    is_todo
+  }
+});
+
+
+const task = task_id => task_setup.createMachine({
+  context: {
+    task_id,
+  },
+  initial: 'idle',
+  states: {
+    idle: {
+      on: {
+        'task.fields': {
+          target: 'fields'
+        },
+        'task.selected': {
+          target: 'selected'
         }
       }
+    },
+    fields: {
+      invoke: {
+        src: 'fields',
+        onDone: {
+          target: 'idle',
+          actions: 'acknowledge_task'
+        }
+      }
+    },
+    selected: {
+      invoke: {
+        src: 'selected',
+        input: ({context}) => ({
+          task_id: context.task_id
+        }),
+        onDone: [
+          {
+            guard: 'is_todo',
+            target: 'idle',
+            actions: {
+              type: 'abort_task',
+              params: {
+                task_id,
+                err: 'TODO'
+              }
+            }
+          },
+          {
+            target: 'idle',
+            actions: {
+              type: 'complete_task',
+              params: {
+                task_id
+              }
+            }
+          }
+        ]
+      }
     }
-  });
+  }
+});
 
-export default ({id, ...actors}) => task(id).provide({actors});
+export default ({id, ...actors}) => {
+  const t = task(id);
+  return t.provide({
+    actors: Object.fromEntries(
+      Object.entries(actors).map(([k, v]) => {
+        if (typeof v == 'function') {
+          return [k, game_updater(v)];
+        }
+        if (v === 'TODO') {
+          return [k, todo];
+        }
+        return [k, v];
+      })
+    )
+  });
+};
 
