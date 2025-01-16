@@ -7,15 +7,16 @@ Take x Food
 import task from './lib-task2.js';
 
 export default task({
-  id: '110',
-  replenish: (_, game) => {
-    game.tasks[110].quantity += 1;
+
+  replenish: ({task_id}, game) => {
+    game.tasks[task_id].quantity += 1;
     return game;
   },
-  selected: (_, game) => {
-    const {quantity} = game.tasks[110];
+
+  selected: ({task_id}, game) => {
+    const {quantity} = game.tasks[task_id];
     game.supply.food += quantity;
-    game.tasks[110].quantity = 0;
+    game.tasks[task_id].quantity = 0;
     return game;
   }
 });

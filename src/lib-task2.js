@@ -8,9 +8,13 @@ const service_not_implemented = fromPromise(() => {
   throw new Error('service not implemented');
 });
 
-const update_game = sendTo(game, ({event}, {fn, ...params}) => ({
+const update_game = sendTo(game, ({ event}, {fn, task_id, ...params}) => ({
   type: 'game.update',
-  updater: produce(fn.bind(null, {event, params})),
+  updater: produce(fn.bind(null, {
+    task_id,
+    event,
+    params
+  })),
 }));
 
 const abort_task = sendTo(game, ({event}, {task_id, err}) => ({
@@ -41,6 +45,9 @@ export const game_updater = fn =>
     },
   })
   .createMachine({
+    context: ({input}) => ({
+      task_id: input.task_id
+    }),
     initial: 'execute',
     states: {
       execute: {
@@ -48,9 +55,10 @@ export const game_updater = fn =>
           target: 'done',
           actions: {
             type: 'update_game',
-            params: {
+            params: ({context}) => ({
+              task_id: context.task_id,
               fn
-            }
+            })
           }
         }
       },
@@ -60,107 +68,109 @@ export const game_updater = fn =>
     }
   });
 
-const task_setup = setup({
-  actors: {
-    fields: service_not_implemented,
-    replenish: service_not_implemented,
-    selected: service_not_implemented
-  },
-  actions: {
-    abort_task,
-    acknowledge_task,
-    complete_task
-  },
-  guards: {
-    is_todo
-  }
-});
-
-
-const task = task_id => task_setup.createMachine({
-  context: {
-    task_id,
-  },
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        'task.fields': {
-          target: 'fields'
-        },
-        'task.selected': {
-          target: 'selected'
-        },
-        'task.replenish': {
-          target: 'replenish',
-        }
-      }
+const task = 
+  setup({
+    actors: {
+      fields: service_not_implemented,
+      replenish: service_not_implemented,
+      selected: service_not_implemented
     },
-    fields: {
-      invoke: {
-        src: 'fields',
-        onDone: {
-          target: 'idle',
-          actions: 'acknowledge_task'
-        }
-      }
+    actions: {
+      abort_task,
+      acknowledge_task,
+      complete_task
     },
-    replenish: {
-      invoke: {
-        src: 'replenish',
-        onDone: {
-          target: 'idle',
-          actions: 'acknowledge_task'
-        }
-      }
-    },
-    selected: {
-      invoke: {
-        src: 'selected',
-        input: ({context}) => ({
-          task_id: context.task_id
-        }),
-        onDone: [
-          {
-            guard: 'is_todo',
-            target: 'idle',
-            actions: {
-              type: 'abort_task',
-              params: {
-                task_id,
-                err: 'TODO'
-              }
-            }
+    guards: {
+      is_todo
+    }
+  })
+  .createMachine({
+    context: ({input}) => ({
+      task_id: input.task_id
+    }),
+    initial: 'idle',
+    states: {
+      idle: {
+        on: {
+          'task.fields': {
+            target: 'fields'
           },
-          {
+          'task.selected': {
+            target: 'selected'
+          },
+          'task.replenish': {
+            target: 'replenish',
+          }
+        }
+      },
+      fields: {
+        invoke: {
+          src: 'fields',
+          input: ({context}) => ({
+            task_id: context.task_id
+          }),
+          onDone: {
             target: 'idle',
-            actions: {
-              type: 'complete_task',
-              params: {
-                task_id
+            actions: 'acknowledge_task'
+          }
+        }
+      },
+      replenish: {
+        invoke: {
+          src: 'replenish',
+          input: ({context}) => ({
+            task_id: context.task_id
+          }),
+          onDone: {
+            target: 'idle',
+            actions: 'acknowledge_task'
+          }
+        }
+      },
+      selected: {
+        invoke: {
+          src: 'selected',
+          input: ({context}) => ({
+            task_id: context.task_id
+          }),
+          onDone: [
+            {
+              guard: 'is_todo',
+              target: 'idle',
+              actions: {
+                type: 'abort_task',
+                params: ({context}) => ({
+                  task_id: context.task_id,
+                  err: 'TODO'
+                })
+              }
+            },
+            {
+              target: 'idle',
+              actions: {
+                type: 'complete_task',
+                params: ({context}) => ({
+                  task_id: context.task_id
+                })
               }
             }
-          }
-        ]
+          ]
+        }
       }
     }
-  }
-});
-
-export default ({id, ...actors}) => {
-  const t = task(id);
-  return t.provide({
-    actors: Object.fromEntries(
-      Object.entries(actors).map(([k, v]) => {
-        if (typeof v == 'function') {
-          return [k, game_updater(v)];
-        }
-        if (v === 'TODO') {
-          return [k, todo];
-        }
-        return [k, v];
-      })
-    )
   });
-};
+
+export default (actors) => task.provide({
+  actors: Object.fromEntries(
+    Object.entries(actors).map(([k, v]) => {
+      if (typeof v == 'function') {
+        return [k, game_updater(v)];
+      }
+      if (v === 'TODO') {
+        return [k, todo];
+      }
+      return [k, v];
+    })
+  )
+});
 

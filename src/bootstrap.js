@@ -82,7 +82,12 @@ const src = setup({
       const out = {...context.out, [id]: {...taskdefs[id]}};
       const tasks = context.tasks.slice(1);
       enqueue.assign({out, tasks});
-      enqueue.spawnChild(task, {systemId: `task-${id}`});
+      enqueue.spawnChild(task, {
+        systemId: `task-${id}`,
+        input: {
+          task_id: id
+        }
+      });
     }),
 
     notify: sendTo(
