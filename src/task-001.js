@@ -7,6 +7,7 @@
 import task, { game_updater } from './lib-task2.js';
 
 export default task({
+  id: '001',
   fields: game_updater((_, game) => {
     const ids = Object.keys(game.farmyard);
     
