@@ -4,11 +4,11 @@
 
 */
 
-import task, { game_updater } from './lib-task2.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '001',
-  fields: game_updater((_, game) => {
+  fields: (_, game) => {
     const ids = Object.keys(game.farmyard);
     
     for (let id of ids) {
@@ -28,5 +28,5 @@ export default task({
     }
 
     return game;
-  })
+  }
 });
