@@ -4,7 +4,7 @@ Fishing
 Take x Food
 
 */
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '110',
@@ -12,7 +12,7 @@ export default task({
     game.tasks[110].quantity += 1;
     return game;
   },
-  execute: (_, game) => {
+  selected: (_, game) => {
     const {quantity} = game.tasks[110];
     game.supply.food += quantity;
     game.tasks[110].quantity = 0;

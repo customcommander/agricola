@@ -4,7 +4,7 @@
 
 */
 
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '119',
@@ -14,6 +14,6 @@ export default task({
     return game;
   },
 
-  todo: true
+  selected: 'TODO'
 });
 

@@ -63,6 +63,7 @@ export const game_updater = fn =>
 const task_setup = setup({
   actors: {
     fields: service_not_implemented,
+    replenish: service_not_implemented,
     selected: service_not_implemented
   },
   actions: {
@@ -89,12 +90,24 @@ const task = task_id => task_setup.createMachine({
         },
         'task.selected': {
           target: 'selected'
+        },
+        'task.replenish': {
+          target: 'replenish',
         }
       }
     },
     fields: {
       invoke: {
         src: 'fields',
+        onDone: {
+          target: 'idle',
+          actions: 'acknowledge_task'
+        }
+      }
+    },
+    replenish: {
+      invoke: {
+        src: 'replenish',
         onDone: {
           target: 'idle',
           actions: 'acknowledge_task'

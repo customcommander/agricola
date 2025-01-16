@@ -4,7 +4,7 @@
 
 */
 
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '116',
@@ -14,7 +14,7 @@ export default task({
     return game;
   },
 
-  execute: (_, game) => {
+  selected: (_, game) => {
     const {quantity} = game.tasks['116'];
     game.tasks['116'].quantity = 0;
     game.supply.stone += quantity;

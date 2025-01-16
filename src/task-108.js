@@ -3,7 +3,7 @@
 Take x CLay
 */
 
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '108',
@@ -11,7 +11,7 @@ export default task({
     game.tasks['108'].quantity += 1;
     return game;
   },
-  execute: (_, game) => {
+  selected: (_, game) => {
     const {quantity} = game.tasks['108'];
     game.supply.clay += quantity;
     game.tasks['108'].quantity = 0;

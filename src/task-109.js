@@ -4,7 +4,7 @@ Take x Reed
 
 */
 
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
   id: '109',
@@ -12,7 +12,7 @@ export default task({
     game.tasks[109].quantity += 1;
     return game;
   },
-  execute: (_, game) => {
+  selected: (_, game) => {
     const {quantity} = game.tasks[109];
     game.supply.reed += quantity;
     game.tasks[109].quantity = 0;

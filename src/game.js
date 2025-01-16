@@ -166,14 +166,6 @@ const machine = src.createMachine({
     tasks: {},
     error: null,
     early_exit: null,
-    /*
-
-      The `on_*` properties are list of tasks ids
-      to be contacted when the game reaches the
-      corresponding state.
-
-    */
-    on_replenish: ['107', '108', '109', '110', '114', '116', '119'],
   }),
   "initial": "init",
   "states": {
@@ -203,17 +195,16 @@ const machine = src.createMachine({
             src: 'dispatcher',
             systemId: 'dispatcher',
             input: ({context}) => {
-              const {on_replenish: notify, tasks} = context;
-
-              const jobs = notify.reduce((acc, task_id) => {
-                const available = tasks[task_id].hidden !== true;
-                // Ignore tasks not yet available
-                if (available) {
+              const {tasks} = context;
+              const entries = Object.entries(tasks);
+              const jobs = entries.reduce((acc, [task_id, task]) => {
+                const replenish = task.replenish === true;
+                const available = task.hidden !== true;
+                if (replenish && available) {
                   acc.push({task_id, ev: 'task.replenish'});
                 }
                 return acc;
               }, []);
-
               return {jobs};
             },
             onDone: {
