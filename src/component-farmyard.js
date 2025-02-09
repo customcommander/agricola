@@ -1,6 +1,5 @@
 import {LitElement, css, html, nothing} from 'lit';
 import {map} from 'lit/directives/map.js';
-import {when} from 'lit/directives/when.js';
 import {ContextConsumer} from '@lit/context';
 
 import {spaces} from './util-farmyard.js';
