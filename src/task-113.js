@@ -6,6 +6,13 @@ Sow and/or Bake bread
 
 import task from './lib-task.js';
 
+export const config = {
+  repeat: true,
+  turn: 3,
+  hidden: true,
+  selected: false,
+};
+
 export default task({
   id: '113',
 
