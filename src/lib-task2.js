@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { fromPromise, sendTo, setup } from "xstate";
+import { fromPromise, sendTo, setup, log } from "xstate";
 
 const game = ({system}) => system.get('gamesys');
 const dispatcher = ({system}) => system.get('dispatcher');
@@ -76,6 +76,7 @@ const task =
       selected: service_not_implemented
     },
     actions: {
+      log_init: log(({context}) => `task ${context.task_id} loaded.`),
       abort_task,
       acknowledge_task,
       complete_task
@@ -88,8 +89,14 @@ const task =
     context: ({input}) => ({
       task_id: input.task_id
     }),
-    initial: 'idle',
+    initial: 'init',
     states: {
+      init: {
+        always: {
+          target: 'idle',
+          actions: 'log_init'
+        }
+      },
       idle: {
         on: {
           'task.fields': {
