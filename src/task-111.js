@@ -4,10 +4,9 @@ Fences
 
 */
 
-import task from './lib-task.js';
+import task from './lib-task2.js';
 
 export default task({
-  id: '111',
-  todo: true
+  selected: 'TODO'
 });
 
