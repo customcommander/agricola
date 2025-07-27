@@ -15,6 +15,10 @@ class Space extends LitElement {
       background-color: green;
     }
 
+    :host([type="field"][vegetable]) {
+      background-color: orangered;
+    }
+
     :host([type="field"][grain]) {
       background-color: yellow;
     }
@@ -29,14 +33,15 @@ class Space extends LitElement {
   `;
 
   static properties = {
-    type:  {},
-    grain: {}
+    type:      {},
+    grain:     {type: Number},
+    vegetable: {type: Number}
   }
 
   render() {
     return html`
       <div>
-        <span>${this.grain ?? nothing}</span>
+        <span>${this.grain ?? this.vegetable ?? nothing}</span>
         <slot></slot>
       </div>
     `;
