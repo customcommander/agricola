@@ -167,17 +167,19 @@ const task =
     }
   });
 
-export default (actors) => task.provide({
-  actors: Object.fromEntries(
-    Object.entries(actors).map(([k, v]) => {
-      if (typeof v == 'function') {
-        return [k, game_updater(v)];
-      }
-      if (v === 'TODO') {
-        return [k, todo];
-      }
-      return [k, v];
-    })
-  )
-});
+export default ({...actors}) => {
+  return task.provide({
+    actors: Object.fromEntries(
+      Object.entries(actors).map(([k, v]) => {
+        if (typeof v == 'function') {
+          return [k, game_updater(v)];
+        }
+        if (v === 'TODO') {
+          return [k, todo];
+        }
+        return [k, v];
+      })
+    )
+  });
+}
 
