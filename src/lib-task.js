@@ -1,328 +1,246 @@
-/*
-
-The purpose of this module is to generate
-a state machine for a given task according
-to a shared and unique blueprint.
-
-The main export takes a task definition
-and returns the corresponding state machine
-for it.
-
-A task definition is an object with
-the following properties:
-
-** id **
-
-A unique task identifier.
-
-** execute **
-
-This should implement the purpose of the task.
-
-*/
-
-import {
-  assign,
-  enqueueActions,
-  sendTo,
-  setup,
-} from 'xstate';
-
 import {
   produce
-} from 'immer';
+} from "immer";
 
-const gamesys = ({system}) => system.get('gamesys');
+import {
+  enqueueActions,
+  log,
+  sendTo,
+  setup,
+} from "xstate";
 
-const dispatcher = ({system}) => system.get('dispatcher');
 
-function early_exit_init({params}, game) {
-  game.early_exit = params.task_id;
-  return game;
-}
+const game = ({system}) => system.get('gamesys');
 
-function early_exit_stop(_, game) {
-  game.early_exit = null;
-  return game;
-}
-
-function selection_clear(_, game) {
-  game.selection = null;
-  return game;
-}
-
-const lib = setup({
+// Check, select & execute
+const micro_task = setup({
   actions: {
-    'game-update':
-    sendTo(gamesys, ({event}, {fn, reply_to, ...params}) => ({
-      type: 'game.update',
-      updater: produce(fn.bind(null, {event, params})),
-      reply_to
-    })),
-
-    'game-query':
-    sendTo(gamesys, (_, {fn, reply_to}) => ({
+    'task-check': sendTo(game, ({context}) => ({
       type: 'game.query',
-      query: fn,
-      reply_to
+      query: context.check,
+      reply_to: `task-${context.task_id}`
     })),
 
-    'task-abort':
-    sendTo(gamesys, ({event}, {task_id, err}) => ({
-      type: 'task.aborted',
-      task_id,
-      err: event.response || err || 'NOT_ENOUGH_RESOURCES'
-    })),
-
-    'task-ack':
-    sendTo(dispatcher, {type: 'task.ack'}),
-
-    'task-complete':
-    enqueueActions(({enqueue, context}, params) => {
-      const {task_id} = params;
-      if (context.exec > 0) {
-        enqueue.assign({exec: 0});
-        enqueue({type: 'game-update', params: {fn: early_exit_stop}});
-      }
-      enqueue.sendTo(gamesys, {type: 'task.completed', task_id});
-    }),
-
-    'allow-early-exit':
-    enqueueActions(({enqueue, context}, params) => {
-      if (context.exec === 1) {
-        enqueue({
-          type: 'game-update',
-          params: {
-            fn: early_exit_init,
-            task_id: params.task_id
-          }
+    'task-input': enqueueActions(({ enqueue, context }) => {
+      // This means we already had a first run and the task is in a "repeat loop".
+      // In this case we display an "Exit button" to allow the player to break out.
+      if (context.run === 1) {
+        enqueue.sendTo(game, {
+          type: 'game.update',
+          updater: produce(game => {
+            game.early_exit = context.task_id;
+            return game;
+          })
         });
       }
+      enqueue.sendTo(game, {
+        type: 'game.update',
+        updater: produce(context.select.bind(null, {
+          task_id: context.task_id
+        })),
+      });
     }),
 
-    'exec++':
-    assign({exec: ({context}) => context.exec + 1})
+    'task-execute': enqueueActions(({enqueue, event, context}) => {
+      // We need to keep track of how many times a task run.
+      // Most tasks can't be repeated and will stop at run=1.
+      enqueue.assign({
+        run: ({ context }) => context.run + 1
+      });
+      enqueue.sendTo(game, {
+        type: 'game.update',
+        updater: produce(context.execute.bind(null, {
+          task_id: context.task_id,
+          event
+        })),
+        reply_to: `task-${context.task_id}`,
+      });
+    }),
+
+    'task-abort': sendTo(
+      ({context, system}) => system.get(context.reply_to),
+      ({context, event}) => ({
+        type: 'task.aborted',
+        task_id: context.task_id,
+        err: event.response
+      })),
+
+    'task-complete': sendTo(
+      ({context, system}) => system.get(context.reply_to),
+      ({context}) => ({
+        type: 'task.completed',
+        task_id: context.task_id
+      }))
   },
-
   guards: {
-    'response-ok?':
-    ({event: {response}}) => {
-      return response === true;
+    'has-check?': ({context}) => {
+      return typeof context.check === 'function';
     },
+    'check->select?': ({context, event}) => {
+      return event.response === true && typeof context.select === 'function';
+    },
+    'check->execute?': ({event}) => {
+      return event.response === true;
+    },
+    'check->abort?': ({context, event}) => {
+      return event.response !== true && context.run === 0;
+    },
+    'can-repeat?': ({context}) => {
+      return context.repeat === true;
+    }
+  }
+}).createMachine({
+  context: ({ input }) => {
+    const {
+      task_id,
+      reply_to,
+      repeat = false,
+      check,
+      select,
+      execute
+    } = input;
 
-    'silent-failure?':
-    ({event: {response}, context: {exec}}) => {
-      return response !== true && exec > 0;
+    return {
+      task_id,
+      reply_to,
+      run: 0,
+      abort: null,
+      repeat,
+      check,
+      select,
+      execute,
+    };
+  },
+  initial: 'boot',
+  states: {
+    boot: {
+      always: [
+        {
+          guard: 'has-check?',
+          target: 'check'
+        },
+        {
+          target: 'execute'
+        }
+      ]
+    },
+    check: {
+      entry: 'task-check',
+      on: {
+        'game.response': [
+          {
+            guard: 'check->abort?',
+            target: 'exit',
+            actions: 'task-abort'
+          },
+          {
+            guard: 'check->select?',
+            target: 'select'
+          },
+          {
+            guard: 'check->execute?',
+            target: 'execute'
+          },
+          {
+            target: 'exit',
+            actions: 'task-complete'
+          }
+        ]
+      }
+    },
+    select: {
+      entry: 'task-input',
+      on: {
+        'select.*': {
+          target: 'execute'
+        },
+        'task.exit': {
+          target: 'exit',
+          actions: 'task-complete'
+        }
+      }
+    },
+    execute: {
+      entry: 'task-execute',
+      on: {
+        'game.updated': [
+          {
+            guard: 'can-repeat?',
+            target: 'check'
+          },
+          {
+            target: 'exit',
+            actions: 'task-complete'
+          }
+        ]
+      }
+    },
+    exit: {
+      type: 'final',
     }
   }
 });
 
-export default function (definitions) {
-  const {
-    execute,
-    fields,
-    check,
-    id,
-    repeat = false,
-    replenish,
-    selection,
-    todo
-  } = definitions;
+export default setup({
+  actors: {
+    'micro-task': micro_task
+  },
 
-  /*
+  actions: {
+    log_init: log(({context}) => `task ${context.task_id} loaded.`),
 
-    Defines a state for transient or secondary subtasks.
-
-    Example: "Take x Wood" task
-
-    The main objective is to update the supply, however it
-    can participate in the `replenish` phase of the game.
-
-    Note: the main purpose of a task should be implemented
-    in the `execute` function.
-
-  */
-  const target = (name, impl) => impl && ({
-    [name]: {
+    'forward': sendTo('task-runner', ({event}) => ({
+      ...event
+    }))
+  }
+}).createMachine({
+  context: ({input: {task_id, ...micro_tasks}}) => ({
+    task_id,
+    ...micro_tasks,
+  }),
+  initial: 'init',
+  states: {
+    init: {
       always: {
         target: 'idle',
-        actions: [
-          {type: 'game-update', params: {fn: impl}},
-          {type: 'task-ack'}
-        ]
+        actions: 'log_init'
       }
-    }
-  });
-
-  let machine = {
-    id: `task-${id}-actor`,
-
-    context: {
-      /*
-
-        All tasks will go through their execution
-        cycle at least once.
-
-        Some can go over it multiple times if the
-        player chooses to. (e.g sowing fields)
-
-        In that case we need to allow the player to
-        exit the execution cycle.
-
-       */
-      exec: 0
     },
-
-    initial: 'idle',
-
-    states: {
-
-      idle: {
-        on: {
-          ...(replenish && {'task.replenish': 'replenish'}),
-          ...(fields    && {'task.fields'   : 'fields'   }),
-
-          ...(todo && {
-            'task.selected': {
-              actions: {
-                type: 'task-abort',
-                params: {
-                  task_id: id,
-                  err: 'TODO'
-                }
-              }
-            }
-          }),
-
-          ...(execute && {
-            'task.selected': {
-              target: ( check     ? 'check'
-                      : selection ? 'selection'
-                                  : 'execute' )
-            }
-          })
+    idle: {
+      on: {
+        'task.*': {
+          target: 'running'
+        }
+      }
+    },
+    running: {
+      invoke: {
+        id: 'task-runner',
+        src: 'micro-task',
+        input: ({context, event}) => {     
+          const task_type = event.type.split('.')[1];
+          return {
+            task_id: context.task_id,
+            reply_to: event.reply_to,
+            ...context[task_type]
+          };
+        },
+        onDone: {
+          target: 'idle',
         }
       },
-
-      ...(target('replenish', replenish)),
-      ...(target('fields'   , fields   )),
-
-      ...(check && {
-        check: {
-          entry: {
-            type: 'game-query',
-            params: {
-              fn: check,
-              reply_to: `task-${id}`
-            }
-          },
-          on: {
-            'game.response': [
-              {
-                guard: 'response-ok?',
-                target: ( selection ? 'selection' 
-                                    : 'execute'   ),
-                actions: {
-                  type: 'allow-early-exit',
-                  params: {
-                    task_id: id
-                  }
-                }
-              },
-              {
-                guard: 'silent-failure?',
-                target: 'idle',
-                actions: {
-                  type: 'task-complete',
-                  params: {
-                    task_id: id
-                  }
-                }
-              },
-              {
-                target: 'idle',
-                actions: {
-                  type: 'task-abort',
-                  params: {
-                    task_id: id,
-                  }
-                }
-              }
-            ]
-          }
+      on: {
+        'game.*': {
+          actions: 'forward'
+        },
+        'select.*': {
+          actions: 'forward'
+        },
+        'task.exit': {
+          actions: 'forward'
         }
-      }),
-
-      ...(selection && {
-        selection: {
-          entry: {
-            type: 'game-update',
-            params: {
-              fn: selection,
-              task_id: id
-            }
-          },
-          on: {
-            'select.*': {
-              target: 'execute',
-            },
-            'task.exit': {
-              target: 'idle',
-              actions: {
-                type: 'task-complete',
-                params: {
-                  task_id: id
-                }
-              }
-            }
-          },
-          exit: {
-            type: 'game-update',
-            params: {
-              fn: selection_clear
-            }
-          }
-        }
-      }),
-
-      ...(execute && {
-        execute: {
-          entry: {
-            type: 'game-update',
-            params: {
-              fn: execute,
-              reply_to: id
-            }
-          },
-          on: {
-            ...(repeat && {
-              'game.updated': {
-                target: 'check',
-                actions: 'exec++'
-              }
-            }),
-
-            ...(!repeat && {
-              'game.updated': {
-                target: 'idle',
-                actions: {
-                  type: 'task-complete',
-                  params: {
-                    task_id: id
-                  }
-                }
-              }
-            })
-          }
-        }
-      })
+      }
     }
-  };
-
-  // console.log(JSON.stringify(machine, (k, v) => typeof v === 'function' ? `<${v.name}>` : v, 2));
-
-  machine = lib.createMachine(machine);
-
-  return machine;
-}
+  }
+});
 

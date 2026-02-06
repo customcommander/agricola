@@ -4,12 +4,12 @@ Feeding phase
 
 */
 
-import task from './lib-task.js';
-
-export default task({
-  id: '002',
-  execute: (_, game) => {
+export default {
+  feed: (_, game) => {
+    // TODO: work out new born!
+    const {family} = game;
+    game.supply.food -= family * 3;
     return game;
   }
-});
+};
 

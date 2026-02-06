@@ -4,9 +4,7 @@
 
 */
 
-import task from './lib-task2.js';
-
-export default task({
+export default {
 
   replenish: ({task_id}, game) => {
     game.tasks[task_id].quantity += 1;
@@ -19,5 +17,5 @@ export default task({
     game.supply.stone += quantity;
     return game;
   }
-});
+};
 

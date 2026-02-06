@@ -1,6 +1,6 @@
-import task from './lib-task2.js';
+// Take X Wood
 
-export default task({
+export default {
 
   replenish: ({task_id}, game) => {
     game.tasks[task_id].quantity += 2;
@@ -13,5 +13,5 @@ export default task({
     game.tasks[task_id].quantity = 0;
     return game;
   }
-});
+};
 

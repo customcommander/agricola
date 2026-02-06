@@ -51,7 +51,6 @@ const src = setup({
 
     'task-start':
     assign(({context, event}) => produce(context, draft => {
-      const {task_id} = event;
       draft.workers -= 1;
       draft.tasks[event.task_id].selected = true;
       draft.early_exit = false;
@@ -69,26 +68,21 @@ const src = setup({
  
     'task-forward':
     sendTo(({system, event}) => system.get(`task-${event.task_id}`),
-           ({context, event}) => ({...event, game_context: context})),
+           ({event}) => ({...event, reply_to: 'gamesys'})),
+
+    'task-cleanup': assign({
+      selection: null,
+      early_exit: null
+    }),
 
     'game-update':
-    enqueueActions(({enqueue, event}) => {
-
+    enqueueActions(({enqueue, event, system}) => {
       enqueue.assign(({context}) => {
         return event.updater(context);
       });
-
-      if (event.reply_to) {
-        const task_id = event.reply_to;
-
-        enqueue.sendTo(
-          ({system}) => system.get(`task-${task_id}`),
-          ({context}) => ({
-            type: 'game.updated',
-            game_context: context
-          })
-        );
-      }
+      enqueue.sendTo(system.get(event.reply_to), {
+        type: 'game.updated',
+      });
     }),
     
     'game-response':
@@ -126,18 +120,6 @@ const src = setup({
       const check = turn === 14;
       console.log(`is last turn? ${turn} ${check}`);
       return check;
-    },
-
-    'is-feeding-task?':
-    ({context, event}) => {
-      const {task_id} = event;
-      return context.tasks[task_id].feeding === true;
-    },
-
-    'is-main-feeding-task?':
-    ({context, event}) => {
-      const {task_id} = event;
-      return task_id === '002';
     }
   }
 });
@@ -201,7 +183,7 @@ const machine = src.createMachine({
                 const replenish = task.replenish === true;
                 const available = task.hidden !== true;
                 if (replenish && available) {
-                  acc.push({task_id, ev: 'task.replenish'});
+                  acc.push({task_id, type: 'task.replenish'});
                 }
                 return acc;
               }, []);
@@ -250,7 +232,8 @@ const machine = src.createMachine({
                 "target": "done"
               }
             ]
-          }
+          },
+          exit: 'task-cleanup'
         },
         "done": {
           "type": "final"
@@ -278,7 +261,7 @@ const machine = src.createMachine({
               const jobs = entries.reduce(
                 (acc, [task_id, def]) => 
                   def.fields === true
-                    ? acc.concat({task_id, ev: 'task.fields'})
+                    ? acc.concat({task_id, type: 'task.fields'})
                     : acc
                 , []);
               return {jobs};
@@ -290,20 +273,17 @@ const machine = src.createMachine({
         },
         feed: {
           on: {
-            'task.selected': {
-              guard: 'is-feeding-task?',
+            'task.feed': {
               actions: 'task-forward'
             },
             'task.completed': {
-              guard: 'is-main-feeding-task?',
-              target: 'breed'
+              target: 'breed',
             }
           }
         },
         breed: {
           always: {
             target: 'done',
-            actions: () => console.log('breed: todo')
           }
         },
         "done": {
@@ -324,7 +304,10 @@ const machine = src.createMachine({
       "type": "final"
     },
     failure: {
-      type: 'final'
+      type: 'final',
+      entry: ({event}) => {
+        console.log('BOOT FAILED', event);
+      }
     }
   },
   "on": {

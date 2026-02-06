@@ -12,8 +12,8 @@ import {
 const src = setup({
   actions: {
     dispatch: enqueueActions(({enqueue, context, system}) => {
-      const [{ev: type, task_id}, ...jobs] = context.jobs;
-      enqueue.sendTo(system.get(`task-${task_id}`), {type});
+      const [{type, task_id}, ...jobs] = context.jobs;
+      enqueue.sendTo(system.get(`task-${task_id}`), {type, reply_to: 'dispatcher'});
       enqueue.assign({jobs});
     })
   },
@@ -35,7 +35,7 @@ export default src.createMachine({
     loop: {
       entry: 'dispatch',
       on: {
-        'task.ack': [
+        'task.completed': [
           {target: 'loop', guard: 'repeat?', reenter: true},
           {target: 'done'}
         ]

@@ -75,9 +75,6 @@ class Tasks extends LitElement {
     }
   `;
 
-  #tasks;
-  #messages;
-
   constructor() {
     super();
     this._consume('tasks');

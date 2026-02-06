@@ -9,7 +9,12 @@ Bootstrap.
 
 1XX Actions (on the board)
 ---
+101
+102
 103 Take Grain
+104 Plow 1 Field
+105 1 Occupation
+106 Day Laborer
 107 Take x Wood
 108 Take x Clay
 109 Take x Reed
@@ -38,13 +43,15 @@ import {
   setup
 } from 'xstate';
 
+import task from './lib-task.js';
+
 const taskdefs = {
   '001': {fields: true},
   '002': {feeding: true},
   '101': {selected: false},
   '102': {selected: false},
   '103': {selected: false},
-  '104': {selected: false},
+  '104': {selected: false, repeat: true},
   '105': {selected: false},
   '106': {selected: false},
   '107': {selected: false, replenish: true, quantity: 2},
@@ -62,11 +69,33 @@ const taskdefs = {
   '119': {selected: false, turn: 9, replenish: true, quantity: 1, hidden: true},
 };
 
+function process_task_defs(defs) {
+  return Object.keys(defs).reduce((acc, k) => {
+    const def = defs[k];
+
+    if (def === 'TODO') {
+      acc[k] = {
+        check: () => 'TODO',
+      };
+    }
+    else if (typeof def === 'function') {
+      acc[k] = {
+        execute: def
+      };
+    }
+    else {
+      acc[k] = def;
+    }
+
+    return acc;
+  }, {});
+}
+
 const src = setup({
   actors: {
     loader: fromPromise(async ({input: id}) => {
       const task = await import(/* webpackInclude: /\d+.js$/ */`./task-${id}.js`);
-      return [id, task.default, task.config];
+      return [id, process_task_defs(task.default), task.config];
     })
   },
 
@@ -78,14 +107,15 @@ const src = setup({
 
   actions: {
     boot: enqueueActions(({enqueue, context, event}) => {
-      const [id, task, config] = event.output;
+      const [id, defs, config] = event.output;
       const out = {...context.out, [id]: config ? {...config} : {...taskdefs[id]}};
       const tasks = context.tasks.slice(1);
       enqueue.assign({out, tasks});
       enqueue.spawnChild(task, {
         systemId: `task-${id}`,
         input: {
-          task_id: id
+          task_id: id,
+          ...defs
         }
       });
     }),
@@ -94,7 +124,8 @@ const src = setup({
       ({system}) => system.get('gamesys'),
       ({context}, params) => ({
         type: params.event,
-        data: context.out
+        data: context.out,
+        error: params.error
       })
     )
   },
@@ -155,9 +186,10 @@ export default src.createMachine({
     failure: {
       entry: {
         type: 'notify',
-        params: {
-          event: 'boot.failure'
-        }
+        params: ({event: ev}) => ({
+          event: 'boot.failure',
+          error: ev.error.message
+        })
       }
     }
   }

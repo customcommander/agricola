@@ -4,13 +4,10 @@
 
 */
 
-import task from './lib-task2.js';
-
-export default task({
-
+export default {
   fields: (_, game) => {
     const ids = Object.keys(game.farmyard);
-    
+
     for (let id of ids) {
       if (game.farmyard[id]?.type != 'field') {
         continue;
@@ -29,4 +26,4 @@ export default task({
 
     return game;
   }
-});
+};

@@ -4,71 +4,61 @@ Sow and/or Bake bread
 
 */
 
-import task from './lib-task.js';
+export default {
+  selected: {
+    repeat: true,
 
-export const config = {
-  repeat: true,
-  turn: 3,
-  hidden: true,
-  selected: false,
-};
+    check: (_, game) => {
+      const { supply: { grain, vegetable }, farmyard } = game;
 
-export default task({
-  id: '113',
+      if (!grain && !vegetable) {
+        return 'NOTHING_TO_SOW';
+      }
 
-  repeat: true,
+      const spaces = Object.values(farmyard);
 
-  check: (_, game) => {
-    const {supply: {grain, vegetable}, farmyard} = game;
+      const has_empty_fields = spaces.some(space => {
+        const { type, grain, vegetable } = space ?? {};
+        return type == 'field' && !grain && !vegetable
+      });
 
-    if (!grain && !vegetable) {
-      return 'NOTHING_TO_SOW';
+      // TODO: specific error code
+      if (!has_empty_fields) return false;
+
+      return true;
+    },
+
+    select: ({task_id}, game) => {
+      const spaces = Object.entries(game.farmyard);
+      const opts = [];
+
+      if (game.supply.grain) opts.push('select.sow-grain');
+      if (game.supply.vegetable) opts.push('select.sow-vegetable');
+
+      game.selection = spaces.flatMap(([space_id, space]) => {
+        const { type, grain, vegetable } = space ?? {};
+        const exit = type != 'field' || (grain || vegetable);
+        return exit ? [] : opts.map(type => ({ type, task_id, space_id }));
+      });
+
+      return game;
+    },
+
+    execute: ({ event }, game) => {
+      const { type, space_id } = event;
+
+      if (type == 'select.sow-grain') {
+        game.supply.grain -= 1;
+        game.farmyard[space_id].grain = 3;
+      }
+
+      if (type == 'select.sow-vegetable') {
+        game.supply.vegetable -= 1;
+        game.farmyard[space_id].vegetable = 2;
+      }
+
+      return game;
     }
-
-    const spaces = Object.values(farmyard);
-
-    const has_empty_fields = spaces.some(space => {
-      const {type, grain, vegetable} = space ?? {};
-      return type == 'field' && !grain && !vegetable
-    });
-
-    // TODO: specific error code
-    if (!has_empty_fields) return false;
-
-    return true;
-  },
-
-  selection: (_, game) => {
-    const task_id = '113';
-    const spaces  = Object.entries(game.farmyard);
-    const opts    = [];
-
-    if (game.supply.grain)     opts.push('select.sow-grain');
-    if (game.supply.vegetable) opts.push('select.sow-vegetable');
-
-    game.selection = spaces.flatMap(([space_id, space]) => {
-      const {type, grain, vegetable} = space ?? {};
-      const exit = type != 'field' || (grain || vegetable);
-      return exit ? [] : opts.map(type => ({type, task_id, space_id}));
-    });
-
-    return game;
-  },
-
-  execute: ({event}, game) => {
-    const {type, space_id} = event;
-
-    if (type == 'select.sow-grain') {
-      game.supply.grain -= 1;
-      game.farmyard[space_id].grain = 3;
-    }
-
-    if (type == 'select.sow-vegetable') {
-      game.supply.vegetable -= 1;
-      game.farmyard[space_id].vegetable = 2;
-    }
-
-    return game;
   }
-});
+};
 

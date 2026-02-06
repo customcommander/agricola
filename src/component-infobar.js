@@ -52,7 +52,7 @@ class InfoBar extends LitElement {
       return nothing;
     }
 
-    const ev = {type: 'task.selected', task_id: '002'};
+    const ev = {type: 'task.feed', task_id: '002'};
 
     return html`
       <button type="button" @click=${() => this._dispatch(ev)}>
