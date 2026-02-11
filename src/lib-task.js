@@ -191,7 +191,21 @@ export default setup({
 
     'forward': sendTo('task-runner', ({event}) => ({
       ...event
-    }))
+    })),
+
+    'task-noop': sendTo(
+      ({event, system}) => system.get(event.reply_to),
+      {
+        type: 'task.completed'
+      }
+    )
+  },
+  guards: {
+    'can-perform-task?': ({context, event}) => {
+      // i.e. task.foo.bar -> foo.bar
+      const task_type = event.type.slice('task.'.length);
+      return context[task_type] != null;
+    }
   }
 }).createMachine({
   context: ({input: {task_id, ...micro_tasks}}) => ({
@@ -208,9 +222,10 @@ export default setup({
     },
     idle: {
       on: {
-        'task.*': {
-          target: 'running'
-        }
+        'task.*': [
+          {target: 'running', guard: 'can-perform-task?'},
+          {actions: 'task-noop'}
+        ]
       }
     },
     running: {

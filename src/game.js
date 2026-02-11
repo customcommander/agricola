@@ -14,6 +14,16 @@ import {
 import bootstrap from './bootstrap.js';
 import dispatcher from './dispatcher.js';
 
+function job(type) {
+  return function generate_jobs({context}) {
+    let jobs;
+    jobs = Object.entries(context.tasks);
+    jobs = jobs.filter(([, task]) => task.active === true);
+    jobs = jobs.map(([task_id]) => ({type, task_id}));
+    return {jobs};
+  };
+}
+
 const src = setup({
   actors: {
     dispatcher
@@ -43,6 +53,7 @@ const src = setup({
 
         if (t.hidden === true && t.turn === draft.turn) {
           draft.tasks[id].hidden = false;
+          draft.tasks[id].active = true;
         }
       });
 
@@ -176,19 +187,7 @@ const machine = src.createMachine({
           invoke: {
             src: 'dispatcher',
             systemId: 'dispatcher',
-            input: ({context}) => {
-              const {tasks} = context;
-              const entries = Object.entries(tasks);
-              const jobs = entries.reduce((acc, [task_id, task]) => {
-                const replenish = task.replenish === true;
-                const available = task.hidden !== true;
-                if (replenish && available) {
-                  acc.push({task_id, type: 'task.replenish'});
-                }
-                return acc;
-              }, []);
-              return {jobs};
-            },
+            input: job('task.replenish'),
             onDone: {
               target: 'done'
             }
@@ -256,16 +255,7 @@ const machine = src.createMachine({
           invoke: {
             src: 'dispatcher',
             systemId: 'dispatcher',
-            input: ({context}) => {
-              const entries = Object.entries(context.tasks);
-              const jobs = entries.reduce(
-                (acc, [task_id, def]) => 
-                  def.fields === true
-                    ? acc.concat({task_id, type: 'task.fields'})
-                    : acc
-                , []);
-              return {jobs};
-            },
+            input: job('task.fields'),
             onDone: {
               target: 'feed'
             }
