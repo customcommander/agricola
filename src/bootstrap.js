@@ -28,6 +28,11 @@ Bootstrap.
 117 After Renovation also Major Improvement
 118 Take Vegetable
 119 Take x Wild Boar
+120 Take x Stone
+121 Take x Cattle
+122 Family growth (even without space in your home)
+123 Plow 1 Field and/or Sow
+124 After Renovation also Fences
 
 What does each property mean?
 
@@ -58,15 +63,20 @@ const taskdefs = {
   '108': {active:  true, selected: false,                         quantity: 1},
   '109': {active:  true, selected: false,                         quantity: 1},
   '110': {active:  true, selected: false,                         quantity: 1},
-  '111': {active:  true, selected: false, turn: 1, hidden: false             },
-  '112': {active: false, selected: false, turn: 2, hidden:  true             },
-  '113': {active: false, selected: false, turn: 3, hidden:  true             },
-  '114': {active: false, selected: false, turn: 4, hidden:  true, quantity: 0},
-  '115': {active: false, selected: false, turn: 5, hidden:  true             },
-  '116': {active: false, selected: false, turn: 6, hidden:  true, quantity: 0},
-  '117': {active: false, selected: false, turn: 7, hidden:  true             },
-  '118': {active: false, selected: false, turn: 8, hidden:  true             },
-  '119': {active: false, selected: false, turn: 9, hidden:  true, quantity: 0},
+  '111': {active:  true, selected: false, turn:  1, hidden: false             },
+  '112': {active: false, selected: false, turn:  2, hidden:  true             },
+  '113': {active: false, selected: false, turn:  3, hidden:  true             },
+  '114': {active: false, selected: false, turn:  4, hidden:  true, quantity: 0},
+  '115': {active: false, selected: false, turn:  5, hidden:  true             },
+  '116': {active: false, selected: false, turn:  6, hidden:  true, quantity: 0},
+  '117': {active: false, selected: false, turn:  7, hidden:  true             },
+  '118': {active: false, selected: false, turn:  8, hidden:  true             },
+  '119': {active: false, selected: false, turn:  9, hidden:  true, quantity: 0},
+  '120': {active: false, selected: false, turn: 10, hidden:  true, quantity: 0},
+  '121': {active: false, selected: false, turn: 11, hidden:  true, quantity: 0},
+  '122': {active: false, selected: false, turn: 12, hidden:  true             },
+  '123': {active: false, selected: false, turn: 13, hidden:  true             },
+  '124': {active: false, selected: false, turn: 14, hidden:  true             },
 };
 
 function process_task_defs(defs) {
@@ -145,7 +155,8 @@ export default src.createMachine({
       '101', '102', '103', '104', '105',
       '106', '107', '108', '109', '110',
       '111', '112', '113', '114', '115',
-      '116', '117', '118', '119', 
+      '116', '117', '118', '119', '120',
+      '121', '122', '123', '124',
 
       // Eventually this will contain the task ids
       // of selected occupations and minor improvements.
