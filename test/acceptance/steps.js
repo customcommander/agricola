@@ -16,10 +16,15 @@ const task_map = {
 };
 
 const stock_map = {
-  'Clay': 108,
-  'Food': 110,
-  'Reed': 109,
-  'Wood': 107,
+  'Wood':       107,
+  'Clay':       108,
+  'Reed':       109,
+  'Food':       110,
+  'Sheep':      114,
+  'Stone':      116,
+  'Wild Boar':  119,
+  'Stone (II)': 120,
+  'Cattle':     121,
 };
 
 Given('I start playing', async function () {
@@ -29,6 +34,12 @@ Given('I start playing', async function () {
 When('I select {string}', async function (selection) {
   await this.send({type: 'task.selected', task_id: task_map[selection]});
 });
+
+// Place workers on non-replenishable tasks
+When('I place my workers', async function () {
+  await this.send({type: 'task.selected', task_id: '103'}); // Grain
+  await this.send({type: 'task.selected', task_id: '106'}); // Laborer
+})
 
 Then('I plow {word}', async function (space_id) {
   await this.send({type: 'select.plow', task_id: '104', space_id});
@@ -57,11 +68,20 @@ Then('I have the following stock on the board', async function (table) {
   await this.assert(game => table.hashes().every(({Stock, Quantity}) => {
     const task_id = stock_map[Stock];
     const {quantity} = game.tasks[task_id];
-    return quantity === Number(Quantity);
+    if (quantity === Number(Quantity)) {
+      return true;
+    } else {
+      throw new Error(`Expected quantity for '${Stock}' to be ${Quantity}. (Was ${quantity})`);
+    }
   }));
 });
 
 When('I feed my family', async function () {
+  await this.wait(state => state.matches({harvest: 'feed'}));
+  await this.send({type: 'task.completed', task_id: '002'});
+});
+
+When('I complete the stage', async function () {
   await this.wait(state => state.matches({harvest: 'feed'}));
   await this.send({type: 'task.completed', task_id: '002'});
 });
