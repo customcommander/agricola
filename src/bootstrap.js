@@ -105,7 +105,7 @@ const src = setup({
   actors: {
     loader: fromPromise(async ({input: id}) => {
       const task = await import(/* webpackInclude: /\d+.js$/ */`./task-${id}.js`);
-      return [id, process_task_defs(task.default), task.config];
+      return [id, process_task_defs(task.default)];
     })
   },
 
@@ -117,8 +117,8 @@ const src = setup({
 
   actions: {
     boot: enqueueActions(({enqueue, context, event}) => {
-      const [id, defs, config] = event.output;
-      const out = {...context.out, [id]: config ? {...config} : {...taskdefs[id]}};
+      const [id, defs] = event.output;
+      const out = {...context.out, [id]: {...taskdefs[id]}};
       const tasks = context.tasks.slice(1);
       enqueue.assign({out, tasks});
       enqueue.spawnChild(task, {
