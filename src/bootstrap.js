@@ -34,11 +34,6 @@ Bootstrap.
 123 Plow 1 Field and/or Sow
 124 After Renovation also Fences
 
-What does each property mean?
-
-fields:
-  The task will be invoked during the field phase.
-
 */
 
 import {
