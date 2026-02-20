@@ -187,8 +187,6 @@ export default setup({
   },
 
   actions: {
-    log_init: log(({context}) => `task ${context.task_id} loaded.`),
-
     'forward': sendTo('task-runner', ({event}) => ({
       ...event
     })),
@@ -212,14 +210,8 @@ export default setup({
     task_id,
     ...micro_tasks,
   }),
-  initial: 'init',
+  initial: 'idle',
   states: {
-    init: {
-      always: {
-        target: 'idle',
-        actions: 'log_init'
-      }
-    },
     idle: {
       on: {
         'task.*': [

@@ -122,14 +122,12 @@ const src = setup({
     is_harvest_time: ({context}) => {
       const {turn} = context;
       const check = [4, 7, 9, 11, 13, 14].includes(turn);
-      console.log(`is harvest time? ${turn} ${check}`);
       return check;
     },
 
     is_last_turn: ({context}) => {
       const {turn} = context;
       const check = turn === 14;
-      console.log(`is last turn? ${turn} ${check}`);
       return check;
     }
   }
