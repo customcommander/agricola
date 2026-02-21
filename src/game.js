@@ -96,14 +96,24 @@ const src = setup({
       });
     }),
     
-    'game-response':
-    sendTo(
-      ({event, system}) => system.get(event.reply_to),
-      ({event: {query, ...ev}, context}) => ({
-        type: 'game.response',
-        response: query({event: ev}, context)
-      })
-    ),
+    'game-response': enqueueActions(({enqueue, context, event, system}) => {
+      const {query, reply_to, ...ev} = event;
+      try {
+        const response = query({event: ev}, context);
+        enqueue.sendTo(system.get(reply_to), {
+          type: 'game.response',
+          response
+        });
+      } catch (e) {
+        enqueue.assign({
+          error: 'GAME_FAILURE'
+        });
+        enqueue.raise({
+          type: 'game.failure',
+          message: e.message
+        });
+      }
+    }),
 
     'error-dismiss':
     assign({error: null}),
@@ -293,9 +303,6 @@ const machine = src.createMachine({
     },
     failure: {
       type: 'final',
-      entry: ({event}) => {
-        console.log('BOOT FAILED', event);
-      }
     }
   },
   "on": {
@@ -313,6 +320,10 @@ const machine = src.createMachine({
     },
     'task.exit': {
       actions: 'task-forward'
+    },
+    'game.failure': {
+      actions: ({event}) => console.log('game.failure', event.message),
+      target: '.failure'
     }
   }
 });

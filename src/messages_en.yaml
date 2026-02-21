@@ -24,6 +24,8 @@ action_ok: Ok
 
 # Errors
 
+GAME_FAILURE: Something went wrong 🤔
+
 NOTHING_TO_SOW: >
   You have no grains and no vegetables.
 
