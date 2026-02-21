@@ -33,6 +33,10 @@ NOT_ENOUGH_RESOURCES: >
   You do not have all the resources
   to complete this action.
 
+NO_ROOMS_FOR_NEW_BORN: >
+  You do not have enough rooms
+  for a new family member
+
 TODO: >
   You still need to do this...
 

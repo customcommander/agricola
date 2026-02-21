@@ -23,7 +23,7 @@ Bootstrap.
 112 Major/Minor Improvement
 113 Sow and/or Bake bread
 114 Take x Sheep
-115 Family Growth
+115 After Family growth also 1 Minor Improvement
 116 Take x Stone
 117 After Renovation also Major Improvement
 118 Take Vegetable
